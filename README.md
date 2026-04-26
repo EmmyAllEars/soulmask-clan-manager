@@ -3,6 +3,11 @@
 A browser-based tribesman roster manager for Soulmask. Vanilla JS, single static page,
 runs anywhere — locally, on GitHub Pages, or any static host.
 
+**Live site:** <https://emmyallears.github.io/soulmask-clan-manager/>
+
+> v0.0.1 — first cut, generated with Claude Cowork. Expect rough edges; please open
+> issues at <https://github.com/EmmyAllEars/soulmask-clan-manager/issues>.
+
 ## Features
 
 - **Roster view** — full table of every tribesman with all 14 work skills + 9 weapon caps
@@ -35,21 +40,10 @@ If the talents dropdown is empty when you open it, that's the issue. Two fixes:
 
 2. **Deploy to GitHub Pages** (see below) and access it via the URL.
 
-## GitHub Pages deployment
+## Hosting
 
-1. From the `ClanManager/` folder, create a git repo:
-   ```
-   cd ClanManager
-   git init
-   git add .
-   git commit -m "Initial Soulmask Clan Manager"
-   git branch -M main
-   git remote add origin git@github.com:YOUR_USERNAME/soulmask-clan.git
-   git push -u origin main
-   ```
-2. On GitHub: Settings → Pages → Branch: `main`, folder: `/ (root)` → Save.
-3. After ~1 minute, your app is live at
-   `https://YOUR_USERNAME.github.io/soulmask-clan/`.
+This repo is already deployed via GitHub Pages — see the **Live site** link at the top.
+To run your own fork: Settings → Pages → Branch: `main`, folder: `/ (root)` → Save.
 
 Your tribesman data lives in your browser's localStorage — never uploaded anywhere. The
 GitHub-hosted page is just the static UI.
