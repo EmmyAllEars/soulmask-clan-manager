@@ -1,0 +1,2988 @@
+{
+  "roster": [
+    {
+      "id": "2JOD1YBKYA5GGCIAZ653Q3NP5",
+      "name": "Atalanta",
+      "level": 46,
+      "title": "Master",
+      "profession": "Craftsman",
+      "tribe": "Wildwolf",
+      "trait": "Fate-Choker",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": 24,
+          "cap": 86
+        },
+        "Miner": {
+          "current": 23,
+          "cap": 85
+        },
+        "Gatherer": {
+          "current": 31,
+          "cap": 83
+        },
+        "Farmer": {
+          "current": 23,
+          "cap": 82
+        },
+        "Weaver": {
+          "current": 26,
+          "cap": 84
+        },
+        "Potter": {
+          "current": 30,
+          "cap": 89
+        },
+        "Carpenter": {
+          "current": 26,
+          "cap": 78
+        },
+        "Tanner": {
+          "current": 25,
+          "cap": 92
+        },
+        "Kiln Worker": {
+          "current": 28,
+          "cap": 83
+        },
+        "Craftsman": {
+          "current": 60,
+          "cap": 118
+        },
+        "Alchemist": {
+          "current": 115,
+          "cap": 116
+        },
+        "Cook": {
+          "current": 111,
+          "cap": 121
+        },
+        "Blacksmith": {
+          "current": 48,
+          "cap": 112
+        },
+        "Armorer": {
+          "current": 55,
+          "cap": 101
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": null
+        },
+        "Shield": {
+          "current": null,
+          "cap": null
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": null
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": null
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": null
+        },
+        "Blade": {
+          "current": null,
+          "cap": null
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "attrs": {
+        "Per": null,
+        "Agi": null,
+        "Phy": null,
+        "End": null,
+        "Str": null
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "EBSAMSVM8ZSXT4MOKK91H14D2",
+      "name": "Belinda",
+      "level": 23,
+      "title": "Skilled",
+      "profession": "Guard",
+      "tribe": "Savagehorn",
+      "trait": "Weapon Master",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": 18,
+          "cap": 85
+        },
+        "Miner": {
+          "current": 22,
+          "cap": 98
+        },
+        "Gatherer": {
+          "current": 13,
+          "cap": 90
+        },
+        "Farmer": {
+          "current": 12,
+          "cap": 80
+        },
+        "Weaver": {
+          "current": 14,
+          "cap": 98
+        },
+        "Potter": {
+          "current": 19,
+          "cap": 79
+        },
+        "Carpenter": {
+          "current": 12,
+          "cap": 78
+        },
+        "Tanner": {
+          "current": 60,
+          "cap": 100
+        },
+        "Kiln Worker": {
+          "current": 33,
+          "cap": 92
+        },
+        "Craftsman": {
+          "current": 12,
+          "cap": 75
+        },
+        "Alchemist": {
+          "current": 14,
+          "cap": 77
+        },
+        "Cook": {
+          "current": 11,
+          "cap": 78
+        },
+        "Blacksmith": {
+          "current": 14,
+          "cap": 97
+        },
+        "Armorer": {
+          "current": 8,
+          "cap": 89
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": null
+        },
+        "Shield": {
+          "current": null,
+          "cap": null
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": null
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": null
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": null
+        },
+        "Blade": {
+          "current": null,
+          "cap": null
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "attrs": {
+        "Per": null,
+        "Agi": null,
+        "Phy": null,
+        "End": null,
+        "Str": null
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "8TGKEZ87C5NFW4SC2LLJTGZ6F",
+      "name": "Blade",
+      "level": 34,
+      "title": "Skilled",
+      "profession": "Guard",
+      "tribe": "Outcast",
+      "trait": "",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": 13,
+          "cap": 78
+        },
+        "Miner": {
+          "current": 21,
+          "cap": 98
+        },
+        "Gatherer": {
+          "current": 17,
+          "cap": 76
+        },
+        "Farmer": {
+          "current": 17,
+          "cap": 86
+        },
+        "Weaver": {
+          "current": 10,
+          "cap": 79
+        },
+        "Potter": {
+          "current": 18,
+          "cap": 91
+        },
+        "Carpenter": {
+          "current": 93,
+          "cap": 99
+        },
+        "Tanner": {
+          "current": 15,
+          "cap": 90
+        },
+        "Kiln Worker": {
+          "current": 22,
+          "cap": 94
+        },
+        "Craftsman": {
+          "current": 11,
+          "cap": 78
+        },
+        "Alchemist": {
+          "current": 12,
+          "cap": 85
+        },
+        "Cook": {
+          "current": 14,
+          "cap": 87
+        },
+        "Blacksmith": {
+          "current": 16,
+          "cap": 79
+        },
+        "Armorer": {
+          "current": 11,
+          "cap": 81
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": null
+        },
+        "Shield": {
+          "current": null,
+          "cap": null
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": null
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": null
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": null
+        },
+        "Blade": {
+          "current": null,
+          "cap": null
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "attrs": {
+        "Per": null,
+        "Agi": null,
+        "Phy": null,
+        "End": null,
+        "Str": null
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "EQEZKG7TNLIPZ1XBTY4WEQ98S",
+      "name": "Butch",
+      "level": 50,
+      "title": "Master",
+      "profession": "Guard",
+      "tribe": "Savagehorn",
+      "trait": "Oppressor",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": 30,
+          "cap": 81
+        },
+        "Miner": {
+          "current": 80,
+          "cap": 100
+        },
+        "Gatherer": {
+          "current": 46,
+          "cap": 100
+        },
+        "Farmer": {
+          "current": 24,
+          "cap": 98
+        },
+        "Weaver": {
+          "current": 24,
+          "cap": 75
+        },
+        "Potter": {
+          "current": 18,
+          "cap": 77
+        },
+        "Carpenter": {
+          "current": 25,
+          "cap": 84
+        },
+        "Tanner": {
+          "current": 21,
+          "cap": 82
+        },
+        "Kiln Worker": {
+          "current": 100,
+          "cap": 100
+        },
+        "Craftsman": {
+          "current": 23,
+          "cap": 95
+        },
+        "Alchemist": {
+          "current": 28,
+          "cap": 84
+        },
+        "Cook": {
+          "current": 19,
+          "cap": 78
+        },
+        "Blacksmith": {
+          "current": 27,
+          "cap": 88
+        },
+        "Armorer": {
+          "current": 23,
+          "cap": 95
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": null
+        },
+        "Shield": {
+          "current": null,
+          "cap": null
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": null
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": null
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": null
+        },
+        "Blade": {
+          "current": null,
+          "cap": null
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "attrs": {
+        "Per": null,
+        "Agi": null,
+        "Phy": null,
+        "End": null,
+        "Str": null
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "B85E2J1YB3VZP5WZ7KW26IAXM",
+      "name": "Dina",
+      "level": 28,
+      "title": "Novice",
+      "profession": "Craftsman",
+      "tribe": "Wildwolf",
+      "trait": "",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": 13,
+          "cap": 89
+        },
+        "Miner": {
+          "current": 13,
+          "cap": 100
+        },
+        "Gatherer": {
+          "current": 19,
+          "cap": 81
+        },
+        "Farmer": {
+          "current": 16,
+          "cap": 99
+        },
+        "Weaver": {
+          "current": 8,
+          "cap": 77
+        },
+        "Potter": {
+          "current": 19,
+          "cap": 76
+        },
+        "Carpenter": {
+          "current": 12,
+          "cap": 83
+        },
+        "Tanner": {
+          "current": 18,
+          "cap": 77
+        },
+        "Kiln Worker": {
+          "current": 12,
+          "cap": 83
+        },
+        "Craftsman": {
+          "current": 34,
+          "cap": 105
+        },
+        "Alchemist": {
+          "current": 30,
+          "cap": 114
+        },
+        "Cook": {
+          "current": 56,
+          "cap": 108
+        },
+        "Blacksmith": {
+          "current": 45,
+          "cap": 106
+        },
+        "Armorer": {
+          "current": 34,
+          "cap": 102
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": null
+        },
+        "Shield": {
+          "current": null,
+          "cap": null
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": null
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": null
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": null
+        },
+        "Blade": {
+          "current": null,
+          "cap": null
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "attrs": {
+        "Per": null,
+        "Agi": null,
+        "Phy": null,
+        "End": null,
+        "Str": null
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "5AB0APEZG1VAPWW7A7WO22B04",
+      "name": "Fatty Wang",
+      "level": 50,
+      "title": "Master",
+      "profession": "Craftsman",
+      "tribe": "Savagehorn",
+      "trait": "",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": 27,
+          "cap": 81
+        },
+        "Miner": {
+          "current": 33,
+          "cap": 99
+        },
+        "Gatherer": {
+          "current": 37,
+          "cap": 94
+        },
+        "Farmer": {
+          "current": 29,
+          "cap": 89
+        },
+        "Weaver": {
+          "current": 28,
+          "cap": 94
+        },
+        "Potter": {
+          "current": 29,
+          "cap": 96
+        },
+        "Carpenter": {
+          "current": 88,
+          "cap": 90
+        },
+        "Tanner": {
+          "current": 34,
+          "cap": 84
+        },
+        "Kiln Worker": {
+          "current": 35,
+          "cap": 94
+        },
+        "Craftsman": {
+          "current": 50,
+          "cap": 114
+        },
+        "Alchemist": {
+          "current": 42,
+          "cap": 101
+        },
+        "Cook": {
+          "current": 63,
+          "cap": 111
+        },
+        "Blacksmith": {
+          "current": 89,
+          "cap": 106
+        },
+        "Armorer": {
+          "current": 87,
+          "cap": 108
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": null
+        },
+        "Shield": {
+          "current": null,
+          "cap": null
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": null
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": null
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": null
+        },
+        "Blade": {
+          "current": null,
+          "cap": null
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "attrs": {
+        "Per": null,
+        "Agi": null,
+        "Phy": null,
+        "End": null,
+        "Str": null
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "4Y9O1PCXZ4UDS9PUOYLB1VFIW",
+      "name": "Marissa",
+      "level": 26,
+      "title": "Master",
+      "profession": "Craftsman",
+      "tribe": "Outcast",
+      "trait": "Skilled Hand",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": 62,
+          "cap": 99
+        },
+        "Miner": {
+          "current": 26,
+          "cap": 89
+        },
+        "Gatherer": {
+          "current": 21,
+          "cap": 83
+        },
+        "Farmer": {
+          "current": 20,
+          "cap": 94
+        },
+        "Weaver": {
+          "current": 17,
+          "cap": 87
+        },
+        "Potter": {
+          "current": 16,
+          "cap": 77
+        },
+        "Carpenter": {
+          "current": 34,
+          "cap": 89
+        },
+        "Tanner": {
+          "current": 18,
+          "cap": 82
+        },
+        "Kiln Worker": {
+          "current": 26,
+          "cap": 79
+        },
+        "Craftsman": {
+          "current": 42,
+          "cap": 93
+        },
+        "Alchemist": {
+          "current": 82,
+          "cap": 112
+        },
+        "Cook": {
+          "current": 39,
+          "cap": 97
+        },
+        "Blacksmith": {
+          "current": 36,
+          "cap": 95
+        },
+        "Armorer": {
+          "current": 42,
+          "cap": 99
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": null
+        },
+        "Shield": {
+          "current": null,
+          "cap": null
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": null
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": null
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": null
+        },
+        "Blade": {
+          "current": null,
+          "cap": null
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "attrs": {
+        "Per": null,
+        "Agi": null,
+        "Phy": null,
+        "End": null,
+        "Str": null
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "CTKJ6507NF59J20G6P1JLIQVI",
+      "name": "Natalie",
+      "level": 50,
+      "title": "Novice",
+      "profession": "Porter",
+      "tribe": "Savagehorn",
+      "trait": "",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": 14,
+          "cap": 76
+        },
+        "Miner": {
+          "current": 20,
+          "cap": 82
+        },
+        "Gatherer": {
+          "current": 13,
+          "cap": 95
+        },
+        "Farmer": {
+          "current": 11,
+          "cap": 81
+        },
+        "Weaver": {
+          "current": 69,
+          "cap": 117
+        },
+        "Potter": {
+          "current": 32,
+          "cap": 98
+        },
+        "Carpenter": {
+          "current": 110,
+          "cap": 110
+        },
+        "Tanner": {
+          "current": 28,
+          "cap": 97
+        },
+        "Kiln Worker": {
+          "current": 100,
+          "cap": 100
+        },
+        "Craftsman": {
+          "current": 13,
+          "cap": 87
+        },
+        "Alchemist": {
+          "current": 15,
+          "cap": 79
+        },
+        "Cook": {
+          "current": 10,
+          "cap": 79
+        },
+        "Blacksmith": {
+          "current": 9,
+          "cap": 89
+        },
+        "Armorer": {
+          "current": 13,
+          "cap": 88
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": null
+        },
+        "Shield": {
+          "current": null,
+          "cap": null
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": null
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": null
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": null
+        },
+        "Blade": {
+          "current": null,
+          "cap": null
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "attrs": {
+        "Per": null,
+        "Agi": null,
+        "Phy": null,
+        "End": null,
+        "Str": null
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "3XZQCDXLSCTHQDT8JRKG6M3QR",
+      "name": "Penny",
+      "level": 50,
+      "title": "Novice",
+      "profession": "Porter",
+      "tribe": "Wildwolf",
+      "trait": "",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": 10,
+          "cap": 89
+        },
+        "Miner": {
+          "current": 7,
+          "cap": 95
+        },
+        "Gatherer": {
+          "current": 13,
+          "cap": 83
+        },
+        "Farmer": {
+          "current": 20,
+          "cap": 78
+        },
+        "Weaver": {
+          "current": 38,
+          "cap": 108
+        },
+        "Potter": {
+          "current": 29,
+          "cap": 120
+        },
+        "Carpenter": {
+          "current": 78,
+          "cap": 110
+        },
+        "Tanner": {
+          "current": 54,
+          "cap": 116
+        },
+        "Kiln Worker": {
+          "current": 110,
+          "cap": 110
+        },
+        "Craftsman": {
+          "current": 7,
+          "cap": 100
+        },
+        "Alchemist": {
+          "current": 9,
+          "cap": 93
+        },
+        "Cook": {
+          "current": 10,
+          "cap": 91
+        },
+        "Blacksmith": {
+          "current": 9,
+          "cap": 79
+        },
+        "Armorer": {
+          "current": 15,
+          "cap": 75
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": null
+        },
+        "Shield": {
+          "current": null,
+          "cap": null
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": null
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": null
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": null
+        },
+        "Blade": {
+          "current": null,
+          "cap": null
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "attrs": {
+        "Per": null,
+        "Agi": null,
+        "Phy": null,
+        "End": null,
+        "Str": null
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "BVWLJ7M688DSPRURS79X6ME20",
+      "name": "Randall",
+      "level": 36,
+      "title": "Novice",
+      "profession": "Porter",
+      "tribe": "Savagehorn",
+      "trait": "Fate-Choker",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": 11,
+          "cap": 77
+        },
+        "Miner": {
+          "current": 16,
+          "cap": 89
+        },
+        "Gatherer": {
+          "current": 10,
+          "cap": 81
+        },
+        "Farmer": {
+          "current": 15,
+          "cap": 93
+        },
+        "Weaver": {
+          "current": 94,
+          "cap": 121
+        },
+        "Potter": {
+          "current": 23,
+          "cap": 115
+        },
+        "Carpenter": {
+          "current": 75,
+          "cap": 100
+        },
+        "Tanner": {
+          "current": 69,
+          "cap": 104
+        },
+        "Kiln Worker": {
+          "current": 31,
+          "cap": 97
+        },
+        "Craftsman": {
+          "current": 15,
+          "cap": 83
+        },
+        "Alchemist": {
+          "current": 13,
+          "cap": 75
+        },
+        "Cook": {
+          "current": 15,
+          "cap": 96
+        },
+        "Blacksmith": {
+          "current": 14,
+          "cap": 93
+        },
+        "Armorer": {
+          "current": 17,
+          "cap": 96
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": null
+        },
+        "Shield": {
+          "current": null,
+          "cap": null
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": null
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": null
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": null
+        },
+        "Blade": {
+          "current": null,
+          "cap": null
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "attrs": {
+        "Per": null,
+        "Agi": null,
+        "Phy": null,
+        "End": null,
+        "Str": null
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "4WPBKF95QJCHZX40GLJFFB63M",
+      "name": "Stevie",
+      "level": 47,
+      "title": "Novice",
+      "profession": "Warrior",
+      "tribe": "Savagehorn",
+      "trait": "",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": 76,
+          "cap": 99
+        },
+        "Miner": {
+          "current": 4,
+          "cap": 96
+        },
+        "Gatherer": {
+          "current": 40,
+          "cap": 97
+        },
+        "Farmer": {
+          "current": 13,
+          "cap": 98
+        },
+        "Weaver": {
+          "current": 74,
+          "cap": 100
+        },
+        "Potter": {
+          "current": 2,
+          "cap": 78
+        },
+        "Carpenter": {
+          "current": 7,
+          "cap": 82
+        },
+        "Tanner": {
+          "current": 17,
+          "cap": 93
+        },
+        "Kiln Worker": {
+          "current": 90,
+          "cap": 96
+        },
+        "Craftsman": {
+          "current": 4,
+          "cap": 91
+        },
+        "Alchemist": {
+          "current": 4,
+          "cap": 86
+        },
+        "Cook": {
+          "current": 4,
+          "cap": 97
+        },
+        "Blacksmith": {
+          "current": 2,
+          "cap": 94
+        },
+        "Armorer": {
+          "current": 10,
+          "cap": 96
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": null
+        },
+        "Shield": {
+          "current": null,
+          "cap": null
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": null
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": null
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": null
+        },
+        "Blade": {
+          "current": null,
+          "cap": null
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "attrs": {
+        "Per": null,
+        "Agi": null,
+        "Phy": null,
+        "End": null,
+        "Str": null
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "5XAYG9EYT5KAU4GZYH370R8C2",
+      "name": "Willow",
+      "level": 36,
+      "title": "Novice",
+      "profession": "Craftsman",
+      "tribe": "Wildwolf",
+      "trait": "",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": 12,
+          "cap": 95
+        },
+        "Miner": {
+          "current": 13,
+          "cap": 94
+        },
+        "Gatherer": {
+          "current": 12,
+          "cap": 94
+        },
+        "Farmer": {
+          "current": 8,
+          "cap": 86
+        },
+        "Weaver": {
+          "current": 12,
+          "cap": 89
+        },
+        "Potter": {
+          "current": 16,
+          "cap": 94
+        },
+        "Carpenter": {
+          "current": 13,
+          "cap": 93
+        },
+        "Tanner": {
+          "current": 6,
+          "cap": 81
+        },
+        "Kiln Worker": {
+          "current": 20,
+          "cap": 79
+        },
+        "Craftsman": {
+          "current": 22,
+          "cap": 110
+        },
+        "Alchemist": {
+          "current": 31,
+          "cap": 113
+        },
+        "Cook": {
+          "current": 98,
+          "cap": 118
+        },
+        "Blacksmith": {
+          "current": 39,
+          "cap": 97
+        },
+        "Armorer": {
+          "current": 29,
+          "cap": 106
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": null
+        },
+        "Shield": {
+          "current": null,
+          "cap": null
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": null
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": null
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": null
+        },
+        "Blade": {
+          "current": null,
+          "cap": null
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "attrs": {
+        "Per": null,
+        "Agi": null,
+        "Phy": null,
+        "End": null,
+        "Str": null
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "DN9O1RO9FY5L7IJMBONPWRRSE",
+      "name": "Hathor",
+      "level": 50,
+      "title": "Master",
+      "profession": "Guard",
+      "tribe": "Savagehorn",
+      "trait": "B+S, AGL, Def",
+      "location": "Copper Outpost",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": 31,
+          "cap": 83
+        },
+        "Miner": {
+          "current": 66,
+          "cap": 92
+        },
+        "Gatherer": {
+          "current": 24,
+          "cap": 79
+        },
+        "Farmer": {
+          "current": 30,
+          "cap": 100
+        },
+        "Weaver": {
+          "current": 25,
+          "cap": 83
+        },
+        "Potter": {
+          "current": 34,
+          "cap": 87
+        },
+        "Carpenter": {
+          "current": 30,
+          "cap": 93
+        },
+        "Tanner": {
+          "current": 21,
+          "cap": 82
+        },
+        "Kiln Worker": {
+          "current": 92,
+          "cap": 100
+        },
+        "Craftsman": {
+          "current": 27,
+          "cap": 92
+        },
+        "Alchemist": {
+          "current": 34,
+          "cap": 89
+        },
+        "Cook": {
+          "current": 24,
+          "cap": 90
+        },
+        "Blacksmith": {
+          "current": 25,
+          "cap": 99
+        },
+        "Armorer": {
+          "current": 27,
+          "cap": 76
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": null
+        },
+        "Shield": {
+          "current": null,
+          "cap": null
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": null
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": null
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": null
+        },
+        "Blade": {
+          "current": null,
+          "cap": null
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "attrs": {
+        "Per": null,
+        "Agi": null,
+        "Phy": null,
+        "End": null,
+        "Str": null
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "5LX1KCOTAOUPLB9FFF36GD1H7",
+      "name": "Stacey",
+      "level": 26,
+      "title": "Master",
+      "profession": "Hunter",
+      "tribe": "Savagehorn",
+      "trait": "",
+      "location": "Copper Outpost",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": null,
+          "cap": null
+        },
+        "Miner": {
+          "current": null,
+          "cap": null
+        },
+        "Gatherer": {
+          "current": null,
+          "cap": null
+        },
+        "Farmer": {
+          "current": null,
+          "cap": null
+        },
+        "Weaver": {
+          "current": null,
+          "cap": null
+        },
+        "Potter": {
+          "current": null,
+          "cap": null
+        },
+        "Carpenter": {
+          "current": null,
+          "cap": null
+        },
+        "Tanner": {
+          "current": null,
+          "cap": null
+        },
+        "Kiln Worker": {
+          "current": null,
+          "cap": null
+        },
+        "Craftsman": {
+          "current": null,
+          "cap": null
+        },
+        "Alchemist": {
+          "current": null,
+          "cap": null
+        },
+        "Cook": {
+          "current": null,
+          "cap": null
+        },
+        "Blacksmith": {
+          "current": null,
+          "cap": null
+        },
+        "Armorer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": null
+        },
+        "Shield": {
+          "current": null,
+          "cap": null
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": null
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": null
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": null
+        },
+        "Blade": {
+          "current": null,
+          "cap": null
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "attrs": {
+        "Per": null,
+        "Agi": null,
+        "Phy": null,
+        "End": null,
+        "Str": null
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": "Skill data still pending."
+    },
+    {
+      "id": "AD41LS8M7FDBQV6IHZX9G9NGU",
+      "name": "Andaria",
+      "level": 50,
+      "title": "Skilled",
+      "profession": "Warrior",
+      "tribe": "Wildwolf",
+      "trait": "",
+      "location": "Main Base (Body Two)",
+      "is_body": true,
+      "skills": {
+        "Lumberjack": {
+          "current": null,
+          "cap": 84
+        },
+        "Miner": {
+          "current": null,
+          "cap": 89
+        },
+        "Gatherer": {
+          "current": null,
+          "cap": 91
+        },
+        "Farmer": {
+          "current": null,
+          "cap": 84
+        },
+        "Weaver": {
+          "current": null,
+          "cap": 91
+        },
+        "Potter": {
+          "current": null,
+          "cap": 95
+        },
+        "Carpenter": {
+          "current": null,
+          "cap": 95
+        },
+        "Tanner": {
+          "current": null,
+          "cap": 89
+        },
+        "Kiln Worker": {
+          "current": null,
+          "cap": 79
+        },
+        "Craftsman": {
+          "current": null,
+          "cap": 77
+        },
+        "Alchemist": {
+          "current": null,
+          "cap": 84
+        },
+        "Cook": {
+          "current": null,
+          "cap": 79
+        },
+        "Blacksmith": {
+          "current": null,
+          "cap": 84
+        },
+        "Armorer": {
+          "current": null,
+          "cap": 76
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": 99
+        },
+        "Shield": {
+          "current": null,
+          "cap": 92
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": 95
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": 85
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": 75
+        },
+        "Blade": {
+          "current": null,
+          "cap": 105
+        },
+        "Bow": {
+          "current": null,
+          "cap": 91
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": 100
+        },
+        "Hammer": {
+          "current": null,
+          "cap": 87
+        }
+      },
+      "attrs": {
+        "Per": 23,
+        "Agi": 34,
+        "Phy": 32,
+        "End": 26,
+        "Str": 23
+      },
+      "recognition": "535 / 1000",
+      "talents": [
+        {
+          "name": "Dual-blade DMG Increase",
+          "level": 3,
+          "icon": "tianfu_shuangdaowuqishanghaitigao.webp",
+          "source": "confirmed-mentor",
+          "note": "Taught by Five Star Blade via Training Ground"
+        }
+      ],
+      "groups": [],
+      "tags": [],
+      "notes": "Emmy's Body Two. Trainee. Talents: Dual-blade DMG Increase Lv 3 (taught by Five Star Blade)."
+    },
+    {
+      "id": "AUYG4QVOCTHY6QWW0VAFQS8JM",
+      "name": "Bertha",
+      "level": 14,
+      "title": "Master",
+      "profession": "Warrior",
+      "tribe": "Savagehorn",
+      "trait": "",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": null,
+          "cap": 95
+        },
+        "Miner": {
+          "current": null,
+          "cap": 75
+        },
+        "Gatherer": {
+          "current": null,
+          "cap": 78
+        },
+        "Farmer": {
+          "current": null,
+          "cap": 95
+        },
+        "Weaver": {
+          "current": null,
+          "cap": 79
+        },
+        "Potter": {
+          "current": null,
+          "cap": 77
+        },
+        "Carpenter": {
+          "current": null,
+          "cap": 78
+        },
+        "Tanner": {
+          "current": null,
+          "cap": 85
+        },
+        "Kiln Worker": {
+          "current": null,
+          "cap": 78
+        },
+        "Craftsman": {
+          "current": null,
+          "cap": 85
+        },
+        "Alchemist": {
+          "current": null,
+          "cap": 84
+        },
+        "Cook": {
+          "current": null,
+          "cap": 84
+        },
+        "Blacksmith": {
+          "current": null,
+          "cap": 75
+        },
+        "Armorer": {
+          "current": null,
+          "cap": 89
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": 96
+        },
+        "Shield": {
+          "current": null,
+          "cap": 76
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": 93
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": 103
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": 94
+        },
+        "Blade": {
+          "current": null,
+          "cap": 107
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": 121
+        },
+        "Hammer": {
+          "current": null,
+          "cap": 99
+        }
+      },
+      "attrs": {
+        "Per": 11,
+        "Agi": 16,
+        "Phy": 7,
+        "End": 7,
+        "Str": 14
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": "MENTOR ASSET: Gauntlets 121 mastery."
+    },
+    {
+      "id": "DUF51Y4WFQ56G1KQE8QE2Y5PF",
+      "name": "Jessie",
+      "level": 50,
+      "title": "Master",
+      "profession": "Warrior",
+      "tribe": "Savagehorn",
+      "trait": "",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": null,
+          "cap": 95
+        },
+        "Miner": {
+          "current": null,
+          "cap": 76
+        },
+        "Gatherer": {
+          "current": null,
+          "cap": 82
+        },
+        "Farmer": {
+          "current": null,
+          "cap": 96
+        },
+        "Weaver": {
+          "current": null,
+          "cap": 75
+        },
+        "Potter": {
+          "current": null,
+          "cap": 92
+        },
+        "Carpenter": {
+          "current": null,
+          "cap": 76
+        },
+        "Tanner": {
+          "current": null,
+          "cap": 76
+        },
+        "Kiln Worker": {
+          "current": null,
+          "cap": 97
+        },
+        "Craftsman": {
+          "current": null,
+          "cap": 82
+        },
+        "Alchemist": {
+          "current": null,
+          "cap": null
+        },
+        "Cook": {
+          "current": null,
+          "cap": 82
+        },
+        "Blacksmith": {
+          "current": null,
+          "cap": 81
+        },
+        "Armorer": {
+          "current": null,
+          "cap": null
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": 85
+        },
+        "Shield": {
+          "current": null,
+          "cap": 85
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": 93
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": 108
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": 89
+        },
+        "Blade": {
+          "current": null,
+          "cap": 97
+        },
+        "Bow": {
+          "current": null,
+          "cap": 95
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": 98
+        },
+        "Hammer": {
+          "current": null,
+          "cap": 105
+        }
+      },
+      "attrs": {
+        "Per": 17,
+        "Agi": 35,
+        "Phy": 30,
+        "End": 22,
+        "Str": 24
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "2AJV4S9VSJXUCA04AKWFDE695",
+      "name": "Gloria",
+      "level": 29,
+      "title": "Master",
+      "profession": "Warrior",
+      "tribe": "Outcast",
+      "trait": "",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": null,
+          "cap": 84
+        },
+        "Miner": {
+          "current": null,
+          "cap": 77
+        },
+        "Gatherer": {
+          "current": null,
+          "cap": 84
+        },
+        "Farmer": {
+          "current": null,
+          "cap": 90
+        },
+        "Weaver": {
+          "current": null,
+          "cap": 82
+        },
+        "Potter": {
+          "current": null,
+          "cap": 85
+        },
+        "Carpenter": {
+          "current": null,
+          "cap": 77
+        },
+        "Tanner": {
+          "current": null,
+          "cap": 79
+        },
+        "Kiln Worker": {
+          "current": null,
+          "cap": 77
+        },
+        "Craftsman": {
+          "current": null,
+          "cap": 79
+        },
+        "Alchemist": {
+          "current": null,
+          "cap": 82
+        },
+        "Cook": {
+          "current": null,
+          "cap": 95
+        },
+        "Blacksmith": {
+          "current": null,
+          "cap": 76
+        },
+        "Armorer": {
+          "current": null,
+          "cap": 85
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": 85
+        },
+        "Shield": {
+          "current": null,
+          "cap": 75
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": 93
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": 100
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": 99
+        },
+        "Blade": {
+          "current": null,
+          "cap": 105
+        },
+        "Bow": {
+          "current": null,
+          "cap": 96
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": 95
+        },
+        "Hammer": {
+          "current": null,
+          "cap": 85
+        }
+      },
+      "attrs": {
+        "Per": 19,
+        "Agi": 15,
+        "Phy": 11,
+        "End": 18,
+        "Str": 18
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "3E8XC5WAGCZ2OF2VJBEU7NXJ8",
+      "name": "Rocky",
+      "level": 48,
+      "title": "Master",
+      "profession": "Guard",
+      "tribe": "Outcast",
+      "trait": "Oppressor",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": null,
+          "cap": 95
+        },
+        "Miner": {
+          "current": null,
+          "cap": 85
+        },
+        "Gatherer": {
+          "current": null,
+          "cap": 97
+        },
+        "Farmer": {
+          "current": null,
+          "cap": 75
+        },
+        "Weaver": {
+          "current": null,
+          "cap": 75
+        },
+        "Potter": {
+          "current": null,
+          "cap": 77
+        },
+        "Carpenter": {
+          "current": null,
+          "cap": 85
+        },
+        "Tanner": {
+          "current": null,
+          "cap": null
+        },
+        "Kiln Worker": {
+          "current": null,
+          "cap": 94
+        },
+        "Craftsman": {
+          "current": null,
+          "cap": 95
+        },
+        "Alchemist": {
+          "current": null,
+          "cap": null
+        },
+        "Cook": {
+          "current": null,
+          "cap": 97
+        },
+        "Blacksmith": {
+          "current": null,
+          "cap": 90
+        },
+        "Armorer": {
+          "current": null,
+          "cap": 95
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": 96
+        },
+        "Shield": {
+          "current": null,
+          "cap": 85
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": 97
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": 108
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": 80
+        },
+        "Blade": {
+          "current": null,
+          "cap": 105
+        },
+        "Bow": {
+          "current": null,
+          "cap": 104
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": 94
+        },
+        "Hammer": {
+          "current": null,
+          "cap": 88
+        }
+      },
+      "attrs": {
+        "Per": 21,
+        "Agi": 22,
+        "Phy": 19,
+        "End": 18,
+        "Str": 26
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "7UL6DTWMWHZY7S7V4AXKSU8SW",
+      "name": "Five Star Blade",
+      "level": 50,
+      "title": "Master",
+      "profession": "Warrior",
+      "tribe": "Savagehorn",
+      "trait": "",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": null,
+          "cap": 98
+        },
+        "Miner": {
+          "current": null,
+          "cap": 99
+        },
+        "Gatherer": {
+          "current": null,
+          "cap": 95
+        },
+        "Farmer": {
+          "current": null,
+          "cap": 75
+        },
+        "Weaver": {
+          "current": null,
+          "cap": 79
+        },
+        "Potter": {
+          "current": null,
+          "cap": 79
+        },
+        "Carpenter": {
+          "current": null,
+          "cap": 85
+        },
+        "Tanner": {
+          "current": null,
+          "cap": null
+        },
+        "Kiln Worker": {
+          "current": null,
+          "cap": 98
+        },
+        "Craftsman": {
+          "current": null,
+          "cap": 89
+        },
+        "Alchemist": {
+          "current": null,
+          "cap": 97
+        },
+        "Cook": {
+          "current": null,
+          "cap": 87
+        },
+        "Blacksmith": {
+          "current": null,
+          "cap": 95
+        },
+        "Armorer": {
+          "current": null,
+          "cap": 85
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": 95
+        },
+        "Shield": {
+          "current": null,
+          "cap": 90
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": 95
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": 93
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": 77
+        },
+        "Blade": {
+          "current": null,
+          "cap": 120
+        },
+        "Bow": {
+          "current": null,
+          "cap": 89
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": 97
+        },
+        "Hammer": {
+          "current": null,
+          "cap": 79
+        }
+      },
+      "attrs": {
+        "Per": 27,
+        "Agi": 41,
+        "Phy": 28,
+        "End": 21,
+        "Str": 11
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": "MENTOR ASSET: Blade 120 mastery + Dual-blade DMG Increase Lv 3 talent."
+    },
+    {
+      "id": "B15GJNBQUGR580ROMDQXMKJPE",
+      "name": "Larry",
+      "level": 50,
+      "title": "Master",
+      "profession": "Guard",
+      "tribe": "Savagehorn",
+      "trait": "",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": null,
+          "cap": 75
+        },
+        "Miner": {
+          "current": null,
+          "cap": 80
+        },
+        "Gatherer": {
+          "current": null,
+          "cap": 96
+        },
+        "Farmer": {
+          "current": null,
+          "cap": 79
+        },
+        "Weaver": {
+          "current": null,
+          "cap": 76
+        },
+        "Potter": {
+          "current": null,
+          "cap": 98
+        },
+        "Carpenter": {
+          "current": null,
+          "cap": 85
+        },
+        "Tanner": {
+          "current": null,
+          "cap": 88
+        },
+        "Kiln Worker": {
+          "current": null,
+          "cap": 87
+        },
+        "Craftsman": {
+          "current": null,
+          "cap": 97
+        },
+        "Alchemist": {
+          "current": null,
+          "cap": 85
+        },
+        "Cook": {
+          "current": null,
+          "cap": 84
+        },
+        "Blacksmith": {
+          "current": null,
+          "cap": 89
+        },
+        "Armorer": {
+          "current": null,
+          "cap": 97
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": 100
+        },
+        "Shield": {
+          "current": null,
+          "cap": 108
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": 95
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": 105
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": 99
+        },
+        "Blade": {
+          "current": null,
+          "cap": 115
+        },
+        "Bow": {
+          "current": null,
+          "cap": 92
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": null
+        },
+        "Hammer": {
+          "current": null,
+          "cap": 91
+        }
+      },
+      "attrs": {
+        "Per": 18,
+        "Agi": 32,
+        "Phy": 26,
+        "End": 23,
+        "Str": 21
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "1AUQ2MBAKNA2E9JCIIRIHCKJI",
+      "name": "Lacey",
+      "level": 50,
+      "title": "Skilled",
+      "profession": "Warrior",
+      "tribe": "Outcast",
+      "trait": "",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": null,
+          "cap": 80
+        },
+        "Miner": {
+          "current": null,
+          "cap": 95
+        },
+        "Gatherer": {
+          "current": null,
+          "cap": 75
+        },
+        "Farmer": {
+          "current": null,
+          "cap": 84
+        },
+        "Weaver": {
+          "current": null,
+          "cap": 80
+        },
+        "Potter": {
+          "current": null,
+          "cap": 84
+        },
+        "Carpenter": {
+          "current": null,
+          "cap": 94
+        },
+        "Tanner": {
+          "current": null,
+          "cap": 87
+        },
+        "Kiln Worker": {
+          "current": null,
+          "cap": 75
+        },
+        "Craftsman": {
+          "current": null,
+          "cap": 80
+        },
+        "Alchemist": {
+          "current": null,
+          "cap": 77
+        },
+        "Cook": {
+          "current": null,
+          "cap": 95
+        },
+        "Blacksmith": {
+          "current": null,
+          "cap": 75
+        },
+        "Armorer": {
+          "current": null,
+          "cap": 85
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": 85
+        },
+        "Shield": {
+          "current": null,
+          "cap": 97
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": 95
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": 105
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": 75
+        },
+        "Blade": {
+          "current": null,
+          "cap": 95
+        },
+        "Bow": {
+          "current": null,
+          "cap": 78
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": 96
+        },
+        "Hammer": {
+          "current": null,
+          "cap": 98
+        }
+      },
+      "attrs": {
+        "Per": 19,
+        "Agi": 24,
+        "Phy": 30,
+        "End": 29,
+        "Str": 22
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "3927F61RD3HO49H3GUD0FOGJH",
+      "name": "Joanna",
+      "level": 50,
+      "title": "Skilled",
+      "profession": "Warrior",
+      "tribe": "Savagehorn",
+      "trait": "The Dauntless",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": null,
+          "cap": 94
+        },
+        "Miner": {
+          "current": null,
+          "cap": 95
+        },
+        "Gatherer": {
+          "current": null,
+          "cap": 94
+        },
+        "Farmer": {
+          "current": null,
+          "cap": 93
+        },
+        "Weaver": {
+          "current": null,
+          "cap": 95
+        },
+        "Potter": {
+          "current": null,
+          "cap": 95
+        },
+        "Carpenter": {
+          "current": null,
+          "cap": 95
+        },
+        "Tanner": {
+          "current": null,
+          "cap": 95
+        },
+        "Kiln Worker": {
+          "current": null,
+          "cap": 75
+        },
+        "Craftsman": {
+          "current": null,
+          "cap": 82
+        },
+        "Alchemist": {
+          "current": null,
+          "cap": 99
+        },
+        "Cook": {
+          "current": null,
+          "cap": 82
+        },
+        "Blacksmith": {
+          "current": null,
+          "cap": 95
+        },
+        "Armorer": {
+          "current": null,
+          "cap": 85
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": 98
+        },
+        "Shield": {
+          "current": null,
+          "cap": 85
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": 95
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": 95
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": 80
+        },
+        "Blade": {
+          "current": null,
+          "cap": 106
+        },
+        "Bow": {
+          "current": null,
+          "cap": null
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": 95
+        },
+        "Hammer": {
+          "current": null,
+          "cap": 108
+        }
+      },
+      "attrs": {
+        "Per": 23,
+        "Agi": 14,
+        "Phy": 27,
+        "End": 15,
+        "Str": 35
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "CH6NJ9XW218HV00KQ4WLB6E0D",
+      "name": "Elsie",
+      "level": 50,
+      "title": "Master",
+      "profession": "Warrior",
+      "tribe": "Wildwolf",
+      "trait": "",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": null,
+          "cap": 88
+        },
+        "Miner": {
+          "current": null,
+          "cap": 95
+        },
+        "Gatherer": {
+          "current": null,
+          "cap": 95
+        },
+        "Farmer": {
+          "current": null,
+          "cap": 82
+        },
+        "Weaver": {
+          "current": null,
+          "cap": 85
+        },
+        "Potter": {
+          "current": null,
+          "cap": 77
+        },
+        "Carpenter": {
+          "current": null,
+          "cap": 98
+        },
+        "Tanner": {
+          "current": null,
+          "cap": 98
+        },
+        "Kiln Worker": {
+          "current": null,
+          "cap": 95
+        },
+        "Craftsman": {
+          "current": null,
+          "cap": 98
+        },
+        "Alchemist": {
+          "current": null,
+          "cap": 87
+        },
+        "Cook": {
+          "current": null,
+          "cap": 85
+        },
+        "Blacksmith": {
+          "current": null,
+          "cap": 91
+        },
+        "Armorer": {
+          "current": null,
+          "cap": 85
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": 98
+        },
+        "Shield": {
+          "current": null,
+          "cap": 98
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": 93
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": 105
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": 84
+        },
+        "Blade": {
+          "current": null,
+          "cap": 115
+        },
+        "Bow": {
+          "current": null,
+          "cap": 95
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": 100
+        },
+        "Hammer": {
+          "current": null,
+          "cap": 115
+        }
+      },
+      "attrs": {
+        "Per": 16,
+        "Agi": 23,
+        "Phy": 31,
+        "End": 26,
+        "Str": 28
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    },
+    {
+      "id": "37FYDR54J5RI637XM5UZWHZ5E",
+      "name": "Melanie",
+      "level": 50,
+      "title": "Master",
+      "profession": "Guard",
+      "tribe": "Savagehorn",
+      "trait": "The Dauntless",
+      "location": "Main Base",
+      "is_body": false,
+      "skills": {
+        "Lumberjack": {
+          "current": null,
+          "cap": 85
+        },
+        "Miner": {
+          "current": null,
+          "cap": 79
+        },
+        "Gatherer": {
+          "current": null,
+          "cap": 98
+        },
+        "Farmer": {
+          "current": null,
+          "cap": 79
+        },
+        "Weaver": {
+          "current": null,
+          "cap": 95
+        },
+        "Potter": {
+          "current": null,
+          "cap": 79
+        },
+        "Carpenter": {
+          "current": null,
+          "cap": 97
+        },
+        "Tanner": {
+          "current": null,
+          "cap": 89
+        },
+        "Kiln Worker": {
+          "current": null,
+          "cap": 75
+        },
+        "Craftsman": {
+          "current": null,
+          "cap": 75
+        },
+        "Alchemist": {
+          "current": null,
+          "cap": 88
+        },
+        "Cook": {
+          "current": null,
+          "cap": 97
+        },
+        "Blacksmith": {
+          "current": null,
+          "cap": 90
+        },
+        "Armorer": {
+          "current": null,
+          "cap": 85
+        }
+      },
+      "weapons": {
+        "Spear": {
+          "current": null,
+          "cap": 98
+        },
+        "Shield": {
+          "current": null,
+          "cap": 95
+        },
+        "Dual-blade": {
+          "current": null,
+          "cap": 77
+        },
+        "Great Sword": {
+          "current": null,
+          "cap": 102
+        },
+        "Spiked Whip": {
+          "current": null,
+          "cap": 100
+        },
+        "Blade": {
+          "current": null,
+          "cap": 98
+        },
+        "Bow": {
+          "current": null,
+          "cap": 99
+        },
+        "Gauntlets": {
+          "current": null,
+          "cap": 86
+        },
+        "Hammer": {
+          "current": null,
+          "cap": 89
+        }
+      },
+      "attrs": {
+        "Per": 19,
+        "Agi": 30,
+        "Phy": 20,
+        "End": 19,
+        "Str": 20
+      },
+      "recognition": null,
+      "talents": [],
+      "groups": [],
+      "tags": [],
+      "notes": ""
+    }
+  ],
+  "version": 1
+}

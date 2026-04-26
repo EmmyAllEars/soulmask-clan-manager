@@ -1,0 +1,294 @@
+/* Soulmask Clan Manager — styles */
+:root {
+  --bg: #1a1a1a;
+  --bg2: #242424;
+  --bg3: #2e2e2e;
+  --border: #3a3a3a;
+  --text: #e6e6e6;
+  --text-dim: #999;
+  --accent: #f4a261;
+  --gold: #f4a261;
+  --green: #c8e6c9;
+  --yellow: #ffe066;
+  --orange: #f4a261;
+  --red: #e76f51;
+  --grey: #666;
+  --tier-mastery: #f4a261;     /* 120+ */
+  --tier-specialist: #ffe066;  /* 100-119 */
+  --tier-iron: #c8e6c9;        /* 90-99 */
+  --tier-sub: #555;            /* <90 */
+  --tier-sub-text: #999;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* ============== TOP BAR ============== */
+header.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+header.topbar h1 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--accent);
+}
+header.topbar .grow { flex: 1; }
+header.topbar button, .toolbar button, .actions button {
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+header.topbar button:hover, .toolbar button:hover, .actions button:hover {
+  background: #404040;
+  border-color: var(--accent);
+}
+header.topbar button.primary { background: var(--accent); color: #222; border-color: var(--accent); }
+header.topbar button.primary:hover { background: #ffb878; }
+header.topbar button.danger { color: #ff8a65; }
+
+/* ============== LAYOUT ============== */
+main { padding: 20px; max-width: 100%; overflow-x: auto; }
+.view { display: none; }
+.view.active { display: block; }
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.toolbar input[type="text"], .toolbar select {
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  min-width: 180px;
+}
+.toolbar .legend { font-size: 12px; color: var(--text-dim); margin-left: auto; }
+.toolbar .legend span { display: inline-block; padding: 2px 8px; margin-left: 4px; border-radius: 3px; color: #222; }
+
+/* ============== ROSTER TABLE ============== */
+table.roster {
+  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+  font-size: 12px;
+}
+table.roster th, table.roster td {
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+table.roster th {
+  background: #2f4858;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  font-weight: 600;
+}
+table.roster th.weapon-col { background: #6b2737; }
+table.roster tr:hover td { background: rgba(244,162,97,0.05); }
+table.roster td.skill-cell, table.roster td.weapon-cell {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  cursor: default;
+}
+table.roster td.tier-mastery { background: var(--tier-mastery); color: #222; font-weight: 600; }
+table.roster td.tier-specialist { background: var(--tier-specialist); color: #222; font-weight: 600; }
+table.roster td.tier-iron { background: var(--tier-iron); color: #222; }
+table.roster td.tier-sub { background: var(--tier-sub); color: var(--tier-sub-text); }
+table.roster td.tier-empty { color: var(--tier-sub-text); }
+table.roster td.name {
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--accent);
+}
+table.roster td.name:hover { text-decoration: underline; }
+table.roster .aligned-skill { font-weight: bold; }
+
+/* ============== PROFILE VIEW ============== */
+.profile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  max-width: 1400px;
+}
+.profile .card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+}
+.profile .card h3 {
+  margin-top: 0;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+.profile .card.full-row { grid-column: 1 / -1; }
+
+.profile-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.profile-header h2 { margin: 0; color: var(--accent); }
+.profile-header .meta { color: var(--text-dim); }
+
+.field { margin-bottom: 10px; }
+.field label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 3px; }
+.field input, .field select, .field textarea {
+  background: var(--bg3); color: var(--text); border: 1px solid var(--border);
+  padding: 6px 8px; border-radius: 4px; font-size: 13px; width: 100%;
+}
+.field textarea { min-height: 80px; resize: vertical; font-family: inherit; }
+
+.skill-row {
+  display: grid;
+  grid-template-columns: 110px 60px 60px 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid #2a2a2a;
+  font-size: 12px;
+}
+.skill-row .label { color: var(--text); }
+.skill-row .label.aligned { color: var(--accent); font-weight: 600; }
+.skill-row .label.aligned::after { content: " ★"; color: var(--accent); }
+.skill-row input {
+  background: var(--bg3); color: var(--text); border: 1px solid var(--border);
+  padding: 3px 5px; border-radius: 3px; width: 100%; font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.skill-row .bar {
+  height: 8px; background: var(--bg3); border-radius: 4px; position: relative;
+  overflow: hidden;
+}
+.skill-row .bar .fill {
+  height: 100%; background: var(--accent); transition: width 0.2s;
+}
+.skill-row .bar .fill.tier-mastery { background: var(--tier-mastery); }
+.skill-row .bar .fill.tier-specialist { background: var(--tier-specialist); }
+.skill-row .bar .fill.tier-iron { background: var(--tier-iron); }
+.skill-row .bar .fill.tier-sub { background: #888; }
+
+/* ============== TALENTS ============== */
+.talents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
+.talent-pill {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px;
+}
+.talent-pill img { width: 36px; height: 36px; flex-shrink: 0; background: var(--bg); border-radius: 4px; }
+.talent-pill .info { flex: 1; min-width: 0; }
+.talent-pill .name { font-weight: 600; font-size: 13px; }
+.talent-pill .effect { font-size: 11px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.talent-pill .lvl {
+  background: var(--accent); color: #222; padding: 2px 8px; border-radius: 4px;
+  font-size: 12px; font-weight: 700;
+}
+.talent-pill.negative { border-color: #6e3a3a; }
+.talent-pill.negative .lvl { background: var(--red); color: white; }
+.talent-pill .remove {
+  background: transparent; border: none; color: var(--text-dim); cursor: pointer;
+  padding: 2px 6px; font-size: 16px; line-height: 1;
+}
+.talent-pill .remove:hover { color: var(--red); }
+
+.add-talent-row { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
+.add-talent-row input { flex: 1; }
+.add-talent-row select { width: 80px; }
+
+/* Talent autocomplete dropdown */
+.talent-dropdown {
+  position: absolute;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  min-width: 320px;
+}
+.talent-dropdown .opt {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 8px; cursor: pointer;
+  border-bottom: 1px solid #2a2a2a;
+}
+.talent-dropdown .opt:hover { background: var(--bg3); }
+.talent-dropdown .opt img { width: 28px; height: 28px; background: var(--bg); border-radius: 3px; }
+.talent-dropdown .opt .info { flex: 1; min-width: 0; }
+.talent-dropdown .opt .n { font-weight: 600; font-size: 12px; }
+.talent-dropdown .opt .e { font-size: 11px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.talent-dropdown .opt .cat { font-size: 10px; color: var(--text-dim); }
+
+/* ============== TAGS / GROUPS ============== */
+.chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--bg3); border: 1px solid var(--border);
+  padding: 3px 8px; border-radius: 12px;
+  font-size: 11px; margin: 2px;
+}
+.chip.group { background: #2f4858; color: white; border-color: #2f4858; }
+.chip.tag { background: #44343a; color: var(--accent); border-color: #44343a; }
+.chip .x { cursor: pointer; opacity: 0.7; margin-left: 4px; }
+.chip .x:hover { opacity: 1; color: var(--red); }
+
+.add-chip-row { display: flex; gap: 6px; margin-top: 4px; }
+.add-chip-row input { flex: 1; }
+
+/* ============== TRAINING SUGGESTIONS ============== */
+.suggestion {
+  border-left: 3px solid var(--accent);
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  background: rgba(244, 162, 97, 0.05);
+  font-size: 13px;
+}
+.suggestion .head { font-weight: 600; color: var(--accent); }
+.suggestion .why { color: var(--text-dim); font-size: 12px; margin-top: 2px; }
+
+/* ============== MODALS ============== */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: none; align-items: center; justify-content: center; z-index: 200;
+}
+.modal-bg.active { display: flex; }
+.modal {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 24px; min-width: 420px; max-width: 90vw; max-height: 85vh;
+  overflow-y: auto;
+}
+.modal h3 { margin-top: 0; color: var(--accent); }
+.modal .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+
+/* ============== UTILITY ============== */
+.muted { color: var(--text-dim); }
+.tag-list { margin-top: 4px; }
+hr { border: none; border-top: 1px solid var(--border); margin: 12px 0; }

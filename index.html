@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soulmask Clan Manager</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <h1>Soulmask Clan Manager</h1>
+  <button id="nav-roster" class="primary">Roster</button>
+  <button id="nav-profile">Profile</button>
+  <span class="grow"></span>
+  <button id="add-btn">+ Add Tribesman</button>
+  <button id="export-csv">Export CSV</button>
+  <button id="import-csv">Import CSV</button>
+  <button id="export-json">Backup JSON</button>
+  <button id="import-json">Restore JSON</button>
+  <button id="reset-defaults" class="danger">Reset to Defaults</button>
+  <input type="file" id="file-input" style="display:none" accept=".csv,.json">
+</header>
+
+<main>
+  <!-- ROSTER VIEW -->
+  <section id="view-roster" class="view active">
+    <div class="toolbar">
+      <input type="text" id="filter-name" placeholder="Filter by name…">
+      <select id="filter-prof">
+        <option value="">All professions</option>
+        <option>Craftsman</option>
+        <option>Porter</option>
+        <option>Laborer</option>
+        <option>Warrior</option>
+        <option>Hunter</option>
+        <option>Guard</option>
+      </select>
+      <select id="filter-tribe">
+        <option value="">All tribes</option>
+      </select>
+      <select id="filter-group">
+        <option value="">All groups</option>
+      </select>
+      <select id="filter-tag">
+        <option value="">All tags</option>
+      </select>
+      <span class="legend">
+        <span style="background:#f4a261">120+ mastery</span>
+        <span style="background:#ffe066">100+ specialist</span>
+        <span style="background:#c8e6c9">90+ Iron</span>
+        <span style="background:#555;color:#999">below Iron</span>
+      </span>
+    </div>
+    <div id="roster-table-wrap"></div>
+  </section>
+
+  <!-- PROFILE VIEW -->
+  <section id="view-profile" class="view">
+    <div class="profile-header">
+      <button onclick="ui.showRoster()" style="background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;">← Back to roster</button>
+    </div>
+    <div id="profile-content"></div>
+  </section>
+</main>
+
+<!-- Modal scaffolding for add/confirm dialogs -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
