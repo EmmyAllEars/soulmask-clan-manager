@@ -4,7 +4,7 @@
  */
 
 // === CONSTANTS ===
-const APP_VERSION = '0.2.0';
+const APP_VERSION = '0.3.0';
 const REPO_URL = 'https://github.com/EmmyAllEars/soulmask-clan-manager';
 const STORAGE_KEY = 'soulmaskClan_v1';
 const THEME_KEY = 'soulmaskClan_theme';
@@ -233,7 +233,6 @@ function renderRoster() {
   html += '<th>Name</th><th>Lvl</th><th>Title</th><th>Profession</th><th>Tribe</th><th>Trait</th><th>Location</th>';
   for (const s of SKILLS) html += `<th>${s}</th>`;
   for (const a of ATTRS) html += `<th>${a}</th>`;
-  html += '<th>Recog</th>';
   for (const w of WEAPONS) html += `<th class="weapon-col">${w}</th>`;
   html += '<th>Groups</th><th>Tags</th><th>Talents</th></tr></thead><tbody>';
   for (const t of list) {
@@ -257,19 +256,24 @@ function renderRoster() {
       const v = (t.skills?.[s]) || {current:null, cap:null};
       const cls = tierClass(v.cap);
       const al = aligned.includes(s) ? ' aligned-skill' : '';
-      html += `<td class="skill-cell ${cls}${al}">${fmtSkill(v.current, v.cap)}</td>`;
+      html += `<td class="skill-cell ${cls}${al}"><div class="cur-cap">
+        <input class="cell-input num-tiny" type="number" value="${v.current ?? ''}" oninput="updSkillFromRoster('${id}','${s}','current',this)">
+        <span class="sep">/</span>
+        <input class="cell-input num-tiny" type="number" value="${v.cap ?? ''}" oninput="updSkillFromRoster('${id}','${s}','cap',this)">
+      </div></td>`;
     }
     for (const a of ATTRS) {
       const v = t.attrs?.[a];
       html += `<td><input class="cell-input num" type="number" value="${v ?? ''}" oninput="updAttrFromRoster('${id}','${a}',this.value===''?null:+this.value)"></td>`;
     }
-    html += `<td><input class="cell-input" value="${escapeHtml(t.recognition || '')}" oninput="updFromRoster('${id}','recognition',this.value)" placeholder="—"></td>`;
     const classW = PROF_CLASS_WEAPONS[t.profession] || [];
     for (const w of WEAPONS) {
       const v = (t.weapons?.[w]) || {cap:null};
       const cls = tierClass(v.cap);
       const al = classW.includes(w) ? ' aligned-skill' : '';
-      html += `<td class="weapon-cell ${cls}${al}">${v.cap ?? '—'}</td>`;
+      html += `<td class="weapon-cell ${cls}${al}">
+        <input class="cell-input num-tiny" type="number" value="${v.cap ?? ''}" oninput="updWeaponFromRoster('${id}','${w}',this)">
+      </td>`;
     }
     html += `<td>${(t.groups || []).map(g => `<span class="chip group">${escapeHtml(g)}</span>`).join('')}</td>`;
     html += `<td>${(t.tags || []).map(g => `<span class="chip tag">${escapeHtml(g)}</span>`).join('')}</td>`;
@@ -321,7 +325,6 @@ function renderProfile() {
     <div class="field"><label>Tribe</label><input value="${escapeHtml(t.tribe||'')}" oninput="upd('${t.id}','tribe',this.value)"></div>
     <div class="field"><label>Trait</label><input value="${escapeHtml(t.trait||'')}" oninput="upd('${t.id}','trait',this.value)"></div>
     <div class="field"><label>Location</label><input value="${escapeHtml(t.location||'')}" oninput="upd('${t.id}','location',this.value)"></div>
-    <div class="field"><label>Recognition</label><input value="${escapeHtml(t.recognition||'')}" oninput="upd('${t.id}','recognition',this.value)" placeholder="e.g. 535 / 1000"></div>
     <div class="field">
       <label><input type="checkbox" ${t.is_body?'checked':''} onchange="upd('${t.id}','is_body',this.checked)" style="width:auto;margin-right:6px;">Player body (uses tribesman caps as your character)</label>
     </div>
@@ -569,6 +572,40 @@ function updAttrFromRoster(id, attr, val) {
 window.updFromRoster = updFromRoster;
 window.updAttrFromRoster = updAttrFromRoster;
 
+function updSkillFromRoster(id, skill, field, inputEl) {
+  const t = state.roster.find(x => x.id === id);
+  if (!t) return;
+  t.skills = t.skills || {};
+  t.skills[skill] = t.skills[skill] || {current:null, cap:null};
+  const val = inputEl.value === '' ? null : +inputEl.value;
+  t.skills[skill][field] = val;
+  saveState();
+  if (field === 'cap') {
+    const td = inputEl.closest('td');
+    if (td) {
+      const aligned = (PROF_BEST_SKILLS[t.profession] || []).includes(skill);
+      td.className = `skill-cell ${tierClass(val)}${aligned ? ' aligned-skill' : ''}`;
+    }
+  }
+}
+
+function updWeaponFromRoster(id, weapon, inputEl) {
+  const t = state.roster.find(x => x.id === id);
+  if (!t) return;
+  t.weapons = t.weapons || {};
+  t.weapons[weapon] = t.weapons[weapon] || {current:null, cap:null};
+  const val = inputEl.value === '' ? null : +inputEl.value;
+  t.weapons[weapon].cap = val;
+  saveState();
+  const td = inputEl.closest('td');
+  if (td) {
+    const aligned = (PROF_CLASS_WEAPONS[t.profession] || []).includes(weapon);
+    td.className = `weapon-cell ${tierClass(val)}${aligned ? ' aligned-skill' : ''}`;
+  }
+}
+window.updSkillFromRoster = updSkillFromRoster;
+window.updWeaponFromRoster = updWeaponFromRoster;
+
 function addToList(id, listKey) {
   const t = state.roster.find(x => x.id === id);
   if (!t) return;
@@ -686,7 +723,7 @@ function renderTrainingSuggestions(trainee) {
 
 // === IMPORT / EXPORT ===
 function exportCSV() {
-  const headers = ['id','name','level','title','profession','tribe','trait','location','is_body','recognition','notes'];
+  const headers = ['id','name','level','title','profession','tribe','trait','location','is_body','notes'];
   for (const s of SKILLS) { headers.push(`skill_${s}_cur`); headers.push(`skill_${s}_cap`); }
   for (const w of WEAPONS) { headers.push(`weapon_${w}_cur`); headers.push(`weapon_${w}_cap`); }
   for (const a of ATTRS) headers.push(`attr_${a}`);
@@ -694,7 +731,7 @@ function exportCSV() {
 
   const rows = [headers.map(csvEscape).join(',')];
   for (const t of state.roster) {
-    const r = [t.id, t.name, t.level, t.title, t.profession, t.tribe, t.trait, t.location, t.is_body, t.recognition, t.notes];
+    const r = [t.id, t.name, t.level, t.title, t.profession, t.tribe, t.trait, t.location, t.is_body, t.notes];
     for (const s of SKILLS) {
       const v = t.skills?.[s] || {};
       r.push(v.current ?? ''); r.push(v.cap ?? '');
@@ -740,7 +777,6 @@ function importCSV(text) {
       trait: obj.trait || '',
       location: obj.location || '',
       is_body: obj.is_body === 'true',
-      recognition: obj.recognition || '',
       notes: obj.notes || '',
       skills: {}, weapons: {}, attrs: {},
       groups: obj.groups ? obj.groups.split('|').filter(Boolean) : [],
@@ -828,7 +864,7 @@ function addTribesman() {
   if (!name) return;
   const t = {
     id: newId(), name, level: null, title: '', profession: '', tribe: '',
-    trait: '', location: '', is_body: false, recognition: '',
+    trait: '', location: '', is_body: false,
     skills: Object.fromEntries(SKILLS.map(s => [s, {current:null, cap:null}])),
     weapons: Object.fromEntries(WEAPONS.map(w => [w, {current:null, cap:null}])),
     attrs: Object.fromEntries(ATTRS.map(a => [a, null])),
