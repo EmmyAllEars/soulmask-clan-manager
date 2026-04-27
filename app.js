@@ -4,7 +4,7 @@
  */
 
 // === CONSTANTS ===
-const APP_VERSION = '0.4.1';
+const APP_VERSION = '0.5.0';
 const REPO_URL = 'https://github.com/EmmyAllEars/soulmask-clan-manager';
 const STORAGE_KEY = 'soulmaskClan_v1';
 const THEME_KEY = 'soulmaskClan_theme';
@@ -39,12 +39,16 @@ const PROF_CLASS_WEAPONS = {
 };
 
 // === STATE ===
+const STORAGE_VERSION = 2;
+
 let state = {
   roster: [],          // array of tribesman objects
   talents: [],         // catalog of all talents (loaded from talents.json)
   groups: [],          // user-defined group names
   tags: [],            // user-defined tag names
+  plans: [],           // training plans (see docs/training_plans.md)
   selectedId: null,    // for profile view
+  selectedPlanId: null,// for plan editor view
   sort: { column: null, dir: null, sub: null }, // null = default order
   lastRosterOrder: [], // ids in last-rendered roster order, for profile prev/next
 };
@@ -57,7 +61,8 @@ function saveState() {
     roster: state.roster,
     groups: state.groups,
     tags: state.tags,
-    version: 1,
+    plans: state.plans,
+    version: STORAGE_VERSION,
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(persist));
 }
@@ -65,6 +70,18 @@ function loadState() {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return null;
   try { return JSON.parse(raw); } catch { return null; }
+}
+
+// Forward-migrate a persisted blob (whatever version it was saved at) into the
+// current shape. Pure: takes a blob, returns a blob, no side effects.
+function migrateState(data) {
+  if (!data || typeof data !== 'object') return data;
+  const v = data.version || 1;
+  if (v < 2) {
+    data.plans = data.plans || [];
+    data.version = 2;
+  }
+  return data;
 }
 
 // === BOOT ===
@@ -80,11 +97,15 @@ async function boot() {
   }
 
   // Load saved state OR defaults
-  const saved = loadState();
+  const raw = loadState();
+  const wasOlder = raw && (raw.version || 1) < STORAGE_VERSION;
+  const saved = migrateState(raw);
   if (saved && saved.roster && saved.roster.length) {
     state.roster = saved.roster;
     state.groups = saved.groups || [];
     state.tags = saved.tags || [];
+    state.plans = saved.plans || [];
+    if (wasOlder) saveState();
   } else {
     await loadDefaults();
   }
@@ -104,10 +125,12 @@ async function loadDefaults() {
     state.roster = data.roster;
     state.groups = [];
     state.tags = [];
+    state.plans = [];
     saveState();
   } catch (e) {
     console.error('Failed to load defaults:', e);
     state.roster = [];
+    state.plans = [];
   }
 }
 
@@ -974,18 +997,23 @@ function parseCSV(text) {
 
 function exportJSON() {
   downloadFile('clan_backup.json', 'application/json', JSON.stringify({
-    roster: state.roster, groups: state.groups, tags: state.tags, version: 1,
+    roster: state.roster,
+    groups: state.groups,
+    tags: state.tags,
+    plans: state.plans,
+    version: STORAGE_VERSION,
     exported: new Date().toISOString()
   }, null, 2));
 }
 function importJSON(text) {
   try {
-    const data = JSON.parse(text);
+    const data = migrateState(JSON.parse(text));
     if (!data.roster) return alert('Invalid backup file: no roster.');
     if (!confirm(`Restore ${data.roster.length} tribesmen? This will REPLACE the current state.`)) return;
     state.roster = data.roster;
     state.groups = data.groups || [];
     state.tags = data.tags || [];
+    state.plans = data.plans || [];
     saveState();
     initFilters();
     renderRoster();
