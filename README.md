@@ -121,6 +121,10 @@ to be safe.
 - **Talent level ceiling**: III (3). No higher.
 - **Positive talent count**: 6 max per tribesman.
 
+## License
+
+[The Unlicense](LICENSE) — public domain, no rights reserved. Use it for anything.
+
 ## Known limitations / next-up
 
 - No undo. Edits are committed to localStorage immediately.
