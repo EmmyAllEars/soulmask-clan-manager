@@ -77,6 +77,7 @@
  * @property {string|null} startedAt - ISO date
  * @property {string|null} completedAt - ISO date
  * @property {number|null} actualDurationMin - filled in once known, drives auto-fit later
+ * @property {string|null} [appliedAt] - ISO date when the step's outcome was pushed to the trainee's data
  * @property {string} note
  */
 

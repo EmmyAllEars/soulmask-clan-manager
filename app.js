@@ -1398,7 +1398,7 @@ function duplicatePlan(id) {
   copy.name = `${src.name} (copy)`;
   copy.status = 'draft';
   copy.createdAt = new Date().toISOString();
-  copy.steps = copy.steps.map(s => ({ ...s, id: newStepId(), status: 'queued', startedAt: null, completedAt: null, actualDurationMin: null }));
+  copy.steps = copy.steps.map(s => ({ ...s, id: newStepId(), status: 'queued', startedAt: null, completedAt: null, actualDurationMin: null, appliedAt: null }));
   state.plans.push(copy);
   saveState();
   return copy;
@@ -1421,6 +1421,7 @@ function newStep(type) {
     startedAt: null,
     completedAt: null,
     actualDurationMin: null,
+    appliedAt: null,     // ISO date when the step's outcome was pushed to the trainee
     note: '',
   };
 }
@@ -1520,16 +1521,118 @@ window.onMoveStep = function(planId, stepId, dir) {
   if (state.selectedPlanId === planId) renderPlanEditor(planId);
 };
 
-window.onSetStepStatus = function(planId, stepId, status) {
+// Manual re-trigger for the Learn-step outcome modal — used when the user
+// cancelled the original picker but later wants to record the outcome.
+window.onApplyStepOutcome = async function(planId, stepId) {
+  const plan = findPlan(planId);
+  const s = findStep(plan, stepId);
+  if (!s || s.appliedAt) return;
+  await applyStepOutcomeToTrainee(plan, s);
+  if (state.selectedPlanId === planId) renderPlanEditor(planId);
+};
+
+window.onSetStepStatus = async function(planId, stepId, status) {
   const plan = findPlan(planId);
   const s = findStep(plan, stepId);
   if (!s) return;
+  const wasCompleted = !!s.completedAt;
   s.status = status;
   if (status === 'running' && !s.startedAt) s.startedAt = new Date().toISOString();
   if (status === 'completed' && !s.completedAt) s.completedAt = new Date().toISOString();
   saveState();
+
+  // First-time transition into completed: apply the step's outcome to the
+  // trainee's data (cap raise → bump weapon cap; upgrade → bump talent level;
+  // learn → ask the user which talent the random Learn produced).
+  if (status === 'completed' && !wasCompleted && !s.appliedAt) {
+    await applyStepOutcomeToTrainee(plan, s);
+  }
+
   if (state.selectedPlanId === planId) renderPlanEditor(planId);
 };
+
+/**
+ * @param {TrainingPlan} plan
+ * @param {TrainingStep} step
+ */
+async function applyStepOutcomeToTrainee(plan, step) {
+  const trainee = findTribesman(plan.traineeId);
+  if (!trainee) return;
+
+  if (step.type === 'cap-raise' && step.weapon && step.targetCap != null) {
+    trainee.weapons = trainee.weapons || {};
+    trainee.weapons[step.weapon] = trainee.weapons[step.weapon] || { current: null, cap: null };
+    const cur = trainee.weapons[step.weapon].cap ?? 0;
+    if (step.targetCap > cur) {
+      trainee.weapons[step.weapon].cap = step.targetCap;
+      step.appliedAt = new Date().toISOString();
+      saveState();
+    }
+    return;
+  }
+
+  if (step.type === 'upgrade' && step.talent && step.targetLevel != null) {
+    trainee.talents = trainee.talents || [];
+    const tal = trainee.talents.find(t => t.name === step.talent);
+    if (tal && step.targetLevel > (tal.level || 0)) {
+      tal.level = step.targetLevel;
+      step.appliedAt = new Date().toISOString();
+      saveState();
+    }
+    return;
+  }
+
+  if (step.type === 'learn') {
+    // Learn produces a random talent in-game; ask which one landed. Options
+    // are the mentor's eligible-at-time-of-completion talents (positive,
+    // not already on trainee, learnable by trainee).
+    const mentor = findTribesman(step.mentorId);
+    const knownNames = new Set((trainee.talents || []).map(t => t.name));
+    const candidates = (mentor?.talents || []).filter(t => {
+      const meta = talentMeta(t.name);
+      return meta && meta.polarity === 'positive'
+        && !knownNames.has(t.name)
+        && isLearnableBy(t.name, trainee);
+    });
+
+    if (!candidates.length) {
+      await showAlertModal({
+        title: 'No outcome to record',
+        message: mentor
+          ? `${mentor.name} has no learnable talents for ${trainee.name} right now. The step is marked complete; add the talent manually if needed.`
+          : `Mentor is missing for this step. The step is marked complete; add the learned talent manually on ${trainee.name}'s profile.`,
+      });
+      return;
+    }
+
+    const pick = await showPickerModal({
+      title: `Which talent did ${trainee.name} learn?`,
+      message: 'Learn produces a random talent in-game; pick the one that actually landed.',
+      options: candidates.map(t => {
+        const meta = talentMeta(t.name);
+        return {
+          value: t.name,
+          label: t.name,
+          sublabel: meta?.effect || '',
+        };
+      }),
+    });
+
+    if (!pick) return; // user cancelled — leave appliedAt unset so they can retry by re-marking complete
+
+    trainee.talents = trainee.talents || [];
+    if (!trainee.talents.some(t => t.name === pick)) {
+      const meta = talentMeta(pick);
+      trainee.talents.push({
+        name: pick,
+        level: 1,
+        icon: meta?.icon || '',
+      });
+    }
+    step.appliedAt = new Date().toISOString();
+    saveState();
+  }
+}
 
 window.onSetPlanStatus = function(planId, status) {
   const p = findPlan(planId);
@@ -1975,12 +2078,22 @@ function renderPlanStep(plan, step, index) {
     `<button class="${step.status === st ? 'primary small' : 'small'}" onclick="onSetStepStatus('${plan.id}','${step.id}','${st}')">${st}</button>`
   ).join('');
 
-  return `<div class="plan-step plan-step-${step.type} status-${step.status}${mentorMissing ? ' mentor-missing' : ''}">
+  // Step's outcome state: applied (pushed to trainee), pending (completed
+  // but Learn-cancel-without-pick), or untouched.
+  const applied = !!step.appliedAt;
+  const pendingApply = step.status === 'completed' && !applied;
+  const applyBtn = step.type === 'learn' && pendingApply
+    ? `<button class="small" onclick="onApplyStepOutcome('${plan.id}','${step.id}')" title="Re-prompt for the talent that was learned">Apply outcome</button>`
+    : '';
+
+  return `<div class="plan-step plan-step-${step.type} status-${step.status}${mentorMissing ? ' mentor-missing' : ''}${applied ? ' applied' : ''}">
     <div class="plan-step-head">
       <span class="step-num">#${index + 1}</span>
       <span class="step-type">${label}</span>
       <span class="step-dur">${dur}</span>
       ${mentorMissing ? '<span class="step-warn">⚠ mentor missing</span>' : ''}
+      ${applied ? '<span class="step-applied" title="Outcome pushed to trainee">✓ applied</span>' : ''}
+      ${applyBtn}
       <span class="grow"></span>
       <button class="small" onclick="onMoveStep('${plan.id}','${step.id}',-1)" ${isFirst ? 'disabled' : ''}>↑</button>
       <button class="small" onclick="onMoveStep('${plan.id}','${step.id}',1)" ${isLast ? 'disabled' : ''}>↓</button>
