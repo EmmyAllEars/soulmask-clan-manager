@@ -42,8 +42,12 @@ const PROF_CLASS_WEAPONS = {
 const STORAGE_VERSION = 2;
 
 // Training Plan time-estimation constants (see docs/training_plans.md).
-// Both base times and tier multipliers are placeholders until measured;
+// Both base times and material multipliers are placeholders until measured;
 // they are exposed in the Calibration panel so Emmy can adjust them.
+//
+// "Material" is the gear's progression tier (1-5: Beast Hide → Bronze → Iron
+// → Steel → Endgame). Soulmask's other gear axes — Quality (I-VI badges)
+// and Mod — do NOT affect training duration, so we don't model them here.
 const DEFAULT_PLAN_BASE_TIMES_MIN = {
   'cap-raise':   180,  // PLACEHOLDER
   'learn':       212,  // ~3h 32m (Lv 1 acquired, random)
@@ -51,8 +55,13 @@ const DEFAULT_PLAN_BASE_TIMES_MIN = {
   'upgrade-2-3': 168,  // ~2h 48m
 };
 const DEFAULT_PLAN_TIER_MULTIPLIERS = {
-  1: 1.40, 2: 1.20, 3: 1.05, 4: 0.95, 5: 0.85, 6: 0.70,
+  1: 1.40,  // Beast Hide — slow
+  2: 1.15,
+  3: 1.00,
+  4: 0.85,
+  5: 0.70,  // Endgame — fast
 };
+const MATERIAL_TIERS = [1, 2, 3, 4, 5];
 const PLAN_STEP_TYPES = ['cap-raise','learn','upgrade'];
 const PLAN_STEP_LABELS = { 'cap-raise':'Cap Raise', 'learn':'Learn Talent', 'upgrade':'Upgrade Talent' };
 const PLAN_STATUSES = ['draft','active','done','abandoned'];
@@ -131,8 +140,12 @@ async function boot() {
     state.groups = saved.groups || [];
     state.tags = saved.tags || [];
     state.plans = saved.plans || [];
+    let normalized = false;
+    state.plans.forEach(p => p.steps?.forEach(s => { if (normalizeStep(s)) normalized = true; }));
+    const savedTiers = Object.keys(saved.calibration?.tierMultipliers || {});
+    const droppedStaleTiers = savedTiers.some(k => !MATERIAL_TIERS.includes(Number(k)));
     state.calibration = mergeCalibration(saved.calibration);
-    if (wasOlder) saveState();
+    if (wasOlder || normalized || droppedStaleTiers) saveState();
   } else {
     await loadDefaults();
   }
@@ -168,9 +181,13 @@ async function loadDefaults() {
 function mergeCalibration(saved) {
   const def = defaultCalibration();
   if (!saved) return def;
+  const tier = { ...def.tierMultipliers };
+  for (const t of MATERIAL_TIERS) {
+    if (saved.tierMultipliers && saved.tierMultipliers[t] != null) tier[t] = saved.tierMultipliers[t];
+  }
   return {
     baseTimes: { ...def.baseTimes, ...(saved.baseTimes || {}) },
-    tierMultipliers: { ...def.tierMultipliers, ...(saved.tierMultipliers || {}) },
+    tierMultipliers: tier,
   };
 }
 
@@ -191,7 +208,8 @@ function newId() { return 'T_' + Math.random().toString(36).slice(2,11).toUpperC
 function newPlanId() { return 'P_' + Math.random().toString(36).slice(2,11).toUpperCase(); }
 function newStepId() { return 'S_' + Math.random().toString(36).slice(2,11).toUpperCase(); }
 
-const ROMAN_TIERS = { 1:'I', 2:'II', 3:'III', 4:'IV', 5:'V', 6:'VI' };
+const ROMAN_TIERS = { 1:'I', 2:'II', 3:'III', 4:'IV', 5:'V' };
+const MATERIAL_NAMES = { 1:'Beast Hide', 2:'Bronze', 3:'Iron', 4:'Steel', 5:'Endgame' };
 
 // Cap ceiling shared by Training Suggestions and Cap Raise plan steps.
 function weaponCeiling(profession, weapon) {
@@ -1092,6 +1110,7 @@ function importJSON(text) {
     state.groups = data.groups || [];
     state.tags = data.tags || [];
     state.plans = data.plans || [];
+    state.plans.forEach(p => p.steps?.forEach(normalizeStep));
     state.calibration = mergeCalibration(data.calibration);
     saveState();
     initFilters();
@@ -1131,7 +1150,7 @@ function stepBaseKey(step) {
 function estimateStepMin(step) {
   if (!step) return 0;
   const base = state.calibration.baseTimes[stepBaseKey(step)];
-  const mult = state.calibration.tierMultipliers[step.gearTier] ?? 1;
+  const mult = state.calibration.tierMultipliers[step.material] ?? 1;
   if (base == null) return 0;
   return Math.round(base * mult);
 }
@@ -1200,13 +1219,27 @@ function newStep(type) {
     talent: null,
     targetCap: null,
     targetLevel: null,
-    gearTier: 3,
+    material: 3,         // gear material tier 1-5; Iron is mid-range default
     status: 'queued',
     startedAt: null,
     completedAt: null,
     actualDurationMin: null,
     note: '',
   };
+}
+
+// Forward-migrate legacy steps that used `gearTier` (1-6, with quality
+// conflated into the same axis). New code uses `material` (1-5).
+// Returns true if it changed anything, so the caller can re-save.
+function normalizeStep(s) {
+  if (s.material == null) {
+    const legacy = s.gearTier != null ? Number(s.gearTier) : 3;
+    s.material = Math.min(5, Math.max(1, legacy));
+    delete s.gearTier;
+    return true;
+  }
+  if ('gearTier' in s) { delete s.gearTier; return true; }
+  return false;
 }
 
 function addStep(planId, type) {
@@ -1250,7 +1283,7 @@ window.stepFieldUpd = function(planId, stepId, field, value) {
   const s = findStep(plan, stepId);
   if (!s) return;
   // Coerce numeric fields
-  if (field === 'gearTier' || field === 'targetCap' || field === 'targetLevel') {
+  if (field === 'material' || field === 'targetCap' || field === 'targetLevel') {
     s[field] = value === '' ? null : Number(value);
   } else if (field === 'mentorId' || field === 'weapon' || field === 'talent') {
     s[field] = value || null;
@@ -1563,9 +1596,9 @@ function renderPlanStep(plan, step, index) {
         <label>Mentor</label>
         <select onchange="stepFieldUpd('${plan.id}','${step.id}','mentorId',this.value)">${mentorOpts}</select>
         ${subject}
-        <label>Gear tier</label>
-        <select onchange="stepFieldUpd('${plan.id}','${step.id}','gearTier',this.value)">
-          ${[1,2,3,4,5,6].map(t => `<option value="${t}" ${t === step.gearTier ? 'selected' : ''}>Tier ${ROMAN_TIERS[t]} (×${state.calibration.tierMultipliers[t]})</option>`).join('')}
+        <label>Material</label>
+        <select onchange="stepFieldUpd('${plan.id}','${step.id}','material',this.value)">
+          ${MATERIAL_TIERS.map(t => `<option value="${t}" ${t === step.material ? 'selected' : ''}>${MATERIAL_NAMES[t]} (Tier ${ROMAN_TIERS[t]} ×${state.calibration.tierMultipliers[t]})</option>`).join('')}
         </select>
       </div>
       <div class="plan-step-status">
@@ -1582,8 +1615,9 @@ function renderCalibrationPanel() {
   const baseRows = Object.entries(c.baseTimes).map(([k, v]) =>
     `<tr><td>${k}</td><td><input type="number" min="1" value="${v}" oninput="onCalibrate('baseTimes','${k}',this.value)"> min</td></tr>`
   ).join('');
-  const tierRows = Object.entries(c.tierMultipliers).map(([k, v]) =>
-    `<tr><td>Tier ${k}</td><td><input type="number" min="0.1" step="0.05" value="${v}" oninput="onCalibrate('tierMultipliers','${k}',this.value)">×</td></tr>`
+  const tierRows = MATERIAL_TIERS.map(t =>
+    `<tr><td>${MATERIAL_NAMES[t]} <span class="muted small">(${ROMAN_TIERS[t]})</span></td>
+      <td><input type="number" min="0.1" step="0.05" value="${c.tierMultipliers[t] ?? 1}" oninput="onCalibrate('tierMultipliers','${t}',this.value)">×</td></tr>`
   ).join('');
   return `<details class="calibration-panel">
     <summary>Calibration constants <span class="muted small">(edit if your timings differ)</span></summary>
@@ -1593,11 +1627,11 @@ function renderCalibrationPanel() {
         <table><tbody>${baseRows}</tbody></table>
       </div>
       <div>
-        <h4>Gear tier multiplier</h4>
+        <h4>Material multiplier</h4>
         <table><tbody>${tierRows}</tbody></table>
       </div>
     </div>
-    <p class="muted small">Both base times and multipliers are placeholders until measured in-game. See <code>docs/training_plans.md</code>.</p>
+    <p class="muted small">Material tier (Beast Hide → Endgame) affects training duration. Quality (the I-VI badges) and Mod do not — confirmed in-game. All values here are placeholders until measured. See <code>docs/training_plans.md</code>.</p>
     <button class="small" onclick="onResetCalibration()">Reset to defaults</button>
   </details>`;
 }
