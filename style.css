@@ -178,7 +178,11 @@ table.roster th {
   font-weight: 600;
 }
 table.roster th.weapon-col { background: var(--table-head-weapon); }
-table.roster tr:hover td { background: var(--row-hover); }
+/* Hover: skip tier-colored cells so their text stays readable against the
+   tier background (which uses --tier-on, a dark color, for contrast). */
+table.roster tr:hover td:not(.tier-mastery):not(.tier-specialist):not(.tier-iron):not(.tier-sub) {
+  background: var(--row-hover);
+}
 table.roster td.skill-cell, table.roster td.weapon-cell {
   text-align: center;
   font-variant-numeric: tabular-nums;
@@ -196,6 +200,62 @@ table.roster td.name {
 }
 table.roster td.name:hover { text-decoration: underline; }
 table.roster .aligned-skill { font-weight: bold; }
+
+/* Inline-editable roster cells */
+table.roster.editable input.cell-input,
+table.roster.editable select.cell-input {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid transparent;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font: inherit;
+  font-size: 12px;
+  width: 100%;
+  min-width: 0;
+}
+table.roster.editable input.cell-input.num {
+  width: 56px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+table.roster.editable input.cell-input:hover,
+table.roster.editable select.cell-input:hover {
+  border-color: var(--border);
+  background: var(--bg3);
+}
+table.roster.editable input.cell-input:focus,
+table.roster.editable select.cell-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg);
+}
+table.roster.editable td.name-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 160px;
+}
+table.roster.editable td.name-cell input.name-input {
+  font-weight: 600;
+  color: var(--accent);
+  flex: 1;
+}
+table.roster.editable .row-go {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 1px 6px;
+  font-size: 14px;
+  line-height: 1;
+}
+table.roster.editable .row-go:hover {
+  color: var(--accent);
+  border-color: var(--border);
+  background: var(--bg3);
+}
 
 /* ============== PROFILE VIEW ============== */
 .profile {

@@ -4,7 +4,7 @@
  */
 
 // === CONSTANTS ===
-const APP_VERSION = '0.1.0';
+const APP_VERSION = '0.2.0';
 const REPO_URL = 'https://github.com/EmmyAllEars/soulmask-clan-manager';
 const STORAGE_KEY = 'soulmaskClan_v1';
 const THEME_KEY = 'soulmaskClan_theme';
@@ -224,10 +224,12 @@ function getFilteredRoster() {
   });
 }
 
+const PROFESSIONS = ['Craftsman','Porter','Laborer','Warrior','Hunter','Guard'];
+
 function renderRoster() {
   const list = getFilteredRoster();
   const wrap = document.getElementById('roster-table-wrap');
-  let html = '<table class="roster"><thead><tr>';
+  let html = '<table class="roster editable"><thead><tr>';
   html += '<th>Name</th><th>Lvl</th><th>Title</th><th>Profession</th><th>Tribe</th><th>Trait</th><th>Location</th>';
   for (const s of SKILLS) html += `<th>${s}</th>`;
   for (const a of ATTRS) html += `<th>${a}</th>`;
@@ -235,11 +237,21 @@ function renderRoster() {
   for (const w of WEAPONS) html += `<th class="weapon-col">${w}</th>`;
   html += '<th>Groups</th><th>Tags</th><th>Talents</th></tr></thead><tbody>';
   for (const t of list) {
-    html += '<tr>';
-    html += `<td class="name" onclick="ui.showProfile('${t.id}')">${escapeHtml(t.name)}</td>`;
-    html += `<td>${t.level ?? '—'}</td><td>${escapeHtml(t.title || '')}</td>`;
-    html += `<td>${escapeHtml(t.profession || '')}</td><td>${escapeHtml(t.tribe || '')}</td>`;
-    html += `<td>${escapeHtml(t.trait || '')}</td><td>${escapeHtml(t.location || '')}</td>`;
+    const id = t.id;
+    html += `<tr data-id="${id}">`;
+    html += `<td class="name-cell">
+      <input class="cell-input name-input" value="${escapeHtml(t.name)}" oninput="updFromRoster('${id}','name',this.value)">
+      <button class="row-go" title="Open profile" onclick="ui.showProfile('${id}')">→</button>
+    </td>`;
+    html += `<td><input class="cell-input num" type="number" value="${t.level ?? ''}" oninput="updFromRoster('${id}','level',this.value===''?null:+this.value)"></td>`;
+    html += `<td><input class="cell-input" value="${escapeHtml(t.title || '')}" oninput="updFromRoster('${id}','title',this.value)"></td>`;
+    html += `<td><select class="cell-input" onchange="updFromRoster('${id}','profession',this.value,{rerender:true})">
+      <option value=""${t.profession ? '' : ' selected'}></option>
+      ${PROFESSIONS.map(p => `<option${p === t.profession ? ' selected' : ''}>${p}</option>`).join('')}
+    </select></td>`;
+    html += `<td><input class="cell-input" value="${escapeHtml(t.tribe || '')}" oninput="updFromRoster('${id}','tribe',this.value)"></td>`;
+    html += `<td><input class="cell-input" value="${escapeHtml(t.trait || '')}" oninput="updFromRoster('${id}','trait',this.value)"></td>`;
+    html += `<td><input class="cell-input" value="${escapeHtml(t.location || '')}" oninput="updFromRoster('${id}','location',this.value)"></td>`;
     const aligned = PROF_BEST_SKILLS[t.profession] || [];
     for (const s of SKILLS) {
       const v = (t.skills?.[s]) || {current:null, cap:null};
@@ -249,9 +261,9 @@ function renderRoster() {
     }
     for (const a of ATTRS) {
       const v = t.attrs?.[a];
-      html += `<td>${v ?? '—'}</td>`;
+      html += `<td><input class="cell-input num" type="number" value="${v ?? ''}" oninput="updAttrFromRoster('${id}','${a}',this.value===''?null:+this.value)"></td>`;
     }
-    html += `<td>${escapeHtml(t.recognition || '—')}</td>`;
+    html += `<td><input class="cell-input" value="${escapeHtml(t.recognition || '')}" oninput="updFromRoster('${id}','recognition',this.value)" placeholder="—"></td>`;
     const classW = PROF_CLASS_WEAPONS[t.profession] || [];
     for (const w of WEAPONS) {
       const v = (t.weapons?.[w]) || {cap:null};
@@ -536,6 +548,26 @@ window.upd = upd;
 window.updAttr = updAttr;
 window.updSkill = updSkill;
 window.updWeapon = updWeapon;
+
+// Roster-side updates: save without re-rendering the table (would steal focus).
+// Pass {rerender: true} when the change affects column highlighting (profession).
+function updFromRoster(id, field, val, opts = {}) {
+  const t = state.roster.find(x => x.id === id);
+  if (!t) return;
+  t[field] = val;
+  saveState();
+  if (opts.rerender) renderRoster();
+  else if (field === 'tribe') initFilters();
+}
+function updAttrFromRoster(id, attr, val) {
+  const t = state.roster.find(x => x.id === id);
+  if (!t) return;
+  t.attrs = t.attrs || {};
+  t.attrs[attr] = val;
+  saveState();
+}
+window.updFromRoster = updFromRoster;
+window.updAttrFromRoster = updAttrFromRoster;
 
 function addToList(id, listKey) {
   const t = state.roster.find(x => x.id === id);
