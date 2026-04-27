@@ -4,6 +4,8 @@
  */
 
 // === CONSTANTS ===
+const APP_VERSION = '0.0.2';
+const REPO_URL = 'https://github.com/EmmyAllEars/soulmask-clan-manager';
 const STORAGE_KEY = 'soulmaskClan_v1';
 const DEFAULT_ROSTER_URL = 'data/default_roster.json';
 const TALENTS_URL = 'data/talents.json';
@@ -85,6 +87,8 @@ async function boot() {
   initFilters();
   renderRoster();
   bindUI();
+  const v = document.getElementById('app-version');
+  if (v) v.textContent = `v${APP_VERSION}`;
 }
 
 async function loadDefaults() {
@@ -132,8 +136,39 @@ const ui = {
     document.getElementById('nav-profile').classList.add('primary');
     renderProfile();
   },
+  reportBug() { openIssue('bug', '[Bug] '); },
+  suggestFeature() { openIssue('enhancement', '[Feature] '); },
 };
 window.ui = ui;
+
+function buildIssueBody() {
+  const activeView = document.querySelector('.view.active');
+  const viewName = activeView?.id === 'view-profile' ? 'Profile' : 'Roster';
+  const sel = state.selectedId ? state.roster.find(t => t.id === state.selectedId) : null;
+  const ctx = sel && viewName === 'Profile' ? ` (tribesman: ${sel.name})` : '';
+  return [
+    '<!-- Describe the bug or feature here. Page details below help with triage — please leave them. -->',
+    '',
+    '',
+    '---',
+    '**Page details (auto-filled):**',
+    `- App version: ${APP_VERSION}`,
+    `- View: ${viewName}${ctx}`,
+    `- Roster size: ${state.roster.length}`,
+    `- Talents loaded: ${state.talents.length}`,
+    `- User agent: ${navigator.userAgent}`,
+    `- Viewport: ${window.innerWidth}×${window.innerHeight}`,
+    `- Timestamp: ${new Date().toISOString()}`,
+  ].join('\n');
+}
+
+function openIssue(label, titlePrefix) {
+  const url = `${REPO_URL}/issues/new?` +
+    `labels=${encodeURIComponent(label)}` +
+    `&title=${encodeURIComponent(titlePrefix)}` +
+    `&body=${encodeURIComponent(buildIssueBody())}`;
+  window.open(url, '_blank', 'noopener');
+}
 
 // === ROSTER VIEW ===
 function initFilters() {
