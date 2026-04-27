@@ -550,6 +550,10 @@ function renderTalentList(t) {
       </div>
       <span class="lvl">${'I'.repeat(tal.level||1)}</span>
       <button class="remove" onclick="rmTalent('${t.id}',${i})" title="Remove">×</button>
+      <div class="talent-tip" role="tooltip">
+        <div class="tip-name">${escapeHtml(tal.name)}</div>
+        ${effect ? `<div class="tip-effect">${escapeHtml(effect)}</div>` : ''}
+      </div>
     </div>`;
   }).join('');
 }
