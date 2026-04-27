@@ -4,7 +4,7 @@
  */
 
 // === CONSTANTS ===
-const APP_VERSION = '0.3.0';
+const APP_VERSION = '0.4.0';
 const REPO_URL = 'https://github.com/EmmyAllEars/soulmask-clan-manager';
 const STORAGE_KEY = 'soulmaskClan_v1';
 const THEME_KEY = 'soulmaskClan_theme';
@@ -45,7 +45,11 @@ let state = {
   groups: [],          // user-defined group names
   tags: [],            // user-defined tag names
   selectedId: null,    // for profile view
+  sort: { column: null, dir: null, sub: null }, // null = default order
+  lastRosterOrder: [], // ids in last-rendered roster order, for profile prev/next
 };
+
+const STRING_SORT_COLUMNS = new Set(['name','title','profession','tribe','trait','location']);
 
 // === STORAGE ===
 function saveState() {
@@ -129,6 +133,7 @@ const ui = {
     document.getElementById('view-profile').classList.remove('active');
     document.getElementById('nav-roster').classList.add('primary');
     document.getElementById('nav-profile').classList.remove('primary');
+    refreshNavProfileLabel();
   },
   showProfile(id) {
     state.selectedId = id;
@@ -137,6 +142,7 @@ const ui = {
     document.getElementById('nav-roster').classList.remove('primary');
     document.getElementById('nav-profile').classList.add('primary');
     renderProfile();
+    refreshNavProfileLabel();
   },
   reportBug() { openIssue('bug', '[Bug] '); },
   suggestFeature() { openIssue('enhancement', '[Feature] '); },
@@ -146,6 +152,15 @@ const ui = {
   },
 };
 window.ui = ui;
+
+function refreshNavProfileLabel() {
+  const navBtn = document.getElementById('nav-profile');
+  if (!navBtn) return;
+  const onProfile = document.getElementById('view-profile')?.classList.contains('active');
+  if (!onProfile) { navBtn.textContent = 'Profile'; return; }
+  const t = state.roster.find(x => x.id === state.selectedId);
+  navBtn.textContent = t ? `Profile: ${t.name}` : 'Profile';
+}
 
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
@@ -224,17 +239,102 @@ function getFilteredRoster() {
   });
 }
 
+function getSortedFiltered() {
+  const list = getFilteredRoster();
+  if (!state.sort.column) return list;
+  return [...list].sort(compareTribesmen);
+}
+
+function compareTribesmen(a, b) {
+  const c = state.sort.column;
+  const dir = state.sort.dir === 'asc' ? 1 : -1;
+  let av, bv;
+  let isString = false;
+
+  if (STRING_SORT_COLUMNS.has(c)) {
+    av = (a[c] || '').toLowerCase();
+    bv = (b[c] || '').toLowerCase();
+    isString = true;
+  } else if (c === 'level') {
+    av = a.level; bv = b.level;
+  } else if (c.startsWith('attr:')) {
+    const k = c.slice(5);
+    av = a.attrs?.[k]; bv = b.attrs?.[k];
+  } else if (c.startsWith('skill:')) {
+    const k = c.slice(6);
+    av = a.skills?.[k]?.[state.sort.sub];
+    bv = b.skills?.[k]?.[state.sort.sub];
+  } else if (c.startsWith('weapon:')) {
+    const k = c.slice(7);
+    av = a.weapons?.[k]?.cap;
+    bv = b.weapons?.[k]?.cap;
+  } else if (c === 'groups')  { av = (a.groups || []).length; bv = (b.groups || []).length; }
+  else if (c === 'tags')      { av = (a.tags || []).length; bv = (b.tags || []).length; }
+  else if (c === 'talents')   { av = (a.talents || []).length; bv = (b.talents || []).length; }
+
+  /* Empty values always sort to the end regardless of direction */
+  const aEmpty = av == null || av === '';
+  const bEmpty = bv == null || bv === '';
+  if (aEmpty && bEmpty) return 0;
+  if (aEmpty) return 1;
+  if (bEmpty) return -1;
+
+  if (isString) return av.localeCompare(bv) * dir;
+  return (av - bv) * dir;
+}
+
+function sortBy(ev, column) {
+  if (ev) ev.preventDefault();
+  const isSkill = column.startsWith('skill:');
+  /* Shift-click on a skill column toggles to sorting by current instead of cap.
+     Weapons only have cap so shift has no effect there. */
+  const desiredSub = isSkill ? (ev?.shiftKey ? 'current' : 'cap') : null;
+
+  if (state.sort.column === column && state.sort.sub === desiredSub) {
+    /* Same column+sub: flip direction, or clear after the second toggle */
+    const isString = STRING_SORT_COLUMNS.has(column);
+    const initialDir = isString ? 'asc' : 'desc';
+    if (state.sort.dir === initialDir) {
+      state.sort.dir = initialDir === 'desc' ? 'asc' : 'desc';
+    } else {
+      state.sort = { column: null, dir: null, sub: null };
+    }
+  } else {
+    state.sort.column = column;
+    state.sort.sub = desiredSub;
+    state.sort.dir = STRING_SORT_COLUMNS.has(column) ? 'asc' : 'desc';
+  }
+  renderRoster();
+}
+window.sortBy = sortBy;
+
+function sortIndicator(column) {
+  if (state.sort.column !== column) return '';
+  const arrow = state.sort.dir === 'asc' ? '↑' : '↓';
+  const subTag = state.sort.sub === 'current' ? 'ᶜ' : '';
+  return ` <span class="sort-ind">${arrow}${subTag}</span>`;
+}
+
+function thSort(label, col, extraClass = '') {
+  const cls = `sortable${extraClass ? ' ' + extraClass : ''}`;
+  return `<th class="${cls}" onclick="sortBy(event,'${col}')">${escapeHtml(label)}${sortIndicator(col)}</th>`;
+}
+
 const PROFESSIONS = ['Craftsman','Porter','Laborer','Warrior','Hunter','Guard'];
 
 function renderRoster() {
-  const list = getFilteredRoster();
+  const list = getSortedFiltered();
+  state.lastRosterOrder = list.map(t => t.id);
   const wrap = document.getElementById('roster-table-wrap');
   let html = '<table class="roster editable"><thead><tr>';
-  html += '<th>Name</th><th>Lvl</th><th>Title</th><th>Profession</th><th>Tribe</th><th>Trait</th><th>Location</th>';
-  for (const s of SKILLS) html += `<th>${s}</th>`;
-  for (const a of ATTRS) html += `<th>${a}</th>`;
-  for (const w of WEAPONS) html += `<th class="weapon-col">${w}</th>`;
-  html += '<th>Groups</th><th>Tags</th><th>Talents</th></tr></thead><tbody>';
+  html += thSort('Name', 'name') + thSort('Lvl', 'level') + thSort('Title', 'title')
+        + thSort('Profession', 'profession') + thSort('Tribe', 'tribe')
+        + thSort('Trait', 'trait') + thSort('Location', 'location');
+  for (const s of SKILLS) html += thSort(s, `skill:${s}`);
+  for (const a of ATTRS)  html += thSort(a, `attr:${a}`);
+  for (const w of WEAPONS) html += thSort(w, `weapon:${w}`, 'weapon-col');
+  html += thSort('Groups', 'groups') + thSort('Tags', 'tags') + thSort('Talents', 'talents');
+  html += '</tr></thead><tbody>';
   for (const t of list) {
     const id = t.id;
     html += `<tr data-id="${id}">`;
@@ -292,7 +392,19 @@ function renderProfile() {
   const aligned = PROF_BEST_SKILLS[t.profession] || [];
   const classW = PROF_CLASS_WEAPONS[t.profession] || [];
 
+  /* Prev/Next walks the same filtered+sorted view as the roster screen. */
+  const order = (state.lastRosterOrder && state.lastRosterOrder.length)
+    ? state.lastRosterOrder
+    : state.roster.map(x => x.id);
+  const idx = order.indexOf(t.id);
+  const prevId = idx > 0 ? order[idx - 1] : null;
+  const nextId = idx >= 0 && idx < order.length - 1 ? order[idx + 1] : null;
+  const pos = idx >= 0 ? `${idx + 1} of ${order.length}` : '';
+
   let html = `<div class="profile-header">
+    <button class="prof-nav" ${prevId ? `onclick="ui.showProfile('${prevId}')"` : 'disabled'} title="Previous tribesman">← Prev</button>
+    <button class="prof-nav" ${nextId ? `onclick="ui.showProfile('${nextId}')"` : 'disabled'} title="Next tribesman">Next →</button>
+    <span class="prof-pos muted">${pos}</span>
     <h2>${escapeHtml(t.name)}</h2>
     <span class="meta">LV ${t.level ?? '—'} · ${escapeHtml(t.title || '')} ${escapeHtml(t.profession || '')} · ${escapeHtml(t.tribe || '')} ${t.trait ? '· '+escapeHtml(t.trait) : ''}</span>
     <span class="grow" style="flex:1"></span>
@@ -348,8 +460,8 @@ function renderProfile() {
     const fillW = v.cap ? Math.min(100, ((v.current||0)/Math.max(v.cap,1))*100) : 0;
     html += `<div class="skill-row">
       <div class="label ${isAligned?'aligned':''}">${s}</div>
-      <input type="number" value="${v.current ?? ''}" placeholder="curr" oninput="updSkill('${t.id}','${s}','current',+this.value||null)">
-      <input type="number" value="${v.cap ?? ''}" placeholder="cap" oninput="updSkill('${t.id}','${s}','cap',+this.value||null)">
+      <input type="number" value="${v.current ?? ''}" placeholder="curr" oninput="updSkill('${t.id}','${s}','current',this)">
+      <input type="number" value="${v.cap ?? ''}" placeholder="cap" oninput="updSkill('${t.id}','${s}','cap',this)">
       <div class="bar"><div class="fill ${tier}" style="width:${fillW}%"></div></div>
     </div>`;
   }
@@ -364,8 +476,8 @@ function renderProfile() {
     const fillW = v.cap ? Math.min(100, ((v.current||0)/Math.max(v.cap,1))*100) : 0;
     html += `<div class="skill-row">
       <div class="label ${isClass?'aligned':''}">${w}${isClass?' (class)':''}</div>
-      <input type="number" value="${v.current ?? ''}" placeholder="curr" oninput="updWeapon('${t.id}','${w}','current',+this.value||null)">
-      <input type="number" value="${v.cap ?? ''}" placeholder="cap" oninput="updWeapon('${t.id}','${w}','cap',+this.value||null)">
+      <input type="number" value="${v.current ?? ''}" placeholder="curr" oninput="updWeapon('${t.id}','${w}','current',this)">
+      <input type="number" value="${v.cap ?? ''}" placeholder="cap" oninput="updWeapon('${t.id}','${w}','cap',this)">
       <div class="bar"><div class="fill ${tier}" style="width:${fillW}%"></div></div>
     </div>`;
   }
@@ -517,6 +629,7 @@ function upd(id, field, val) {
   t[field] = val;
   saveState();
   renderRoster();
+  if (field === 'name') refreshNavProfileLabel();
 }
 function updAttr(id, attr, val) {
   const t = state.roster.find(x => x.id === id);
@@ -526,27 +639,39 @@ function updAttr(id, attr, val) {
   saveState();
   renderRoster();
 }
-function updSkill(id, skill, field, val) {
+function updSkill(id, skill, field, inputEl) {
   const t = state.roster.find(x => x.id === id);
   if (!t) return;
   t.skills = t.skills || {};
-  t.skills[skill] = t.skills[skill] || {};
+  t.skills[skill] = t.skills[skill] || {current:null, cap:null};
+  const val = inputEl.value === '' ? null : +inputEl.value;
   t.skills[skill][field] = val;
   saveState();
-  renderRoster();
-  // Refresh just the bar
-  renderProfile();
+  updateProfileBar(inputEl, t.skills[skill]);
 }
-function updWeapon(id, weapon, field, val) {
+function updWeapon(id, weapon, field, inputEl) {
   const t = state.roster.find(x => x.id === id);
   if (!t) return;
   t.weapons = t.weapons || {};
-  t.weapons[weapon] = t.weapons[weapon] || {};
+  t.weapons[weapon] = t.weapons[weapon] || {current:null, cap:null};
+  const val = inputEl.value === '' ? null : +inputEl.value;
   t.weapons[weapon][field] = val;
   saveState();
-  renderRoster();
-  renderProfile();
+  updateProfileBar(inputEl, t.weapons[weapon]);
 }
+
+/* Update the .bar inside a .skill-row in place — avoids re-rendering the whole
+   profile per keystroke (which scrolls the page back to the top). */
+function updateProfileBar(inputEl, v) {
+  const row = inputEl.closest('.skill-row');
+  if (!row) return;
+  const fill = row.querySelector('.bar .fill');
+  if (!fill) return;
+  const fillW = v.cap ? Math.min(100, ((v.current || 0) / Math.max(v.cap, 1)) * 100) : 0;
+  fill.style.width = fillW + '%';
+  fill.className = 'fill ' + tierClass(v.cap);
+}
+
 window.upd = upd;
 window.updAttr = updAttr;
 window.updSkill = updSkill;
@@ -561,6 +686,7 @@ function updFromRoster(id, field, val, opts = {}) {
   saveState();
   if (opts.rerender) renderRoster();
   else if (field === 'tribe') initFilters();
+  if (field === 'name') refreshNavProfileLabel();
 }
 function updAttrFromRoster(id, attr, val) {
   const t = state.roster.find(x => x.id === id);
