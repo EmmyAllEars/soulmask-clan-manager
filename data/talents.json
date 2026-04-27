@@ -396,6 +396,18 @@
     "polarity": "positive"
   },
   {
+    "name": "Hardened Skin — Anti-Blunt",
+    "cn_name": null,
+    "category": "Weapon Damage Talents",
+    "type": "Combat — Damage-type Resist",
+    "effect": "DMG taken from blunt/strike-type attacks −10% / −15% / −20%",
+    "lock": null,
+    "prereq": null,
+    "icon": "tianfu_yingpikangdaji.webp",
+    "icon_url": "https://saraserenity.net/soulmask/img/ng/tianfu_yingpikangdaji.webp",
+    "polarity": "positive"
+  },
+  {
     "name": "Hardened Skin — Anti-Pierce",
     "cn_name": null,
     "category": "Weapon Damage Talents",
