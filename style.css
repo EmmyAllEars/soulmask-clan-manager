@@ -1,23 +1,82 @@
-/* Soulmask Clan Manager — styles */
-:root {
-  --bg: #1a1a1a;
-  --bg2: #242424;
-  --bg3: #2e2e2e;
-  --border: #3a3a3a;
-  --text: #e6e6e6;
-  --text-dim: #999;
-  --accent: #f4a261;
-  --gold: #f4a261;
-  --green: #c8e6c9;
-  --yellow: #ffe066;
-  --orange: #f4a261;
-  --red: #e76f51;
-  --grey: #666;
-  --tier-mastery: #f4a261;     /* 120+ */
-  --tier-specialist: #ffe066;  /* 100-119 */
-  --tier-iron: #c8e6c9;        /* 90-99 */
-  --tier-sub: #555;            /* <90 */
-  --tier-sub-text: #999;
+/* Soulmask Clan Manager — styles
+ * Theming: switch via `data-theme="dark"|"light"` on <html>.
+ */
+
+/* ============== THEME TOKENS ============== */
+:root[data-theme="dark"] {
+  --bg:           #1c1f24;
+  --bg2:          #252930;
+  --bg3:          #2e333b;
+  --border:       #3a4049;
+  --text:         #d4d8de;
+  --text-dim:     #8b94a0;
+  --accent:       #c89978;
+  --accent-hover: #d4a583;
+  --accent-on:    #1c1f24;       /* text color on accent fill */
+  --red:          #d97766;
+  --red-bg:       #3a2422;
+  --row-hover:    rgba(200, 153, 120, 0.06);
+  --table-head-skill:  #3a4a55;
+  --table-head-weapon: #5a3a44;
+  --shadow:       0 8px 24px rgba(0,0,0,0.55);
+
+  --tier-mastery:    #d49160;
+  --tier-specialist: #e8d56a;
+  --tier-iron:       #a8c9a8;
+  --tier-sub:        #3f4651;
+  --tier-sub-text:   #8b94a0;
+  --tier-on:         #1c1f24;     /* text on the tier swatch backgrounds */
+
+  --chip-group-bg:   #324452;
+  --chip-group-fg:   #e8eef3;
+  --chip-tag-bg:     #3d2f33;
+  --chip-tag-fg:     #d4a583;
+}
+
+:root[data-theme="light"] {
+  --bg:           #f4eee2;
+  --bg2:          #fbf6ec;
+  --bg3:          #e8dfca;
+  --border:       #cdc1a4;
+  --text:         #2c2620;
+  --text-dim:     #7a6f5e;
+  --accent:       #a06330;
+  --accent-hover: #8a5022;
+  --accent-on:    #fbf6ec;
+  --red:          #a83e2e;
+  --red-bg:       #f3dcd5;
+  --row-hover:    rgba(160, 99, 48, 0.07);
+  --table-head-skill:  #7a8a95;
+  --table-head-weapon: #8a5560;
+  --shadow:       0 8px 20px rgba(80,60,30,0.18);
+
+  --tier-mastery:    #e8a872;
+  --tier-specialist: #f0d75e;
+  --tier-iron:       #b8d8b8;
+  --tier-sub:        #d6cfbf;
+  --tier-sub-text:   #7a6f5e;
+  --tier-on:         #2c2620;
+
+  --chip-group-bg:   #d3dde3;
+  --chip-group-fg:   #2f4858;
+  --chip-tag-bg:     #efddc8;
+  --chip-tag-fg:     #8a5224;
+}
+
+/* Default: dark, until JS sets the attribute. Avoids flash of unstyled. */
+:root:not([data-theme]) {
+  color-scheme: dark;
+  --bg: #1c1f24; --bg2: #252930; --bg3: #2e333b; --border: #3a4049;
+  --text: #d4d8de; --text-dim: #8b94a0;
+  --accent: #c89978; --accent-hover: #d4a583; --accent-on: #1c1f24;
+  --red: #d97766; --red-bg: #3a2422; --row-hover: rgba(200, 153, 120, 0.06);
+  --table-head-skill: #3a4a55; --table-head-weapon: #5a3a44;
+  --shadow: 0 8px 24px rgba(0,0,0,0.55);
+  --tier-mastery: #d49160; --tier-specialist: #e8d56a;
+  --tier-iron: #a8c9a8; --tier-sub: #3f4651; --tier-sub-text: #8b94a0;
+  --tier-on: #1c1f24;
+  --chip-group-bg: #324452; --chip-group-fg: #e8eef3;
+  --chip-tag-bg: #3d2f33; --chip-tag-fg: #d4a583;
 }
 
 * { box-sizing: border-box; }
@@ -27,7 +86,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 /* ============== TOP BAR ============== */
@@ -46,6 +105,7 @@ header.topbar h1 {
   margin: 0;
   font-size: 18px;
   color: var(--accent);
+  letter-spacing: 0.2px;
 }
 header.topbar .grow { flex: 1; }
 header.topbar button, .toolbar button, .actions button {
@@ -56,14 +116,15 @@ header.topbar button, .toolbar button, .actions button {
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
+  transition: background 0.12s, border-color 0.12s;
 }
 header.topbar button:hover, .toolbar button:hover, .actions button:hover {
-  background: #404040;
+  background: var(--bg);
   border-color: var(--accent);
 }
-header.topbar button.primary { background: var(--accent); color: #222; border-color: var(--accent); }
-header.topbar button.primary:hover { background: #ffb878; }
-header.topbar button.danger { color: #ff8a65; }
+header.topbar button.primary { background: var(--accent); color: var(--accent-on); border-color: var(--accent); }
+header.topbar button.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+header.topbar button.danger { color: var(--red); }
 
 /* ============== LAYOUT ============== */
 main { padding: 20px; max-width: 100%; overflow-x: auto; }
@@ -87,7 +148,14 @@ main { padding: 20px; max-width: 100%; overflow-x: auto; }
   min-width: 180px;
 }
 .toolbar .legend { font-size: 12px; color: var(--text-dim); margin-left: auto; }
-.toolbar .legend span { display: inline-block; padding: 2px 8px; margin-left: 4px; border-radius: 3px; color: #222; }
+.toolbar .legend span.swatch {
+  display: inline-block; padding: 2px 8px; margin-left: 4px; border-radius: 3px;
+  color: var(--tier-on);
+}
+.swatch.t-mastery    { background: var(--tier-mastery); }
+.swatch.t-specialist { background: var(--tier-specialist); }
+.swatch.t-iron       { background: var(--tier-iron); }
+.swatch.t-sub        { background: var(--tier-sub); color: var(--tier-sub-text); }
 
 /* ============== ROSTER TABLE ============== */
 table.roster {
@@ -102,25 +170,25 @@ table.roster th, table.roster td {
   white-space: nowrap;
 }
 table.roster th {
-  background: #2f4858;
-  color: white;
+  background: var(--table-head-skill);
+  color: #fff;
   position: sticky;
   top: 0;
   z-index: 5;
   font-weight: 600;
 }
-table.roster th.weapon-col { background: #6b2737; }
-table.roster tr:hover td { background: rgba(244,162,97,0.05); }
+table.roster th.weapon-col { background: var(--table-head-weapon); }
+table.roster tr:hover td { background: var(--row-hover); }
 table.roster td.skill-cell, table.roster td.weapon-cell {
   text-align: center;
   font-variant-numeric: tabular-nums;
   cursor: default;
 }
-table.roster td.tier-mastery { background: var(--tier-mastery); color: #222; font-weight: 600; }
-table.roster td.tier-specialist { background: var(--tier-specialist); color: #222; font-weight: 600; }
-table.roster td.tier-iron { background: var(--tier-iron); color: #222; }
-table.roster td.tier-sub { background: var(--tier-sub); color: var(--tier-sub-text); }
-table.roster td.tier-empty { color: var(--tier-sub-text); }
+table.roster td.tier-mastery    { background: var(--tier-mastery);    color: var(--tier-on); font-weight: 600; }
+table.roster td.tier-specialist { background: var(--tier-specialist); color: var(--tier-on); font-weight: 600; }
+table.roster td.tier-iron       { background: var(--tier-iron);       color: var(--tier-on); }
+table.roster td.tier-sub        { background: var(--tier-sub);        color: var(--tier-sub-text); }
+table.roster td.tier-empty      { color: var(--tier-sub-text); }
 table.roster td.name {
   font-weight: 600;
   cursor: pointer;
@@ -160,6 +228,17 @@ table.roster .aligned-skill { font-weight: bold; }
 .profile-header h2 { margin: 0; color: var(--accent); }
 .profile-header .meta { color: var(--text-dim); }
 
+.btn-danger-strong {
+  background: var(--red-bg);
+  color: var(--red);
+  border: 1px solid var(--red);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.btn-danger-strong:hover { background: var(--red); color: var(--accent-on); }
+
 .field { margin-bottom: 10px; }
 .field label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 3px; }
 .field input, .field select, .field textarea {
@@ -174,7 +253,7 @@ table.roster .aligned-skill { font-weight: bold; }
   gap: 8px;
   align-items: center;
   padding: 4px 0;
-  border-bottom: 1px solid #2a2a2a;
+  border-bottom: 1px solid var(--border);
   font-size: 12px;
 }
 .skill-row .label { color: var(--text); }
@@ -192,10 +271,10 @@ table.roster .aligned-skill { font-weight: bold; }
 .skill-row .bar .fill {
   height: 100%; background: var(--accent); transition: width 0.2s;
 }
-.skill-row .bar .fill.tier-mastery { background: var(--tier-mastery); }
+.skill-row .bar .fill.tier-mastery    { background: var(--tier-mastery); }
 .skill-row .bar .fill.tier-specialist { background: var(--tier-specialist); }
-.skill-row .bar .fill.tier-iron { background: var(--tier-iron); }
-.skill-row .bar .fill.tier-sub { background: #888; }
+.skill-row .bar .fill.tier-iron       { background: var(--tier-iron); }
+.skill-row .bar .fill.tier-sub        { background: var(--text-dim); }
 
 /* ============== TALENTS ============== */
 .talents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
@@ -209,11 +288,11 @@ table.roster .aligned-skill { font-weight: bold; }
 .talent-pill .name { font-weight: 600; font-size: 13px; }
 .talent-pill .effect { font-size: 11px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .talent-pill .lvl {
-  background: var(--accent); color: #222; padding: 2px 8px; border-radius: 4px;
+  background: var(--accent); color: var(--accent-on); padding: 2px 8px; border-radius: 4px;
   font-size: 12px; font-weight: 700;
 }
-.talent-pill.negative { border-color: #6e3a3a; }
-.talent-pill.negative .lvl { background: var(--red); color: white; }
+.talent-pill.negative { border-color: var(--red); }
+.talent-pill.negative .lvl { background: var(--red); color: var(--accent-on); }
 .talent-pill .remove {
   background: transparent; border: none; color: var(--text-dim); cursor: pointer;
   padding: 2px 6px; font-size: 16px; line-height: 1;
@@ -233,13 +312,13 @@ table.roster .aligned-skill { font-weight: bold; }
   max-height: 280px;
   overflow-y: auto;
   z-index: 1000;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  box-shadow: var(--shadow);
   min-width: 320px;
 }
 .talent-dropdown .opt {
   display: flex; align-items: center; gap: 8px;
   padding: 6px 8px; cursor: pointer;
-  border-bottom: 1px solid #2a2a2a;
+  border-bottom: 1px solid var(--border);
 }
 .talent-dropdown .opt:hover { background: var(--bg3); }
 .talent-dropdown .opt img { width: 28px; height: 28px; background: var(--bg); border-radius: 3px; }
@@ -255,8 +334,8 @@ table.roster .aligned-skill { font-weight: bold; }
   padding: 3px 8px; border-radius: 12px;
   font-size: 11px; margin: 2px;
 }
-.chip.group { background: #2f4858; color: white; border-color: #2f4858; }
-.chip.tag { background: #44343a; color: var(--accent); border-color: #44343a; }
+.chip.group { background: var(--chip-group-bg); color: var(--chip-group-fg); border-color: var(--chip-group-bg); }
+.chip.tag   { background: var(--chip-tag-bg);   color: var(--chip-tag-fg);   border-color: var(--chip-tag-bg); }
 .chip .x { cursor: pointer; opacity: 0.7; margin-left: 4px; }
 .chip .x:hover { opacity: 1; color: var(--red); }
 
@@ -268,7 +347,7 @@ table.roster .aligned-skill { font-weight: bold; }
   border-left: 3px solid var(--accent);
   padding: 8px 12px;
   margin-bottom: 8px;
-  background: rgba(244, 162, 97, 0.05);
+  background: var(--row-hover);
   font-size: 13px;
 }
 .suggestion .head { font-weight: 600; color: var(--accent); }
@@ -276,7 +355,7 @@ table.roster .aligned-skill { font-weight: bold; }
 
 /* ============== MODALS ============== */
 .modal-bg {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55);
   display: none; align-items: center; justify-content: center; z-index: 200;
 }
 .modal-bg.active { display: flex; }
@@ -305,10 +384,26 @@ footer.appfoot {
 footer.appfoot .meta {
   display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 6px;
 }
-footer.appfoot .sep { opacity: 0.5; }
+footer.appfoot .sep { opacity: 0.4; }
 footer.appfoot a, footer.appfoot button.linklike {
   color: var(--accent); background: none; border: none; padding: 0;
   cursor: pointer; font: inherit; text-decoration: none;
 }
 footer.appfoot a:hover, footer.appfoot button.linklike:hover { text-decoration: underline; }
 footer.appfoot .disclaimer { font-size: 11px; opacity: 0.75; }
+
+footer.appfoot .theme-toggle {
+  margin-left: auto;
+  background: var(--bg3);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+}
+footer.appfoot .theme-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

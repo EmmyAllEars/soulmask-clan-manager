@@ -4,9 +4,10 @@
  */
 
 // === CONSTANTS ===
-const APP_VERSION = '0.0.2';
+const APP_VERSION = '0.1.0';
 const REPO_URL = 'https://github.com/EmmyAllEars/soulmask-clan-manager';
 const STORAGE_KEY = 'soulmaskClan_v1';
+const THEME_KEY = 'soulmaskClan_theme';
 const DEFAULT_ROSTER_URL = 'data/default_roster.json';
 const TALENTS_URL = 'data/talents.json';
 const ICON_DIR = 'icons/';
@@ -89,6 +90,7 @@ async function boot() {
   bindUI();
   const v = document.getElementById('app-version');
   if (v) v.textContent = `v${APP_VERSION}`;
+  initTheme();
 }
 
 async function loadDefaults() {
@@ -138,8 +140,25 @@ const ui = {
   },
   reportBug() { openIssue('bug', '[Bug] '); },
   suggestFeature() { openIssue('enhancement', '[Feature] '); },
+  toggleTheme() {
+    const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+    applyTheme(cur === 'dark' ? 'light' : 'dark');
+  },
 };
 window.ui = ui;
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.querySelector('.theme-toggle');
+  if (btn) btn.textContent = theme === 'dark' ? '☀ Light' : '☾ Dark';
+  try { localStorage.setItem(THEME_KEY, theme); } catch {}
+}
+function initTheme() {
+  let saved = null;
+  try { saved = localStorage.getItem(THEME_KEY); } catch {}
+  const sys = window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  applyTheme(saved || sys);
+}
 
 function buildIssueBody() {
   const activeView = document.querySelector('.view.active');
@@ -261,7 +280,7 @@ function renderProfile() {
     <h2>${escapeHtml(t.name)}</h2>
     <span class="meta">LV ${t.level ?? '—'} · ${escapeHtml(t.title || '')} ${escapeHtml(t.profession || '')} · ${escapeHtml(t.tribe || '')} ${t.trait ? '· '+escapeHtml(t.trait) : ''}</span>
     <span class="grow" style="flex:1"></span>
-    <button onclick="onDeleteTribesman('${t.id}')" class="danger" style="background:#3a1f1f;color:#ff8a65;border:1px solid #6e3a3a;padding:6px 12px;border-radius:4px;cursor:pointer">Delete tribesman</button>
+    <button onclick="onDeleteTribesman('${t.id}')" class="btn-danger-strong">Delete tribesman</button>
   </div>`;
   html += '<div class="profile">';
 
