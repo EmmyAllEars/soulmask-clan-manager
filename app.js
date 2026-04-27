@@ -542,7 +542,8 @@ function renderTalentList(t) {
     const meta = state.talents.find(x => x.name === tal.name);
     const isNeg = meta && meta.polarity === 'negative';
     const effect = (meta && meta.effect) ? meta.effect : '';
-    return `<div class="talent-pill ${isNeg?'negative':''}">
+    const tooltip = tal.name + (effect ? '\n' + effect : '');
+    return `<div class="talent-pill ${isNeg?'negative':''}" title="${escapeHtml(tooltip)}">
       <img src="${ICON_DIR}${tal.icon}" alt="${escapeHtml(tal.name)}" onerror="this.style.opacity=0.2">
       <div class="info">
         <div class="name">${escapeHtml(tal.name)}</div>
