@@ -1103,16 +1103,55 @@ function getTrainingSuggestions(trainee) {
   return out;
 }
 
+// Returns the list of draft/active plans whose steps already cover this
+// suggestion. Match rules per step type:
+//   cap-raise: same trainee + step.weapon === suggestion.weapon
+//   upgrade:   same trainee + step.talent === suggestion.talent
+//   learn:     same trainee + any learn step at all (Learn is random in-game,
+//              so a queued Learn session is a queued Learn session — we can't
+//              be more specific without modeling outcome targeting).
+// Excludes steps already completed/abandoned: they're done work.
+/**
+ * @param {Tribesman} trainee
+ * @param {TrainingSuggestion} suggestion
+ * @returns {TrainingPlan[]}
+ */
+function plansContainingSuggestion(trainee, suggestion) {
+  return state.plans.filter(p => {
+    if (p.traineeId !== trainee.id) return false;
+    if (p.status !== 'draft' && p.status !== 'active') return false;
+    return p.steps.some(s => {
+      if (s.status === 'completed' || s.status === 'abandoned') return false;
+      if (s.type !== suggestion.type) return false;
+      if (s.type === 'cap-raise') return s.weapon === suggestion.weapon;
+      if (s.type === 'upgrade')   return s.talent === suggestion.talent;
+      if (s.type === 'learn')     return true; // any learn step counts
+      return false;
+    });
+  });
+}
+
 function renderTrainingSuggestions(trainee) {
   const suggestions = getTrainingSuggestions(trainee);
   if (!suggestions.length) {
     return '<p class="muted">No training opportunities found in current roster.</p>';
   }
-  return suggestions.map((s, i) => `<div class="suggestion">
-    <div class="head">${s.head}</div>
-    <div class="why">${s.why}</div>
-    <button class="small suggestion-add" onclick="onAddSuggestionToPlan('${trainee.id}', ${i})">+ Add to plan</button>
-  </div>`).join('');
+  return suggestions.map((s, i) => {
+    const inPlans = plansContainingSuggestion(trainee, s);
+    let badge = '';
+    if (inPlans.length === 1) {
+      const p = inPlans[0];
+      badge = `<a class="suggestion-in-plan" href="javascript:void(0)" onclick="ui.showPlan('${p.id}')" title="Open plan">✓ in plan: ${escapeHtml(p.name || 'Untitled')}</a>`;
+    } else if (inPlans.length > 1) {
+      badge = `<span class="suggestion-in-plan" title="${escapeHtml(inPlans.map(p => p.name || 'Untitled').join(', '))}">✓ in ${inPlans.length} plans</span>`;
+    }
+    return `<div class="suggestion${inPlans.length ? ' is-planned' : ''}">
+      <div class="head">${s.head}</div>
+      <div class="why">${s.why}</div>
+      ${badge}
+      <button class="small suggestion-add" onclick="onAddSuggestionToPlan('${trainee.id}', ${i})">+ Add to plan</button>
+    </div>`;
+  }).join('');
 }
 
 // === IMPORT / EXPORT ===

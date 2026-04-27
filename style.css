@@ -800,6 +800,23 @@ button[disabled] { opacity: 0.4; cursor: not-allowed; }
 }
 .suggestion .suggestion-add:hover { background: var(--accent); color: var(--accent-on); }
 
+/* "✓ in plan: <name>" badge — shown when this suggestion is already a step
+   in one of the trainee's draft/active plans (#32). Sits next to the
+   + Add to plan button so the duplicate-plan signal is visible at a glance. */
+.suggestion .suggestion-in-plan {
+  display: inline-block;
+  margin-top: 6px; margin-right: 8px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--row-hover);
+  color: var(--tier-iron);
+  border: 1px solid var(--tier-iron);
+  font-size: 11px;
+  text-decoration: none;
+}
+a.suggestion-in-plan:hover { filter: brightness(1.15); text-decoration: underline; }
+.suggestion.is-planned { opacity: 0.85; }
+
 /* Profile-side Plans card */
 .profile-plans-warning {
   background: var(--row-hover); border-left: 3px solid var(--tier-specialist);
