@@ -28,6 +28,15 @@ const WEAPONS = [
 ];
 const ATTRS = ['Per','Agi','Phy','End','Str'];
 const ATTR_NAMES = {Per:'Perception', Agi:'Agility', Phy:'Physique', End:'Endurance', Str:'Strength'};
+// In-game tooltip text for each attribute, shown on hover in the profile and
+// on the roster column headers.
+const ATTR_TOOLTIPS = {
+  Per: 'Perception boosts Coma resistance by 0.5% per point, increasing crafting output and bow damage by 0.5%, and improving thrown weapon accuracy.',
+  Agi: 'Agility boosts Paralyze resistance by 0.5% per point, increasing crafting efficiency, and enhancing Spear, Blade, Dual-blade, Gauntlets, and Spiked Whip damage by 0.5%. Additionally, melee weapon attack speed increases by 0.25%.',
+  Phy: 'For every point of Physique, Max HP +10, Max Resilience +1, Chill Resist +0.2, Flame Resist +0.2, and Base HP Recovery Speed +10%; eliminates residual Poison and Radiation in the body more quickly.',
+  End: 'For every point of Endurance, Max Stamina +1, Stamina Cost -0.5%.',
+  Str: 'For every point of Strength, Max Load +2, Poison Resist +0.2, Collecting Efficiency +0.5%, Great Sword DMG +0.5%, Hammer DMG +0.5%; improves throwing distance.',
+};
 
 // Profession alignment for skill highlighting
 const PROF_BEST_SKILLS = {
@@ -456,9 +465,10 @@ function sortIndicator(column) {
   return ` <span class="sort-ind">${arrow}${subTag}</span>`;
 }
 
-function thSort(label, col, extraClass = '') {
-  const cls = `sortable${extraClass ? ' ' + extraClass : ''}`;
-  return `<th class="${cls}" onclick="sortBy(event,'${col}')">${escapeHtml(label)}${sortIndicator(col)}</th>`;
+function thSort(label, col, extraClass = '', tip = '') {
+  const cls = `sortable${extraClass ? ' ' + extraClass : ''}${tip ? ' has-help' : ''}`;
+  const tipHtml = tip ? `<span class="help-tip" role="tooltip">${escapeHtml(tip)}</span>` : '';
+  return `<th class="${cls}" onclick="sortBy(event,'${col}')">${escapeHtml(label)}${sortIndicator(col)}${tipHtml}</th>`;
 }
 
 const PROFESSIONS = ['Craftsman','Porter','Laborer','Warrior','Hunter','Guard'];
@@ -471,8 +481,8 @@ function renderRoster() {
   html += thSort('Name', 'name') + thSort('Lvl', 'level') + thSort('Title', 'title')
         + thSort('Profession', 'profession') + thSort('Tribe', 'tribe')
         + thSort('Trait', 'trait') + thSort('Location', 'location');
-  for (const s of SKILLS) html += thSort(s, `skill:${s}`);
-  for (const a of ATTRS)  html += thSort(a, `attr:${a}`);
+  for (const s of SKILLS) html += thSort(s, `skill:${s}`, '', `${s}\nClick to sort by cap. Shift-click to sort by current.`);
+  for (const a of ATTRS)  html += thSort(a, `attr:${a}`, '', `${ATTR_NAMES[a]}\n${ATTR_TOOLTIPS[a]}`);
   for (const w of WEAPONS) html += thSort(w, `weapon:${w}`, 'weapon-col');
   html += thSort('Groups', 'groups') + thSort('Tags', 'tags') + thSort('Talents', 'talents');
   html += '</tr></thead><tbody>';
@@ -589,7 +599,9 @@ function renderProfile() {
   html += `<div class="card">
     <h3>Attributes</h3>`;
   for (const a of ATTRS) {
-    html += `<div class="field"><label>${a} — ${ATTR_NAMES[a]}</label>
+    html += `<div class="field"><label class="has-help">${a} — ${ATTR_NAMES[a]}<span class="help-marker" tabindex="0">?</span>
+      <span class="help-tip" role="tooltip">${escapeHtml(ATTR_TOOLTIPS[a])}</span>
+    </label>
       <input type="number" value="${t.attrs?.[a] ?? ''}" oninput="updAttr('${t.id}','${a}',+this.value||null)"></div>`;
   }
   html += '</div>';
