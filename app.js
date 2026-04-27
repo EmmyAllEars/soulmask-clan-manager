@@ -1,6 +1,11 @@
 /* Soulmask Clan Manager — vanilla JS app
  * Persistence: localStorage key 'soulmaskClan_v1'
  * Initial bootstrap: data/default_roster.json + data/talents.json
+ *
+ * Type definitions live in types.js. JSDoc references in this file
+ * (e.g. {Tribesman}, {TrainingPlan}) resolve against those typedefs
+ * via jsconfig.json. To turn on strict checking, add `// @ts-check`
+ * to the top of this file or set `checkJs: true` in jsconfig.json.
  */
 
 // === CONSTANTS ===
@@ -67,6 +72,7 @@ const PLAN_STEP_LABELS = { 'cap-raise':'Cap Raise', 'learn':'Learn Talent', 'upg
 const PLAN_STATUSES = ['draft','active','done','abandoned'];
 const STEP_STATUSES = ['queued','running','completed','abandoned'];
 
+/** @returns {Calibration} */
 function defaultCalibration() {
   return {
     baseTimes: { ...DEFAULT_PLAN_BASE_TIMES_MIN },
@@ -74,6 +80,7 @@ function defaultCalibration() {
   };
 }
 
+/** @type {AppState} */
 let state = {
   roster: [],          // array of tribesman objects
   talents: [],         // catalog of all talents (loaded from talents.json)
@@ -109,6 +116,12 @@ function loadState() {
 
 // Forward-migrate a persisted blob (whatever version it was saved at) into the
 // current shape. Pure: takes a blob, returns a blob, no side effects.
+/**
+ * Forward-migrate a persisted blob (whatever version it was saved at)
+ * into the current shape. Pure: takes a blob, returns a blob.
+ * @param {*} data
+ * @returns {*}
+ */
 function migrateState(data) {
   if (!data || typeof data !== 'object') return data;
   const v = data.version || 1;
@@ -178,6 +191,10 @@ async function loadDefaults() {
 
 // Merge a persisted (or absent) calibration blob with the current defaults so
 // that adding new constants in future versions doesn't strand existing saves.
+/**
+ * @param {Partial<Calibration>|null|undefined} saved
+ * @returns {Calibration}
+ */
 function mergeCalibration(saved) {
   const def = defaultCalibration();
   if (!saved) return def;
@@ -212,6 +229,11 @@ const ROMAN_TIERS = { 1:'I', 2:'II', 3:'III', 4:'IV', 5:'V' };
 const MATERIAL_NAMES = { 1:'Beast Hide', 2:'Bronze', 3:'Iron', 4:'Steel', 5:'Endgame' };
 
 // Cap ceiling shared by Training Suggestions and Cap Raise plan steps.
+/**
+ * @param {Profession} profession
+ * @param {string} weapon
+ * @returns {number} 125 if class weapon, else 100
+ */
 function weaponCeiling(profession, weapon) {
   const cls = PROF_CLASS_WEAPONS[profession] || [];
   return cls.includes(weapon) ? 125 : 100;
@@ -958,6 +980,11 @@ const PROFESSION_EXCLUSIVE_TAGS = new Set(['Craftsman','Porter','Hunter','Warrio
 /* Talent names carry exclusivity inline: "Foo — [Craftsman Exclusive]",
    "Bar — [Wildwolf Exclusive]". Profession tags gate by trainee.profession;
    anything else is treated as a tribe lock against trainee.tribe. */
+/**
+ * @param {string} talentName
+ * @param {Tribesman} trainee
+ * @returns {boolean}
+ */
 function isLearnableBy(talentName, trainee) {
   const m = talentName.match(/\[([^\]]+) Exclusive\]/);
   if (!m) return true;
@@ -968,6 +995,12 @@ function isLearnableBy(talentName, trainee) {
 
 // Pure: derive the list of training suggestions for a trainee. Each entry
 // carries enough metadata for the "+ Add to plan" button to seed a draft step.
+/**
+ * Pure: derive the list of training suggestions for a trainee. Each entry
+ * carries enough metadata for "+ Add to plan" to seed a draft step.
+ * @param {Tribesman} trainee
+ * @returns {TrainingSuggestion[]}
+ */
 function getTrainingSuggestions(trainee) {
   const out = [];
   const classW = PROF_CLASS_WEAPONS[trainee.profession] || [];
@@ -1233,13 +1266,18 @@ function downloadFile(name, mime, content) {
 // Per-tribesman ordered list of training-ground sessions. See
 // docs/training_plans.md for the full design.
 
+/** @param {string} id @returns {TrainingPlan|undefined} */
 function findPlan(id) { return state.plans.find(p => p.id === id); }
+/** @param {TrainingPlan|undefined|null} plan @param {string} stepId @returns {TrainingStep|undefined} */
 function findStep(plan, stepId) { return plan?.steps.find(s => s.id === stepId); }
+/** @param {string} id @returns {Tribesman|undefined} */
 function findTribesman(id) { return state.roster.find(t => t.id === id); }
+/** @param {string} name @returns {TalentMeta|undefined} */
 function talentMeta(name) { return state.talents.find(x => x.name === name); }
 
 // --- Time estimation -------------------------------------------------------
 
+/** @param {TrainingStep} step @returns {string} key into Calibration.baseTimes */
 function stepBaseKey(step) {
   if (step.type === 'cap-raise') return 'cap-raise';
   if (step.type === 'learn') return 'learn';
@@ -1248,6 +1286,7 @@ function stepBaseKey(step) {
   return target <= 2 ? 'upgrade-1-2' : 'upgrade-2-3';
 }
 
+/** @param {TrainingStep|null|undefined} step @returns {number} minutes */
 function estimateStepMin(step) {
   if (!step) return 0;
   const base = state.calibration.baseTimes[stepBaseKey(step)];
@@ -1256,11 +1295,13 @@ function estimateStepMin(step) {
   return Math.round(base * mult);
 }
 
+/** @param {TrainingPlan|null|undefined} plan @returns {number} sum of step estimates in minutes */
 function estimatePlanMin(plan) {
   if (!plan) return 0;
   return plan.steps.reduce((sum, s) => sum + estimateStepMin(s), 0);
 }
 
+/** @param {number|null|undefined} min @returns {string} */
 function fmtMinutes(min) {
   if (!min || min < 1) return '—';
   const h = Math.floor(min / 60), m = min % 60;
@@ -1271,6 +1312,7 @@ function fmtMinutes(min) {
 
 // --- Plan CRUD -------------------------------------------------------------
 
+/** @param {string} traineeId @param {string} [name] @returns {TrainingPlan} */
 function createPlan(traineeId, name) {
   const trainee = findTribesman(traineeId);
   const plan = {
@@ -1287,6 +1329,7 @@ function createPlan(traineeId, name) {
   return plan;
 }
 
+/** @param {string} id */
 function deletePlan(id) {
   const idx = state.plans.findIndex(p => p.id === id);
   if (idx < 0) return;
@@ -1295,6 +1338,7 @@ function deletePlan(id) {
   saveState();
 }
 
+/** @param {string} id @returns {TrainingPlan|null} */
 function duplicatePlan(id) {
   const src = findPlan(id);
   if (!src) return null;
@@ -1311,6 +1355,7 @@ function duplicatePlan(id) {
 
 // --- Step CRUD -------------------------------------------------------------
 
+/** @param {StepType} type @returns {TrainingStep} */
 function newStep(type) {
   return {
     id: newStepId(),
@@ -1332,6 +1377,10 @@ function newStep(type) {
 // Forward-migrate legacy steps that used `gearTier` (1-6, with quality
 // conflated into the same axis). New code uses `material` (1-5).
 // Returns true if it changed anything, so the caller can re-save.
+/**
+ * @param {TrainingStep & {gearTier?: number}} s
+ * @returns {boolean} true if the step was changed (caller can re-save)
+ */
 function normalizeStep(s) {
   if (s.material == null) {
     const legacy = s.gearTier != null ? Number(s.gearTier) : 3;
@@ -1343,6 +1392,7 @@ function normalizeStep(s) {
   return false;
 }
 
+/** @param {string} planId @param {StepType} type @returns {TrainingStep|null} */
 function addStep(planId, type) {
   const plan = findPlan(planId);
   if (!plan) return null;
@@ -1352,6 +1402,7 @@ function addStep(planId, type) {
   return s;
 }
 
+/** @param {string} planId @param {string} stepId */
 function removeStep(planId, stepId) {
   const plan = findPlan(planId);
   if (!plan) return;
@@ -1359,6 +1410,7 @@ function removeStep(planId, stepId) {
   saveState();
 }
 
+/** @param {string} planId @param {string} stepId @param {-1|1} dir */
 function moveStep(planId, stepId, dir) {
   const plan = findPlan(planId);
   if (!plan) return;
@@ -1508,6 +1560,7 @@ window.onResetCalibration = async function() {
 // Convert a structured Training Suggestion into a fresh TrainingStep with as
 // many fields pre-filled as the suggestion lets us. Mentor defaults to the
 // top candidate; user can swap it in the plan editor.
+/** @param {TrainingSuggestion} suggestion @returns {TrainingStep} */
 function suggestionToStep(suggestion) {
   const step = newStep(suggestion.type);
   step.mentorId = suggestion.mentorIds?.[0] || null;
@@ -1529,6 +1582,7 @@ function suggestionToStep(suggestion) {
 // scannable; user can extend manually.
 const SUGGEST_PLAN_STEP_BUDGET = 5;
 
+/** @param {string} traineeId @returns {TrainingPlan|null} */
 function suggestPlanFor(traineeId) {
   const trainee = findTribesman(traineeId);
   if (!trainee) return null;
@@ -2029,6 +2083,7 @@ async function addTribesman() {
 // tied to the original character corpse in-game) but keeps talents, skills,
 // weapons, attrs, groups, tags, and notes — that's the whole point of
 // duplication: planning "what if I built another one like this".
+/** @param {string} id @returns {Tribesman|null} */
 function duplicateTribesman(id) {
   const src = state.roster.find(t => t.id === id);
   if (!src) return null;
