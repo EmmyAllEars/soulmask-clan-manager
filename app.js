@@ -527,6 +527,7 @@ function renderProfile() {
     <h2>${escapeHtml(t.name)}</h2>
     <span class="meta">LV ${t.level ?? '—'} · ${escapeHtml(t.title || '')} ${escapeHtml(t.profession || '')} · ${escapeHtml(t.tribe || '')} ${t.trait ? '· '+escapeHtml(t.trait) : ''}</span>
     <span class="grow" style="flex:1"></span>
+    <button onclick="onSuggestPlan('${t.id}')" title="Build a draft plan from this tribesman's Training Suggestions">Suggest plan</button>
     <button onclick="onDuplicateTribesman('${t.id}')" title="Create an editable copy with a new id">Duplicate</button>
     <button onclick="onDeleteTribesman('${t.id}')" class="btn-danger-strong">Delete tribesman</button>
   </div>`;
@@ -1469,6 +1470,47 @@ function suggestionToStep(suggestion) {
   // 'learn' has no extra fields beyond mentor (random outcome in-game)
   return step;
 }
+
+// One-click materialize the trainee's Training Suggestions into a draft
+// plan. Ordering rationale (per #21): cap raises gate weapon power and so
+// front-load the most leverage, learns broaden the talent pool, upgrades
+// polish what's already there. Capped at 5 steps so the plan stays
+// scannable; user can extend manually.
+const SUGGEST_PLAN_STEP_BUDGET = 5;
+
+function suggestPlanFor(traineeId) {
+  const trainee = findTribesman(traineeId);
+  if (!trainee) return null;
+  const suggestions = getTrainingSuggestions(trainee);
+  if (!suggestions.length) return null;
+
+  // Sort cap-raises by gap descending (biggest improvement first); learns
+  // and upgrades retain their natural order from getTrainingSuggestions.
+  const capRaises = suggestions
+    .filter(s => s.type === 'cap-raise')
+    .slice()
+    .sort((a, b) => (b.targetCap - b.currentCap) - (a.targetCap - a.currentCap));
+  const learns = suggestions.filter(s => s.type === 'learn');
+  const upgrades = suggestions.filter(s => s.type === 'upgrade');
+  const ordered = [...capRaises, ...learns, ...upgrades].slice(0, SUGGEST_PLAN_STEP_BUDGET);
+
+  const plan = createPlan(traineeId, `${trainee.name} — suggested plan`);
+  for (const s of ordered) plan.steps.push(suggestionToStep(s));
+  saveState();
+  return plan;
+}
+
+window.onSuggestPlan = function(traineeId) {
+  const trainee = findTribesman(traineeId);
+  if (!trainee) return;
+  const suggestions = getTrainingSuggestions(trainee);
+  if (!suggestions.length) {
+    alert(`No training opportunities found for ${trainee.name} in the current roster.`);
+    return;
+  }
+  const plan = suggestPlanFor(traineeId);
+  if (plan) ui.showPlan(plan.id);
+};
 
 // Picker dialog: "add to existing plan" or "start a new plan". Renders into
 // the existing modal scaffolding (#modal-bg / #modal). Plain DOM, no framework.
