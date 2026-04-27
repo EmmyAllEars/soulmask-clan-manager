@@ -646,6 +646,12 @@ function renderProfile() {
     ${renderTrainingSuggestions(t)}
   </div>`;
 
+  // Training Plans (this tribesman as trainee or mentor)
+  html += `<div class="card full-row">
+    <h3>Training Plans</h3>
+    ${renderProfileTrainingPlans(t)}
+  </div>`;
+
   html += '</div>';
   document.getElementById('profile-content').innerHTML = html;
 
@@ -884,8 +890,30 @@ window.rmFromList = rmFromList;
 function onDeleteTribesman(id) {
   const t = state.roster.find(x => x.id === id);
   if (!t) return;
-  if (!confirm(`Delete ${t.name}? This cannot be undone.`)) return;
+
+  // Plans that need cleanup: cascade-delete the ones where this tribesman is
+  // the trainee; orphan-flag the steps where they're a mentor in someone
+  // else's plan (the step keeps mentorId, but the renderer detects the
+  // dangling reference and surfaces a warning).
+  const traineeOf = state.plans.filter(p => p.traineeId === id);
+  const mentorStepCount = state.plans
+    .filter(p => p.traineeId !== id)
+    .reduce((n, p) => n + p.steps.filter(s => s.mentorId === id).length, 0);
+
+  let warn = `Delete ${t.name}? This cannot be undone.`;
+  if (traineeOf.length || mentorStepCount) {
+    warn += '\n\n';
+    if (traineeOf.length) warn += `· ${traineeOf.length} plan${traineeOf.length === 1 ? '' : 's'} where ${t.name} is the trainee will also be deleted.\n`;
+    if (mentorStepCount) warn += `· ${mentorStepCount} step${mentorStepCount === 1 ? '' : 's'} in other plans use ${t.name} as mentor; those steps will be flagged "mentor missing" but kept.\n`;
+  }
+  if (!confirm(warn)) return;
+
   state.roster = state.roster.filter(x => x.id !== id);
+  if (traineeOf.length) {
+    const ids = new Set(traineeOf.map(p => p.id));
+    state.plans = state.plans.filter(p => !ids.has(p.id));
+    if (state.selectedPlanId && ids.has(state.selectedPlanId)) state.selectedPlanId = null;
+  }
   saveState();
   initFilters();
   ui.showRoster();
@@ -907,18 +935,18 @@ function isLearnableBy(talentName, trainee) {
   return trainee.tribe === tag;
 }
 
-function renderTrainingSuggestions(trainee) {
+// Pure: derive the list of training suggestions for a trainee. Each entry
+// carries enough metadata for the "+ Add to plan" button to seed a draft step.
+function getTrainingSuggestions(trainee) {
   const out = [];
-  // 1. Cap-raise opportunities
-  // For each weapon where trainee.cap < ceiling (125 if class, 100 otherwise)
-  // find any tribesman in roster with HIGHER cap for that weapon
   const classW = PROF_CLASS_WEAPONS[trainee.profession] || [];
+
+  // 1. Cap-raise opportunities
   for (const w of WEAPONS) {
     const v = (trainee.weapons?.[w]) || {cap:null};
     if (v.cap == null) continue;
     const ceiling = classW.includes(w) ? 125 : 100;
     if (v.cap >= ceiling) continue;
-    // find best mentor
     const mentors = state.roster
       .filter(m => m.id !== trainee.id)
       .map(m => ({m, cap: m.weapons?.[w]?.cap}))
@@ -926,11 +954,17 @@ function renderTrainingSuggestions(trainee) {
       .sort((a,b) => b.cap - a.cap);
     if (!mentors.length) continue;
     const top = mentors.slice(0, 3);
-    out.push(`<div class="suggestion">
-      <div class="head">Raise ${w} cap from ${v.cap} → up to ${Math.min(top[0].cap, ceiling)}</div>
-      <div class="why">Mentor candidates: ${top.map(x => `<b>${escapeHtml(x.m.name)}</b> (${x.cap})`).join(', ')}.
-      ${classW.includes(w) ? `${w} is a class weapon for ${trainee.profession} — ceiling 125.` : `${w} is off-class — ceiling 100.`}</div>
-    </div>`);
+    out.push({
+      type: 'cap-raise',
+      weapon: w,
+      currentCap: v.cap,
+      targetCap: Math.min(top[0].cap, ceiling),
+      ceiling,
+      mentorIds: top.map(x => x.m.id),
+      head: `Raise ${w} cap from ${v.cap} → up to ${Math.min(top[0].cap, ceiling)}`,
+      why: `Mentor candidates: ${top.map(x => `<b>${escapeHtml(x.m.name)}</b> (${x.cap})`).join(', ')}.
+        ${classW.includes(w) ? `${w} is a class weapon for ${trainee.profession} — ceiling 125.` : `${w} is off-class — ceiling 100.`}`,
+    });
   }
 
   // 2. Talent upgrades — same talent at higher level
@@ -939,49 +973,70 @@ function renderTrainingSuggestions(trainee) {
     const mentors = state.roster
       .filter(m => m.id !== trainee.id)
       .filter(m => (m.talents||[]).some(mt => mt.name === tal.name && mt.level > tal.level));
-    if (mentors.length) {
-      out.push(`<div class="suggestion">
-        <div class="head">Upgrade talent: ${escapeHtml(tal.name)} (Lv ${tal.level} → up to ${Math.max(...mentors.flatMap(m => m.talents.filter(mt=>mt.name===tal.name).map(mt=>mt.level)))})</div>
-        <div class="why">Mentors: ${mentors.map(m => escapeHtml(m.name)).join(', ')}</div>
-      </div>`);
-    }
+    if (!mentors.length) continue;
+    const topLevel = Math.max(...mentors.flatMap(m => m.talents.filter(mt=>mt.name===tal.name).map(mt=>mt.level)));
+    out.push({
+      type: 'upgrade',
+      talent: tal.name,
+      currentLevel: tal.level,
+      targetLevel: Math.min(3, topLevel),
+      mentorIds: mentors.map(m => m.id),
+      head: `Upgrade talent: ${escapeHtml(tal.name)} (Lv ${tal.level} → up to ${topLevel})`,
+      why: `Mentors: ${mentors.map(m => escapeHtml(m.name)).join(', ')}`,
+    });
   }
 
-  // 3. Talents available to learn — any talent NOT on trainee that other tribesmen have
-  // Limit to top 3 most-common across roster (to avoid overwhelming)
+  // 3. Talents available to learn
   const traineeTalNames = new Set((trainee.talents||[]).map(t => t.name));
-  const traineeIsBody = trainee.is_body;
   const posTalsCount = (trainee.talents||[]).filter(t => {
-    const m = state.talents.find(x => x.name === t.name);
+    const m = talentMeta(t.name);
     return m && m.polarity === 'positive';
   }).length;
   if (posTalsCount < 6) {
-    // Group available talents by name -> highest mentor level
     const avail = new Map();
     for (const m of state.roster) {
       if (m.id === trainee.id) continue;
       for (const t of (m.talents||[])) {
-        const meta = state.talents.find(x => x.name === t.name);
+        const meta = talentMeta(t.name);
         if (!meta || meta.polarity !== 'positive') continue;
         if (traineeTalNames.has(t.name)) continue;
         if (!isLearnableBy(t.name, trainee)) continue;
-        const cur = avail.get(t.name) || {topLevel:0, mentors:[]};
+        const cur = avail.get(t.name) || {topLevel:0, mentorIds:[], mentorNames:[]};
         if (t.level > cur.topLevel) cur.topLevel = t.level;
-        cur.mentors.push(m.name);
+        cur.mentorIds.push(m.id);
+        cur.mentorNames.push(m.name);
         avail.set(t.name, cur);
       }
     }
     if (avail.size) {
       const top = [...avail.entries()].sort((a,b) => b[1].topLevel - a[1].topLevel).slice(0, 5);
-      out.push(`<div class="suggestion">
-        <div class="head">${posTalsCount}/6 positive talents — could learn ${avail.size} more from existing roster</div>
-        <div class="why">Top candidates: ${top.map(([n,d]) => `<b>${escapeHtml(n)}</b> (max Lv ${d.topLevel}, from ${d.mentors.slice(0,2).map(escapeHtml).join('/')})`).join(' · ')}</div>
-      </div>`);
+      // Aggregate mentor IDs from all top candidates so the "Add to plan"
+      // path can pre-fill any of them as a learn-step mentor.
+      const allMentorIds = [...new Set(top.flatMap(([,d]) => d.mentorIds))];
+      out.push({
+        type: 'learn',
+        mentorIds: allMentorIds,
+        availableCount: avail.size,
+        positiveCount: posTalsCount,
+        head: `${posTalsCount}/6 positive talents — could learn ${avail.size} more from existing roster`,
+        why: `Top candidates: ${top.map(([n,d]) => `<b>${escapeHtml(n)}</b> (max Lv ${d.topLevel}, from ${d.mentorNames.slice(0,2).map(escapeHtml).join('/')})`).join(' · ')}`,
+      });
     }
   }
 
-  if (!out.length) return '<p class="muted">No training opportunities found in current roster.</p>';
-  return out.join('');
+  return out;
+}
+
+function renderTrainingSuggestions(trainee) {
+  const suggestions = getTrainingSuggestions(trainee);
+  if (!suggestions.length) {
+    return '<p class="muted">No training opportunities found in current roster.</p>';
+  }
+  return suggestions.map((s, i) => `<div class="suggestion">
+    <div class="head">${s.head}</div>
+    <div class="why">${s.why}</div>
+    <button class="small suggestion-add" onclick="onAddSuggestionToPlan('${trainee.id}', ${i})">+ Add to plan</button>
+  </div>`).join('');
 }
 
 // === IMPORT / EXPORT ===
@@ -1375,6 +1430,94 @@ window.onResetCalibration = function() {
   else renderPlansList();
 };
 
+// --- Suggestion → Plan handoff ---------------------------------------------
+
+// Convert a structured Training Suggestion into a fresh TrainingStep with as
+// many fields pre-filled as the suggestion lets us. Mentor defaults to the
+// top candidate; user can swap it in the plan editor.
+function suggestionToStep(suggestion) {
+  const step = newStep(suggestion.type);
+  step.mentorId = suggestion.mentorIds?.[0] || null;
+  if (suggestion.type === 'cap-raise') {
+    step.weapon = suggestion.weapon;
+    step.targetCap = suggestion.targetCap;
+  } else if (suggestion.type === 'upgrade') {
+    step.talent = suggestion.talent;
+    step.targetLevel = suggestion.targetLevel;
+  }
+  // 'learn' has no extra fields beyond mentor (random outcome in-game)
+  return step;
+}
+
+// Picker dialog: "add to existing plan" or "start a new plan". Renders into
+// the existing modal scaffolding (#modal-bg / #modal). Plain DOM, no framework.
+window.onAddSuggestionToPlan = function(traineeId, suggestionIndex) {
+  const trainee = findTribesman(traineeId);
+  if (!trainee) return;
+  const suggestions = getTrainingSuggestions(trainee);
+  const s = suggestions[suggestionIndex];
+  if (!s) return;
+
+  const existing = state.plans.filter(p =>
+    p.traineeId === traineeId && (p.status === 'draft' || p.status === 'active')
+  );
+
+  const planOptions = existing.map(p =>
+    `<option value="${p.id}">${escapeHtml(p.name || 'Untitled')} (${p.steps.length} steps · ${p.status})</option>`
+  ).join('');
+
+  const modal = document.getElementById('modal');
+  const bg = document.getElementById('modal-bg');
+  modal.innerHTML = `<h3>Add to plan</h3>
+    <p class="muted small">${s.head}</p>
+    ${existing.length ? `
+      <div class="field">
+        <label><input type="radio" name="add-plan-mode" value="existing" checked> Add to existing plan</label>
+        <select id="add-plan-existing">${planOptions}</select>
+      </div>
+    ` : ''}
+    <div class="field">
+      <label><input type="radio" name="add-plan-mode" value="new" ${existing.length ? '' : 'checked'}> Start a new plan</label>
+      <input id="add-plan-new-name" type="text" placeholder="Plan name…" value="${escapeHtml(trainee.name)} — ${PLAN_STEP_LABELS[s.type]}">
+    </div>
+    <div class="actions">
+      <button onclick="closeAddSuggestionModal()">Cancel</button>
+      <button class="primary" onclick="confirmAddSuggestionToPlan('${traineeId}', ${suggestionIndex})">Add step</button>
+    </div>`;
+  bg.classList.add('active');
+};
+
+window.closeAddSuggestionModal = function() {
+  document.getElementById('modal-bg').classList.remove('active');
+  document.getElementById('modal').innerHTML = '';
+};
+
+window.confirmAddSuggestionToPlan = function(traineeId, suggestionIndex) {
+  const trainee = findTribesman(traineeId);
+  if (!trainee) return closeAddSuggestionModal();
+  const suggestion = getTrainingSuggestions(trainee)[suggestionIndex];
+  if (!suggestion) return closeAddSuggestionModal();
+
+  const mode = document.querySelector('input[name="add-plan-mode"]:checked')?.value || 'new';
+  let plan;
+  if (mode === 'existing') {
+    const planId = document.getElementById('add-plan-existing')?.value;
+    plan = findPlan(planId);
+  }
+  if (!plan) {
+    const name = document.getElementById('add-plan-new-name')?.value?.trim()
+      || `${trainee.name} — new plan`;
+    plan = createPlan(traineeId, name);
+  }
+
+  const step = suggestionToStep(suggestion);
+  plan.steps.push(step);
+  if (plan.status === 'draft') plan.status = 'draft'; // unchanged
+  saveState();
+  closeAddSuggestionModal();
+  ui.showPlan(plan.id);
+};
+
 // --- Renderers -------------------------------------------------------------
 
 function renderPlansList() {
@@ -1511,6 +1654,7 @@ function renderPlanStep(plan, step, index) {
   const isFirst = index === 0;
   const dur = fmtMinutes(estimateStepMin(step));
   const label = PLAN_STEP_LABELS[step.type] || step.type;
+  const mentorMissing = step.mentorId && !findTribesman(step.mentorId);
 
   // Build mentor candidates per step type
   const mentors = state.roster.filter(m => m.id !== plan.traineeId);
@@ -1581,11 +1725,12 @@ function renderPlanStep(plan, step, index) {
     `<button class="${step.status === st ? 'primary small' : 'small'}" onclick="onSetStepStatus('${plan.id}','${step.id}','${st}')">${st}</button>`
   ).join('');
 
-  return `<div class="plan-step plan-step-${step.type} status-${step.status}">
+  return `<div class="plan-step plan-step-${step.type} status-${step.status}${mentorMissing ? ' mentor-missing' : ''}">
     <div class="plan-step-head">
       <span class="step-num">#${index + 1}</span>
       <span class="step-type">${label}</span>
       <span class="step-dur">${dur}</span>
+      ${mentorMissing ? '<span class="step-warn">⚠ mentor missing</span>' : ''}
       <span class="grow"></span>
       <button class="small" onclick="onMoveStep('${plan.id}','${step.id}',-1)" ${isFirst ? 'disabled' : ''}>↑</button>
       <button class="small" onclick="onMoveStep('${plan.id}','${step.id}',1)" ${isLast ? 'disabled' : ''}>↓</button>
@@ -1609,6 +1754,77 @@ function renderPlanStep(plan, step, index) {
     </div>
   </div>`;
 }
+
+// Profile-side Plans card: surfaces both directions (this tribesman as trainee
+// and as mentor). Q6 warning fires when they're trainee on >1 active plan
+// (Training Ground only allows one trainee session at a time).
+function renderProfileTrainingPlans(tribesman) {
+  const asTrainee = state.plans.filter(p => p.traineeId === tribesman.id);
+  const asMentor = state.plans.filter(p =>
+    p.traineeId !== tribesman.id &&
+    p.steps.some(s => s.mentorId === tribesman.id)
+  );
+
+  const activeTraineeCount = asTrainee.filter(p =>
+    p.status === 'active' || p.status === 'draft'
+  ).filter(p => p.steps.some(s => s.status !== 'completed' && s.status !== 'abandoned')).length;
+
+  let html = '';
+
+  if (activeTraineeCount > 1) {
+    html += `<div class="profile-plans-warning">
+      ⚠ ${escapeHtml(tribesman.name)} is the trainee on ${activeTraineeCount} active plans —
+      the Training Ground only allows one trainee session at a time.
+    </div>`;
+  }
+
+  html += `<div class="profile-plans-actions">
+    <button class="small" onclick="onCreatePlanForTribesman('${tribesman.id}')">+ New plan for ${escapeHtml(tribesman.name)}</button>
+  </div>`;
+
+  if (!asTrainee.length && !asMentor.length) {
+    html += `<p class="muted">No plans reference ${escapeHtml(tribesman.name)} yet. Use <b>+ Add to plan</b> on a Training Suggestion above to commit one.</p>`;
+    return html;
+  }
+
+  if (asTrainee.length) {
+    html += `<h4 class="profile-plans-h">As trainee</h4><ul class="profile-plans-list">${
+      asTrainee.map(p => renderProfilePlanRow(p, 'trainee', tribesman.id)).join('')
+    }</ul>`;
+  }
+  if (asMentor.length) {
+    html += `<h4 class="profile-plans-h">As mentor</h4><ul class="profile-plans-list">${
+      asMentor.map(p => renderProfilePlanRow(p, 'mentor', tribesman.id)).join('')
+    }</ul>`;
+  }
+
+  return html;
+}
+
+function renderProfilePlanRow(plan, role, tribesmanId) {
+  const completed = plan.steps.filter(s => s.status === 'completed').length;
+  const total = estimatePlanMin(plan);
+  const trainee = findTribesman(plan.traineeId);
+  let detail = '';
+  if (role === 'mentor') {
+    const mySteps = plan.steps.filter(s => s.mentorId === tribesmanId);
+    detail = ` — mentoring ${mySteps.length} step${mySteps.length === 1 ? '' : 's'} for ${trainee ? escapeHtml(trainee.name) : '<span class="muted">missing</span>'}`;
+  }
+  return `<li>
+    <a href="javascript:void(0)" onclick="ui.showPlan('${plan.id}')"><b>${escapeHtml(plan.name || 'Untitled')}</b></a>
+    <span class="plan-status plan-status-${plan.status}">${plan.status}</span>
+    <span class="muted small">${completed}/${plan.steps.length} steps · ${fmtMinutes(total)}${detail}</span>
+  </li>`;
+}
+
+window.onCreatePlanForTribesman = function(traineeId) {
+  const trainee = findTribesman(traineeId);
+  if (!trainee) return;
+  const name = prompt('Plan name:', `${trainee.name} — new plan`);
+  if (name === null) return;
+  const p = createPlan(traineeId, name || `${trainee.name} — new plan`);
+  ui.showPlan(p.id);
+};
 
 function renderCalibrationPanel() {
   const c = state.calibration;
