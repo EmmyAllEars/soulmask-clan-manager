@@ -186,10 +186,24 @@ table.roster th .sort-ind {
   font-weight: normal;
   font-size: 11px;
 }
-/* Hover: skip tier-colored cells so their text stays readable against the
-   tier background (which uses --tier-on, a dark color, for contrast). */
+/* Row hover: combine three signals so it reads at a glance regardless of
+   how much of the row is tier-colored:
+   1. Wash non-tier cells with the row-hover tint.
+   2. Bump tier cells' brightness slightly (preserves their text contrast).
+   3. Drop a 3px accent bar on the leading cell (Name) as the left-edge
+      anchor — visible across the whole row even when middle cells are
+      tier-saturated. */
 table.roster tr:hover td:not(.tier-mastery):not(.tier-specialist):not(.tier-iron):not(.tier-sub) {
   background: var(--row-hover);
+}
+table.roster tr:hover td.tier-mastery,
+table.roster tr:hover td.tier-specialist,
+table.roster tr:hover td.tier-iron,
+table.roster tr:hover td.tier-sub {
+  filter: brightness(1.06);
+}
+table.roster tbody tr:hover td:first-child {
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 table.roster td.skill-cell, table.roster td.weapon-cell {
   text-align: center;
