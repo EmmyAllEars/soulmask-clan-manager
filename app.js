@@ -4,7 +4,7 @@
  */
 
 // === CONSTANTS ===
-const APP_VERSION = '0.4.0';
+const APP_VERSION = '0.4.1';
 const REPO_URL = 'https://github.com/EmmyAllEars/soulmask-clan-manager';
 const STORAGE_KEY = 'soulmaskClan_v1';
 const THEME_KEY = 'soulmaskClan_theme';
@@ -771,6 +771,19 @@ function onDeleteTribesman(id) {
 window.onDeleteTribesman = onDeleteTribesman;
 
 // === TRAINING SUGGESTIONS ===
+const PROFESSION_EXCLUSIVE_TAGS = new Set(['Craftsman','Porter','Hunter','Warrior','Guard','Laborer']);
+
+/* Talent names carry exclusivity inline: "Foo — [Craftsman Exclusive]",
+   "Bar — [Wildwolf Exclusive]". Profession tags gate by trainee.profession;
+   anything else is treated as a tribe lock against trainee.tribe. */
+function isLearnableBy(talentName, trainee) {
+  const m = talentName.match(/\[([^\]]+) Exclusive\]/);
+  if (!m) return true;
+  const tag = m[1];
+  if (PROFESSION_EXCLUSIVE_TAGS.has(tag)) return trainee.profession === tag;
+  return trainee.tribe === tag;
+}
+
 function renderTrainingSuggestions(trainee) {
   const out = [];
   // 1. Cap-raise opportunities
@@ -828,6 +841,7 @@ function renderTrainingSuggestions(trainee) {
         const meta = state.talents.find(x => x.name === t.name);
         if (!meta || meta.polarity !== 'positive') continue;
         if (traineeTalNames.has(t.name)) continue;
+        if (!isLearnableBy(t.name, trainee)) continue;
         const cur = avail.get(t.name) || {topLevel:0, mentors:[]};
         if (t.level > cur.topLevel) cur.topLevel = t.level;
         cur.mentors.push(m.name);
