@@ -395,6 +395,7 @@ table.roster.editable .row-go:hover {
   display: flex; align-items: center; gap: 8px;
   background: var(--bg3); border: 1px solid var(--border);
   border-radius: 6px; padding: 8px;
+  position: relative;
 }
 .talent-pill img { width: 36px; height: 36px; flex-shrink: 0; background: var(--bg); border-radius: 4px; }
 .talent-pill .info { flex: 1; min-width: 0; }
@@ -411,6 +412,32 @@ table.roster.editable .row-go:hover {
   padding: 2px 6px; font-size: 16px; line-height: 1;
 }
 .talent-pill .remove:hover { color: var(--red); }
+
+.talent-tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  z-index: 10;
+  width: max-content;
+  max-width: 320px;
+  background: var(--bg2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 60ms ease;
+}
+.talent-pill:hover .talent-tip,
+.talent-pill:focus-within .talent-tip {
+  opacity: 1;
+  visibility: visible;
+}
+.talent-tip .tip-name { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+.talent-tip .tip-effect { font-size: 12px; color: var(--text-dim); white-space: normal; line-height: 1.35; }
 
 .add-talent-row { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
 .add-talent-row input { flex: 1; }

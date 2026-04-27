@@ -542,8 +542,7 @@ function renderTalentList(t) {
     const meta = state.talents.find(x => x.name === tal.name);
     const isNeg = meta && meta.polarity === 'negative';
     const effect = (meta && meta.effect) ? meta.effect : '';
-    const tooltip = tal.name + (effect ? '\n' + effect : '');
-    return `<div class="talent-pill ${isNeg?'negative':''}" title="${escapeHtml(tooltip)}">
+    return `<div class="talent-pill ${isNeg?'negative':''}">
       <img src="${ICON_DIR}${tal.icon}" alt="${escapeHtml(tal.name)}" onerror="this.style.opacity=0.2">
       <div class="info">
         <div class="name">${escapeHtml(tal.name)}</div>
@@ -551,6 +550,10 @@ function renderTalentList(t) {
       </div>
       <span class="lvl">${'I'.repeat(tal.level||1)}</span>
       <button class="remove" onclick="rmTalent('${t.id}',${i})" title="Remove">×</button>
+      <div class="talent-tip" role="tooltip">
+        <div class="tip-name">${escapeHtml(tal.name)}</div>
+        ${effect ? `<div class="tip-effect">${escapeHtml(effect)}</div>` : ''}
+      </div>
     </div>`;
   }).join('');
 }
