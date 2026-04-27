@@ -528,6 +528,72 @@ table.roster.editable .row-go:hover {
 .modal h3 { margin-top: 0; color: var(--accent); }
 .modal .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
 
+/* ============== HELP TOOLTIPS ============== */
+/* Generic hover/focus tooltip system. Apply .has-help to a positioned
+   parent and put a .help-tip child inside it. The optional .help-marker
+   shows a small "?" badge next to the label. */
+.has-help { position: relative; }
+.help-marker {
+  display: inline-block;
+  width: 14px; height: 14px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: var(--bg3);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  font-size: 10px; line-height: 14px;
+  text-align: center;
+  cursor: help;
+  vertical-align: middle;
+}
+.has-help:hover .help-marker, .has-help:focus-within .help-marker {
+  border-color: var(--accent); color: var(--accent);
+}
+.help-tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  width: max-content;
+  max-width: 360px;
+  background: var(--bg2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow);
+  font-size: 12px; line-height: 1.4;
+  white-space: pre-line; /* honors \n in tip text */
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 60ms ease;
+  font-weight: normal;
+}
+.has-help:hover .help-tip,
+.has-help:focus-within .help-tip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Sort hint chip in the toolbar legend */
+.legend-hint {
+  margin-left: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 11px;
+  cursor: help;
+}
+.legend-hint:hover { border-color: var(--accent); color: var(--accent); }
+.legend-hint .help-tip { left: auto; right: 0; max-width: 320px; }
+
+/* Roster column header tip — anchor to the right of long-text columns
+   so it doesn't fall off the left edge for early columns */
+table.roster th.has-help .help-tip { top: 100%; bottom: auto; }
+
 /* ============== UTILITY ============== */
 .muted { color: var(--text-dim); }
 .tag-list { margin-top: 4px; }
