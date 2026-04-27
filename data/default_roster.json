@@ -107,15 +107,38 @@
         }
       },
       "attrs": {
-        "Per": null,
-        "Agi": null,
-        "Phy": null,
-        "End": null,
-        "Str": null
+        "Per": 17,
+        "Agi": 30,
+        "Phy": 17,
+        "End": 16,
+        "Str": 17
       },
-      "recognition": null,
-      "talents": [],
-      "groups": [],
+      "recognition": "",
+      "talents": [
+        {
+          "name": "Light Footsteps",
+          "level": 3,
+          "icon": "tianfu_bulvqingying.webp"
+        },
+        {
+          "name": "Accelerate Alchemy — [Craftsman Exclusive]",
+          "level": 3,
+          "icon": "tianfu_jiasulianjin.webp"
+        },
+        {
+          "name": "Accelerate Cooking — [Craftsman Exclusive]",
+          "level": 3,
+          "icon": "tianfu_jiasupengren.webp"
+        },
+        {
+          "name": "Tool Maintenance — [Craftsman Exclusive]",
+          "level": 3,
+          "icon": "tianfu_gongjujingxiu.webp"
+        }
+      ],
+      "groups": [
+        "Craftsmen"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -190,50 +213,61 @@
       "weapons": {
         "Spear": {
           "current": null,
-          "cap": null
+          "cap": 115
         },
         "Shield": {
           "current": null,
-          "cap": null
+          "cap": 120
         },
         "Dual-blade": {
           "current": null,
-          "cap": null
+          "cap": 97
         },
         "Great Sword": {
           "current": null,
-          "cap": null
+          "cap": 101
         },
         "Spiked Whip": {
           "current": null,
-          "cap": null
+          "cap": 81
         },
         "Blade": {
           "current": null,
-          "cap": null
+          "cap": 118
         },
         "Bow": {
           "current": null,
-          "cap": null
+          "cap": 93
         },
         "Gauntlets": {
           "current": null,
-          "cap": null
+          "cap": 79
         },
         "Hammer": {
           "current": null,
-          "cap": null
+          "cap": 92
         }
       },
       "attrs": {
-        "Per": null,
-        "Agi": null,
-        "Phy": null,
-        "End": null,
-        "Str": null
+        "Per": 11,
+        "Agi": 18,
+        "Phy": 11,
+        "End": 14,
+        "Str": 13
       },
       "recognition": null,
-      "talents": [],
+      "talents": [
+        {
+          "name": "Go for the Jugular",
+          "level": 2,
+          "icon": "tianfu_zhijiyaohai.webp"
+        },
+        {
+          "name": "Shock Defense",
+          "level": 2,
+          "icon": "tianfu_fangyuzhendang.webp"
+        }
+      ],
       "groups": [],
       "tags": [],
       "notes": ""
@@ -309,39 +343,39 @@
       "weapons": {
         "Spear": {
           "current": null,
-          "cap": null
+          "cap": 102
         },
         "Shield": {
           "current": null,
-          "cap": null
+          "cap": 106
         },
         "Dual-blade": {
           "current": null,
-          "cap": null
+          "cap": 84
         },
         "Great Sword": {
           "current": null,
-          "cap": null
+          "cap": 106
         },
         "Spiked Whip": {
           "current": null,
-          "cap": null
+          "cap": 77
         },
         "Blade": {
           "current": null,
-          "cap": null
+          "cap": 123
         },
         "Bow": {
           "current": null,
-          "cap": null
+          "cap": 118
         },
         "Gauntlets": {
           "current": null,
-          "cap": null
+          "cap": 75
         },
         "Hammer": {
           "current": null,
-          "cap": null
+          "cap": 75
         }
       },
       "attrs": {
@@ -352,9 +386,29 @@
         "Str": null
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
-      "tags": [],
+      "talents": [
+        {
+          "name": "Body-Resilience Conversion",
+          "level": 3,
+          "icon": "tianfu__juetihuaren.webp"
+        },
+        {
+          "name": "Life Shacles",
+          "level": 3,
+          "icon": "tianfu_shengmingjiesuo.webp"
+        },
+        {
+          "name": "Damage Immunity Blessing",
+          "level": 2,
+          "icon": "tianfu__mianshangqiyou.webp"
+        }
+      ],
+      "groups": [
+        "Craftsmen"
+      ],
+      "tags": [
+        "Mentor"
+      ],
       "notes": ""
     },
     {
@@ -428,39 +482,39 @@
       "weapons": {
         "Spear": {
           "current": null,
-          "cap": null
+          "cap": 119
         },
         "Shield": {
           "current": null,
-          "cap": null
+          "cap": 115
         },
         "Dual-blade": {
           "current": null,
-          "cap": null
+          "cap": 85
         },
         "Great Sword": {
           "current": null,
-          "cap": null
+          "cap": 115
         },
         "Spiked Whip": {
           "current": null,
-          "cap": null
+          "cap": 75
         },
         "Blade": {
           "current": null,
-          "cap": null
+          "cap": 99
         },
         "Bow": {
           "current": null,
-          "cap": null
+          "cap": 101
         },
         "Gauntlets": {
           "current": null,
-          "cap": null
+          "cap": 82
         },
         "Hammer": {
           "current": null,
-          "cap": null
+          "cap": 100
         }
       },
       "attrs": {
@@ -471,9 +525,39 @@
         "Str": null
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
-      "tags": [],
+      "talents": [
+        {
+          "name": "Last Light Counter",
+          "level": 3,
+          "icon": "tianfu__huiguangfanji.webp"
+        },
+        {
+          "name": "Movement Speed Steal — [Savagehorn Exclusive]",
+          "level": 3,
+          "icon": "tianfu__yisuqiequ.webp"
+        },
+        {
+          "name": "Blood Activating",
+          "level": 3,
+          "icon": "tianfu_shengminghuifujiakuai.webp"
+        },
+        {
+          "name": "Unyielding Will",
+          "level": 3,
+          "icon": "tianfu__shisijuexin.webp"
+        },
+        {
+          "name": "Rampage",
+          "level": 3,
+          "icon": "tianfu__baozou.webp"
+        }
+      ],
+      "groups": [
+        "Craftsmen"
+      ],
+      "tags": [
+        "Mentor"
+      ],
       "notes": ""
     },
     {
@@ -590,14 +674,27 @@
         "Str": null
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Last Radiance",
+          "level": 1,
+          "icon": "tianfu_huiguangfanzhao.webp"
+        },
+        {
+          "name": "Skillful Hand — [Wildwolf Exclusive]",
+          "level": 3,
+          "icon": "tianfu_cuifengqiaoshou.webp"
+        }
+      ],
+      "groups": [
+        "Craftsmen"
+      ],
       "tags": [],
       "notes": ""
     },
     {
       "id": "5AB0APEZG1VAPWW7A7WO22B04",
-      "name": "Fatty Wang",
+      "name": "Lao Wang",
       "level": 50,
       "title": "Master",
       "profession": "Craftsman",
@@ -702,15 +799,43 @@
         }
       },
       "attrs": {
-        "Per": null,
-        "Agi": null,
-        "Phy": null,
-        "End": null,
-        "Str": null
+        "Per": 30,
+        "Agi": 29,
+        "Phy": 27,
+        "End": 21,
+        "Str": 21
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Accelerate Cooking — [Craftsman Exclusive]",
+          "level": 3,
+          "icon": "tianfu_jiasupengren.webp"
+        },
+        {
+          "name": "Crafting Speed Up — [Craftsman Exclusive]",
+          "level": 3,
+          "icon": "tianfu_jiasuqijuzhizao.webp"
+        },
+        {
+          "name": "Refined Tool — [Craftsman Exclusive]",
+          "level": 3,
+          "icon": "tianfu_jingzhizhubao.webp"
+        },
+        {
+          "name": "Backpack Expansion",
+          "level": 3,
+          "icon": "tianfu_beibaokuorong.webp"
+        },
+        {
+          "name": "Anti-Hunger",
+          "level": 3,
+          "icon": "tianfu_kangjie.webp"
+        }
+      ],
+      "groups": [
+        "Craftsmen"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -828,8 +953,21 @@
         "Str": null
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Extraordinary Talent",
+          "level": 3,
+          "icon": "tianfu_xingyun.webp"
+        },
+        {
+          "name": "Tool Maintenance — [Craftsman Exclusive]",
+          "level": 3,
+          "icon": "tianfu_gongjujingxiu.webp"
+        }
+      ],
+      "groups": [
+        "Craftsmen"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -947,8 +1085,31 @@
         "Str": null
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Accelerate Leatherworking — [Porter Exclusive]",
+          "level": 2,
+          "icon": "tianfu_jiasuroupi.webp"
+        },
+        {
+          "name": "Quick Bandaging",
+          "level": 3,
+          "icon": "tianfu_kuaisubaoza.webp"
+        },
+        {
+          "name": "Swift Pace",
+          "level": 3,
+          "icon": "tianfu_yidongsudutisheng.webp"
+        },
+        {
+          "name": "Camel Cow",
+          "level": 3,
+          "icon": "tianfu_fuzhongtisheng.webp"
+        }
+      ],
+      "groups": [
+        "Craftsmen"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -1066,8 +1227,36 @@
         "Str": null
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Acceleration at Stress",
+          "level": 2,
+          "icon": "tianfu_yingjifanying.webp"
+        },
+        {
+          "name": "Loadless Fast Marching",
+          "level": 2,
+          "icon": "tianfu_qingzhuangsuxing.webp"
+        },
+        {
+          "name": "Rapid Growth",
+          "level": 2,
+          "icon": "tianfu_kuaisuchengzhang.webp"
+        },
+        {
+          "name": "Accelerate Wood & Stone — [Porter Exclusive]",
+          "level": 2,
+          "icon": "tianfu_jiasupaomu.webp"
+        },
+        {
+          "name": "Anti-Hunger",
+          "level": 2,
+          "icon": "tianfu_kangjie.webp"
+        }
+      ],
+      "groups": [
+        "Craftsmen"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -1185,8 +1374,46 @@
         "Str": null
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Unnoticeable",
+          "level": 1,
+          "icon": "tianfu_shanyuweizhuang.webp"
+        },
+        {
+          "name": "Backpack Expansion",
+          "level": 1,
+          "icon": "tianfu_beibaokuorong.webp"
+        },
+        {
+          "name": "Accelerate Leatherworking — [Porter Exclusive]",
+          "level": 1,
+          "icon": "tianfu_jiasuroupi.webp"
+        },
+        {
+          "name": "Rapid Absorption",
+          "level": 1,
+          "icon": "tianfu_shuifenxiaohaosudujiangdi_2.webp"
+        },
+        {
+          "name": "Slow-witted",
+          "level": 3,
+          "icon": "tianfu_jimin_2.webp"
+        },
+        {
+          "name": "Heavy Footsteps",
+          "level": 3,
+          "icon": "tianfu_bulvqingying_2.webp"
+        },
+        {
+          "name": "Weakened DEF",
+          "level": 2,
+          "icon": "tianfu_fangyutisheng_2.webp"
+        }
+      ],
+      "groups": [
+        "Craftsmen"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -1261,39 +1488,39 @@
       "weapons": {
         "Spear": {
           "current": null,
-          "cap": null
+          "cap": 87
         },
         "Shield": {
           "current": null,
-          "cap": null
+          "cap": 79
         },
         "Dual-blade": {
           "current": null,
-          "cap": null
+          "cap": 107
         },
         "Great Sword": {
           "current": null,
-          "cap": null
+          "cap": 105
         },
         "Spiked Whip": {
           "current": null,
-          "cap": null
+          "cap": 93
         },
         "Blade": {
           "current": null,
-          "cap": null
+          "cap": 108
         },
         "Bow": {
           "current": null,
-          "cap": null
+          "cap": 89
         },
         "Gauntlets": {
           "current": null,
-          "cap": null
+          "cap": 110
         },
         "Hammer": {
           "current": null,
-          "cap": null
+          "cap": 112
         }
       },
       "attrs": {
@@ -1304,8 +1531,31 @@
         "Str": null
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Superarmor Break",
+          "level": 1,
+          "icon": "tianfu_batibengjie.webp"
+        },
+        {
+          "name": "Life Shacles",
+          "level": 1,
+          "icon": "tianfu_shengmingjiesuo.webp"
+        },
+        {
+          "name": "Giant Sword DMG Increase",
+          "level": 1,
+          "icon": "tianfu_zhongjianwuqishanghaitigao.webp"
+        },
+        {
+          "name": "Gauntlets DMG Increase",
+          "level": 1,
+          "icon": "tianfu_quantaoiwuqishanghaitigao.webp"
+        }
+      ],
+      "groups": [
+        "Craftsmen"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -1380,51 +1630,69 @@
       "weapons": {
         "Spear": {
           "current": null,
-          "cap": null
+          "cap": 84
         },
         "Shield": {
           "current": null,
-          "cap": null
+          "cap": 87
         },
         "Dual-blade": {
           "current": null,
-          "cap": null
+          "cap": 93
         },
         "Great Sword": {
           "current": null,
-          "cap": null
+          "cap": 88
         },
         "Spiked Whip": {
           "current": null,
-          "cap": null
+          "cap": 83
         },
         "Blade": {
           "current": null,
-          "cap": null
+          "cap": 99
         },
         "Bow": {
           "current": null,
-          "cap": null
+          "cap": 90
         },
         "Gauntlets": {
           "current": null,
-          "cap": null
+          "cap": 97
         },
         "Hammer": {
           "current": null,
-          "cap": null
+          "cap": 80
         }
       },
       "attrs": {
-        "Per": null,
-        "Agi": null,
-        "Phy": null,
-        "End": null,
-        "Str": null
+        "Per": 9,
+        "Agi": 15,
+        "Phy": 25,
+        "End": 25,
+        "Str": 23
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Swift Pace",
+          "level": 1,
+          "icon": "tianfu_yidongsudutisheng.webp"
+        },
+        {
+          "name": "Loaded Raid",
+          "level": 1,
+          "icon": "tianfu_zhongzhuangbenxi.webp"
+        },
+        {
+          "name": "Weaponsmith's Focus — [Craftsman Exclusive]",
+          "level": 1,
+          "icon": "tianfu_duanqizhuanzhu.webp"
+        }
+      ],
+      "groups": [
+        "Craftsmen"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -1499,39 +1767,39 @@
       "weapons": {
         "Spear": {
           "current": null,
-          "cap": null
+          "cap": 106
         },
         "Shield": {
           "current": null,
-          "cap": null
+          "cap": 114
         },
         "Dual-blade": {
           "current": null,
-          "cap": null
+          "cap": 98
         },
         "Great Sword": {
           "current": null,
-          "cap": null
+          "cap": 102
         },
         "Spiked Whip": {
           "current": null,
-          "cap": null
+          "cap": 78
         },
         "Blade": {
           "current": null,
-          "cap": null
+          "cap": 117
         },
         "Bow": {
           "current": null,
-          "cap": null
+          "cap": 102
         },
         "Gauntlets": {
           "current": null,
-          "cap": null
+          "cap": 89
         },
         "Hammer": {
           "current": null,
-          "cap": null
+          "cap": 84
         }
       },
       "attrs": {
@@ -1542,8 +1810,36 @@
         "Str": null
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Wild Nature Awakened",
+          "level": 1,
+          "icon": "tianfu_yexingjuexing.webp"
+        },
+        {
+          "name": "Multi-Throw",
+          "level": 1,
+          "icon": "tianfu_duochongtouzhi.webp"
+        },
+        {
+          "name": "Powerful Attack",
+          "level": 1,
+          "icon": "tianfu_gongjilitisheng.webp"
+        },
+        {
+          "name": "Defensive Attack",
+          "level": 1,
+          "icon": "tianfu__fangyuqiangxi.webp"
+        },
+        {
+          "name": "Quick Bandaging",
+          "level": 1,
+          "icon": "tianfu_kuaisubaoza.webp"
+        }
+      ],
+      "groups": [
+        "Copper Outpost"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -1560,111 +1856,124 @@
       "skills": {
         "Lumberjack": {
           "current": null,
-          "cap": null
+          "cap": 99
         },
         "Miner": {
           "current": null,
-          "cap": null
+          "cap": 86
         },
         "Gatherer": {
           "current": null,
-          "cap": null
+          "cap": 81
         },
         "Farmer": {
           "current": null,
-          "cap": null
+          "cap": 90
         },
         "Weaver": {
           "current": null,
-          "cap": null
+          "cap": 90
         },
         "Potter": {
           "current": null,
-          "cap": null
+          "cap": 96
         },
         "Carpenter": {
           "current": null,
-          "cap": null
+          "cap": 79
         },
         "Tanner": {
           "current": null,
-          "cap": null
+          "cap": 99
         },
         "Kiln Worker": {
           "current": null,
-          "cap": null
+          "cap": 88
         },
         "Craftsman": {
           "current": null,
-          "cap": null
+          "cap": 88
         },
         "Alchemist": {
           "current": null,
-          "cap": null
+          "cap": 91
         },
         "Cook": {
           "current": null,
-          "cap": null
+          "cap": 93
         },
         "Blacksmith": {
           "current": null,
-          "cap": null
+          "cap": 80
         },
         "Armorer": {
           "current": null,
-          "cap": null
+          "cap": 96
         }
       },
       "weapons": {
         "Spear": {
           "current": null,
-          "cap": null
+          "cap": 114
         },
         "Shield": {
           "current": null,
-          "cap": null
+          "cap": 90
         },
         "Dual-blade": {
           "current": null,
-          "cap": null
+          "cap": 97
         },
         "Great Sword": {
           "current": null,
-          "cap": null
+          "cap": 85
         },
         "Spiked Whip": {
           "current": null,
-          "cap": null
+          "cap": 105
         },
         "Blade": {
           "current": null,
-          "cap": null
+          "cap": 103
         },
         "Bow": {
           "current": null,
-          "cap": null
+          "cap": 108
         },
         "Gauntlets": {
           "current": null,
-          "cap": null
+          "cap": 102
         },
         "Hammer": {
           "current": null,
-          "cap": null
+          "cap": 83
         }
       },
       "attrs": {
-        "Per": null,
-        "Agi": null,
-        "Phy": null,
-        "End": null,
-        "Str": null
+        "Per": 16,
+        "Agi": 14,
+        "Phy": 13,
+        "End": 13,
+        "Str": 16
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Full Stamina",
+          "level": 3,
+          "icon": "tianfu_tilihuifujiakuai.webp"
+        },
+        {
+          "name": "Protection of the Savagehorn — [Savagehorn Exclusive]",
+          "level": 3,
+          "icon": "tianfu__manjiaobihu.webp"
+        }
+      ],
+      "groups": [
+        "Copper Outpost"
+      ],
       "tags": [],
-      "notes": "Skill data still pending."
+      "notes": ""
     },
     {
       "id": "AD41LS8M7FDBQV6IHZX9G9NGU",
@@ -1745,11 +2054,11 @@
         },
         "Dual-blade": {
           "current": null,
-          "cap": 95
+          "cap": 115
         },
         "Great Sword": {
           "current": null,
-          "cap": 85
+          "cap": 115
         },
         "Spiked Whip": {
           "current": null,
@@ -1761,7 +2070,7 @@
         },
         "Bow": {
           "current": null,
-          "cap": 91
+          "cap": 99
         },
         "Gauntlets": {
           "current": null,
@@ -1769,7 +2078,7 @@
         },
         "Hammer": {
           "current": null,
-          "cap": 87
+          "cap": 117
         }
       },
       "attrs": {
@@ -1787,10 +2096,34 @@
           "icon": "tianfu_shuangdaowuqishanghaitigao.webp",
           "source": "confirmed-mentor",
           "note": "Taught by Five Star Blade via Training Ground"
+        },
+        {
+          "name": "Confusion Reflect",
+          "level": 2,
+          "icon": "tianfu_hunluanfantan.webp"
+        },
+        {
+          "name": "Malice",
+          "level": 2,
+          "icon": "tianfu_eyi.webp"
+        },
+        {
+          "name": "Throw Dodge",
+          "level": 2,
+          "icon": "tianfu_shanbitouzhi.webp"
+        },
+        {
+          "name": "Go for the Jugular",
+          "level": 1,
+          "icon": "tianfu_zhijiyaohai.webp"
         }
       ],
-      "groups": [],
-      "tags": [],
+      "groups": [
+        "Run Amok"
+      ],
+      "tags": [
+        "Avatar"
+      ],
       "notes": "Emmy's Body Two. Trainee. Talents: Dual-blade DMG Increase Lv 3 (taught by Five Star Blade)."
     },
     {
@@ -1872,7 +2205,7 @@
         },
         "Dual-blade": {
           "current": null,
-          "cap": 93
+          "cap": 99
         },
         "Great Sword": {
           "current": null,
@@ -1888,7 +2221,7 @@
         },
         "Bow": {
           "current": null,
-          "cap": null
+          "cap": 94
         },
         "Gauntlets": {
           "current": null,
@@ -1907,9 +2240,19 @@
         "Str": 14
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
-      "tags": [],
+      "talents": [
+        {
+          "name": "Grapple-Throw",
+          "level": 3,
+          "icon": "tianfu_qianyintouzhi.webp"
+        }
+      ],
+      "groups": [
+        "Paeon"
+      ],
+      "tags": [
+        "Mentor"
+      ],
       "notes": "MENTOR ASSET: Gauntlets 121 mastery."
     },
     {
@@ -2026,8 +2369,36 @@
         "Str": 24
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Crave for Blood",
+          "level": 3,
+          "icon": "tianfu_kewangxianxue.webp"
+        },
+        {
+          "name": "Limb / Torso / Head / Tail Destruction",
+          "level": 3,
+          "icon": "tianfu_zhitipohuai.webp"
+        },
+        {
+          "name": "Rampage",
+          "level": 3,
+          "icon": "tianfu__baozou.webp"
+        },
+        {
+          "name": "Endurance",
+          "level": 3,
+          "icon": "tianfu__rennai.webp"
+        },
+        {
+          "name": "Crit Steal",
+          "level": 3,
+          "icon": "tianfu_baojiqiequ.webp"
+        }
+      ],
+      "groups": [
+        "Run Amok"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -2145,8 +2516,21 @@
         "Str": 18
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Fire Deterrence",
+          "level": 3,
+          "icon": "tianfu__ranshaoweixie.webp"
+        },
+        {
+          "name": "Offense is the Best Defense",
+          "level": 3,
+          "icon": "tianfu__yigongdaishou.webp"
+        }
+      ],
+      "groups": [
+        "Paeon"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -2264,8 +2648,31 @@
         "Str": 26
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Blood Activating",
+          "level": 3,
+          "icon": "tianfu_shengminghuifujiakuai.webp"
+        },
+        {
+          "name": "Pain Reversal",
+          "level": 3,
+          "icon": "tianfu__tongkunizhuan.webp"
+        },
+        {
+          "name": "Skill Recovery",
+          "level": 3,
+          "icon": "tianfu_jiqiaohuifu.webp"
+        },
+        {
+          "name": "Fatal",
+          "level": 3,
+          "icon": "tianfu__zhiming.webp"
+        }
+      ],
+      "groups": [
+        "Run Amok"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -2383,9 +2790,39 @@
         "Str": 11
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
-      "tags": [],
+      "talents": [
+        {
+          "name": "Rampage",
+          "level": 3,
+          "icon": "tianfu__baozou.webp"
+        },
+        {
+          "name": "Onslaught — [Warrior Exclusive]",
+          "level": 2,
+          "icon": "tianfu__menggong.webp"
+        },
+        {
+          "name": "Dual-blade DMG Increase",
+          "level": 3,
+          "icon": "tianfu_shuangdaowuqishanghaitigao.webp"
+        },
+        {
+          "name": "Extraordinary Talent",
+          "level": 2,
+          "icon": "tianfu_xingyun.webp"
+        },
+        {
+          "name": "Defense to Offense",
+          "level": 3,
+          "icon": "tianfu_zhuanshouweigong.webp"
+        }
+      ],
+      "groups": [
+        "Run Amok"
+      ],
+      "tags": [
+        "Mentor"
+      ],
       "notes": "MENTOR ASSET: Blade 120 mastery + Dual-blade DMG Increase Lv 3 talent."
     },
     {
@@ -2502,8 +2939,36 @@
         "Str": 21
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Baffle Reflect",
+          "level": 3,
+          "icon": "tianfu_mihuofantan.webp"
+        },
+        {
+          "name": "Defensive Attack",
+          "level": 3,
+          "icon": "tianfu__fangyuqiangxi.webp"
+        },
+        {
+          "name": "Skill Recovery",
+          "level": 3,
+          "icon": "tianfu_jiqiaohuifu.webp"
+        },
+        {
+          "name": "Fight to Death",
+          "level": 3,
+          "icon": "tianfu_shemingxiangbo.webp"
+        },
+        {
+          "name": "Merciless Means",
+          "level": 3,
+          "icon": "tianfu_shouduancairen.webp"
+        }
+      ],
+      "groups": [
+        "Run Amok"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -2621,8 +3086,36 @@
         "Str": 22
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Resourceful",
+          "level": 2,
+          "icon": "tianfu_jimin.webp"
+        },
+        {
+          "name": "Attack-Defense Resonance — Attack",
+          "level": 1,
+          "icon": "tianfu_gongfanpingheng1.webp"
+        },
+        {
+          "name": "Breezy Downpour",
+          "level": 2,
+          "icon": "tianfu__weifengjinyu.webp"
+        },
+        {
+          "name": "Blood Activating",
+          "level": 2,
+          "icon": "tianfu_shengminghuifujiakuai.webp"
+        },
+        {
+          "name": "Tabooed Body",
+          "level": 2,
+          "icon": "tianfu__jinjizhiqu.webp"
+        }
+      ],
+      "groups": [
+        "Run Amok"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -2740,8 +3233,36 @@
         "Str": 35
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Remote Strike",
+          "level": 2,
+          "icon": "tianfu_yuanchengdaji.webp"
+        },
+        {
+          "name": "Full Stamina",
+          "level": 1,
+          "icon": "tianfu_tilihuifujiakuai.webp"
+        },
+        {
+          "name": "Enhance DEF",
+          "level": 3,
+          "icon": "tianfu_fangyutisheng.webp"
+        },
+        {
+          "name": "Good at Melee Combat",
+          "level": 3,
+          "icon": "tianfu_shanchangroubo.webp"
+        },
+        {
+          "name": "Resurgence",
+          "level": 2,
+          "icon": "tianfu__sihuifuran.webp"
+        }
+      ],
+      "groups": [
+        "Run Amok"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -2859,8 +3380,36 @@
         "Str": 28
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
+      "talents": [
+        {
+          "name": "Trick Force",
+          "level": 3,
+          "icon": "tianfu_qiaojin.webp"
+        },
+        {
+          "name": "Slaughter Fervency",
+          "level": 3,
+          "icon": "tianfu_tulukuangre.webp"
+        },
+        {
+          "name": "Clever Escape",
+          "level": 3,
+          "icon": "tianfu_linghuotaotuo.webp"
+        },
+        {
+          "name": "Moment of Respite",
+          "level": 3,
+          "icon": "tianfu_yushijufen.webp"
+        },
+        {
+          "name": "Life Shacles",
+          "level": 3,
+          "icon": "tianfu_shengmingjiesuo.webp"
+        }
+      ],
+      "groups": [
+        "Run Amok"
+      ],
       "tags": [],
       "notes": ""
     },
@@ -2978,9 +3527,39 @@
         "Str": 20
       },
       "recognition": null,
-      "talents": [],
-      "groups": [],
-      "tags": [],
+      "talents": [
+        {
+          "name": "Fierce Attack",
+          "level": 3,
+          "icon": "tianfu_gongjisudutisheng.webp"
+        },
+        {
+          "name": "Offense is the Best Defense",
+          "level": 3,
+          "icon": "tianfu__yigongdaishou.webp"
+        },
+        {
+          "name": "Throw Dodge",
+          "level": 3,
+          "icon": "tianfu_shanbitouzhi.webp"
+        },
+        {
+          "name": "Chain Dodge",
+          "level": 3,
+          "icon": "tianfu__liansuoshanbi.webp"
+        },
+        {
+          "name": "Remote Strike",
+          "level": 3,
+          "icon": "tianfu_yuanchengdaji.webp"
+        }
+      ],
+      "groups": [
+        "Run Amok"
+      ],
+      "tags": [
+        "Red Quality"
+      ],
       "notes": ""
     }
   ],

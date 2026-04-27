@@ -432,10 +432,24 @@ table.roster.editable .row-go:hover {
   transition: opacity 60ms ease;
 }
 .talent-pill:hover .talent-tip,
-.talent-pill:focus-within .talent-tip {
+.talent-pill:focus-within .talent-tip,
+.talent-icon-mini:hover .talent-tip,
+.talent-icon-mini:focus-within .talent-tip {
   opacity: 1;
   visibility: visible;
 }
+
+/* Compact talent icons in the roster's Talents column */
+.talent-icon-row { display: flex; flex-wrap: wrap; gap: 2px; max-width: 240px; }
+.talent-icon-mini {
+  position: relative; display: inline-block;
+  width: 22px; height: 22px;
+  border-radius: 3px; border: 1px solid var(--border);
+  background: var(--bg);
+  cursor: help;
+}
+.talent-icon-mini img { width: 100%; height: 100%; object-fit: cover; border-radius: 2px; display: block; }
+.talent-icon-mini.negative { border-color: var(--red); }
 .talent-tip .tip-name { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
 .talent-tip .tip-effect { font-size: 12px; color: var(--text-dim); white-space: normal; line-height: 1.35; }
 

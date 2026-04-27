@@ -83,7 +83,7 @@ let state = {
   calibration: defaultCalibration(), // tunable timing constants
   selectedId: null,    // for profile view
   selectedPlanId: null,// for plan editor view
-  sort: { column: null, dir: null, sub: null }, // null = default order
+  sort: { column: 'name', dir: 'asc', sub: null }, // alphabetical by default; click to toggle
   lastRosterOrder: [], // ids in last-rendered roster order, for profile prev/next
 };
 
@@ -496,7 +496,7 @@ function renderRoster() {
     }
     html += `<td>${(t.groups || []).map(g => `<span class="chip group">${escapeHtml(g)}</span>`).join('')}</td>`;
     html += `<td>${(t.tags || []).map(g => `<span class="chip tag">${escapeHtml(g)}</span>`).join('')}</td>`;
-    html += `<td>${(t.talents || []).length}</td>`;
+    html += `<td>${renderTalentIconRow(t.talents)}</td>`;
     html += '</tr>';
   }
   html += '</tbody></table>';
@@ -657,6 +657,26 @@ function renderProfile() {
 
   renderTalentList(t);
   bindTalentAutocomplete(t);
+}
+
+// Compact icon row for the roster's "Talents" column. Each icon hovers to
+// reveal the same name/effect tooltip the profile pills use.
+function renderTalentIconRow(talents) {
+  const tals = talents || [];
+  if (!tals.length) return '<span class="muted small">—</span>';
+  return `<div class="talent-icon-row">${tals.map(tal => {
+    const meta = state.talents.find(x => x.name === tal.name);
+    const effect = (meta && meta.effect) ? meta.effect : '';
+    const isNeg = meta && meta.polarity === 'negative';
+    const lv = tal.level ? ` · Lv ${tal.level}` : '';
+    return `<span class="talent-icon-mini ${isNeg?'negative':''}" tabindex="0">
+      <img src="${ICON_DIR}${tal.icon}" alt="${escapeHtml(tal.name)}" onerror="this.style.opacity=0.2">
+      <div class="talent-tip" role="tooltip">
+        <div class="tip-name">${escapeHtml(tal.name)}${escapeHtml(lv)}</div>
+        ${effect ? `<div class="tip-effect">${escapeHtml(effect)}</div>` : ''}
+      </div>
+    </span>`;
+  }).join('')}</div>`;
 }
 
 function renderTalentList(t) {
