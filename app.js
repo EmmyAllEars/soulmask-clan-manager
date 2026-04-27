@@ -41,12 +41,46 @@ const PROF_CLASS_WEAPONS = {
 // === STATE ===
 const STORAGE_VERSION = 2;
 
+// Training Plan time-estimation constants (see docs/training_plans.md).
+// Both base times and material multipliers are placeholders until measured;
+// they are exposed in the Calibration panel so Emmy can adjust them.
+//
+// "Material" is the gear's progression tier (1-5: Beast Hide → Bronze → Iron
+// → Steel → Endgame). Soulmask's other gear axes — Quality (I-VI badges)
+// and Mod — do NOT affect training duration, so we don't model them here.
+const DEFAULT_PLAN_BASE_TIMES_MIN = {
+  'cap-raise':   180,  // PLACEHOLDER
+  'learn':       212,  // ~3h 32m (Lv 1 acquired, random)
+  'upgrade-1-2':  86,  // ~1h 26m
+  'upgrade-2-3': 168,  // ~2h 48m
+};
+const DEFAULT_PLAN_TIER_MULTIPLIERS = {
+  1: 1.40,  // Beast Hide — slow
+  2: 1.15,
+  3: 1.00,
+  4: 0.85,
+  5: 0.70,  // Endgame — fast
+};
+const MATERIAL_TIERS = [1, 2, 3, 4, 5];
+const PLAN_STEP_TYPES = ['cap-raise','learn','upgrade'];
+const PLAN_STEP_LABELS = { 'cap-raise':'Cap Raise', 'learn':'Learn Talent', 'upgrade':'Upgrade Talent' };
+const PLAN_STATUSES = ['draft','active','done','abandoned'];
+const STEP_STATUSES = ['queued','running','completed','abandoned'];
+
+function defaultCalibration() {
+  return {
+    baseTimes: { ...DEFAULT_PLAN_BASE_TIMES_MIN },
+    tierMultipliers: { ...DEFAULT_PLAN_TIER_MULTIPLIERS },
+  };
+}
+
 let state = {
   roster: [],          // array of tribesman objects
   talents: [],         // catalog of all talents (loaded from talents.json)
   groups: [],          // user-defined group names
   tags: [],            // user-defined tag names
   plans: [],           // training plans (see docs/training_plans.md)
+  calibration: defaultCalibration(), // tunable timing constants
   selectedId: null,    // for profile view
   selectedPlanId: null,// for plan editor view
   sort: { column: null, dir: null, sub: null }, // null = default order
@@ -62,6 +96,7 @@ function saveState() {
     groups: state.groups,
     tags: state.tags,
     plans: state.plans,
+    calibration: state.calibration,
     version: STORAGE_VERSION,
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(persist));
@@ -105,7 +140,12 @@ async function boot() {
     state.groups = saved.groups || [];
     state.tags = saved.tags || [];
     state.plans = saved.plans || [];
-    if (wasOlder) saveState();
+    let normalized = false;
+    state.plans.forEach(p => p.steps?.forEach(s => { if (normalizeStep(s)) normalized = true; }));
+    const savedTiers = Object.keys(saved.calibration?.tierMultipliers || {});
+    const droppedStaleTiers = savedTiers.some(k => !MATERIAL_TIERS.includes(Number(k)));
+    state.calibration = mergeCalibration(saved.calibration);
+    if (wasOlder || normalized || droppedStaleTiers) saveState();
   } else {
     await loadDefaults();
   }
@@ -126,12 +166,29 @@ async function loadDefaults() {
     state.groups = [];
     state.tags = [];
     state.plans = [];
+    state.calibration = defaultCalibration();
     saveState();
   } catch (e) {
     console.error('Failed to load defaults:', e);
     state.roster = [];
     state.plans = [];
+    state.calibration = defaultCalibration();
   }
+}
+
+// Merge a persisted (or absent) calibration blob with the current defaults so
+// that adding new constants in future versions doesn't strand existing saves.
+function mergeCalibration(saved) {
+  const def = defaultCalibration();
+  if (!saved) return def;
+  const tier = { ...def.tierMultipliers };
+  for (const t of MATERIAL_TIERS) {
+    if (saved.tierMultipliers && saved.tierMultipliers[t] != null) tier[t] = saved.tierMultipliers[t];
+  }
+  return {
+    baseTimes: { ...def.baseTimes, ...(saved.baseTimes || {}) },
+    tierMultipliers: tier,
+  };
 }
 
 // === HELPERS ===
@@ -148,24 +205,54 @@ function fmtSkill(cur, cap) {
   return `${cur} / ${cap}`;
 }
 function newId() { return 'T_' + Math.random().toString(36).slice(2,11).toUpperCase(); }
+function newPlanId() { return 'P_' + Math.random().toString(36).slice(2,11).toUpperCase(); }
+function newStepId() { return 'S_' + Math.random().toString(36).slice(2,11).toUpperCase(); }
+
+const ROMAN_TIERS = { 1:'I', 2:'II', 3:'III', 4:'IV', 5:'V' };
+const MATERIAL_NAMES = { 1:'Beast Hide', 2:'Bronze', 3:'Iron', 4:'Steel', 5:'Endgame' };
+
+// Cap ceiling shared by Training Suggestions and Cap Raise plan steps.
+function weaponCeiling(profession, weapon) {
+  const cls = PROF_CLASS_WEAPONS[profession] || [];
+  return cls.includes(weapon) ? 125 : 100;
+}
 
 // === UI MAIN ===
+function setActiveView(viewId, navId) {
+  for (const v of ['view-roster','view-profile','view-plans']) {
+    document.getElementById(v)?.classList.toggle('active', v === viewId);
+  }
+  for (const n of ['nav-roster','nav-profile','nav-plans']) {
+    document.getElementById(n)?.classList.toggle('primary', n === navId);
+  }
+}
+
 const ui = {
   showRoster() {
-    document.getElementById('view-roster').classList.add('active');
-    document.getElementById('view-profile').classList.remove('active');
-    document.getElementById('nav-roster').classList.add('primary');
-    document.getElementById('nav-profile').classList.remove('primary');
+    setActiveView('view-roster', 'nav-roster');
     refreshNavProfileLabel();
+    refreshNavPlanLabel();
   },
   showProfile(id) {
     state.selectedId = id;
-    document.getElementById('view-roster').classList.remove('active');
-    document.getElementById('view-profile').classList.add('active');
-    document.getElementById('nav-roster').classList.remove('primary');
-    document.getElementById('nav-profile').classList.add('primary');
+    setActiveView('view-profile', 'nav-profile');
     renderProfile();
     refreshNavProfileLabel();
+    refreshNavPlanLabel();
+  },
+  showPlans() {
+    state.selectedPlanId = null;
+    setActiveView('view-plans', 'nav-plans');
+    renderPlansList();
+    refreshNavProfileLabel();
+    refreshNavPlanLabel();
+  },
+  showPlan(id) {
+    state.selectedPlanId = id;
+    setActiveView('view-plans', 'nav-plans');
+    renderPlanEditor(id);
+    refreshNavProfileLabel();
+    refreshNavPlanLabel();
   },
   reportBug() { openIssue('bug', '[Bug] '); },
   suggestFeature() { openIssue('enhancement', '[Feature] '); },
@@ -183,6 +270,15 @@ function refreshNavProfileLabel() {
   if (!onProfile) { navBtn.textContent = 'Profile'; return; }
   const t = state.roster.find(x => x.id === state.selectedId);
   navBtn.textContent = t ? `Profile: ${t.name}` : 'Profile';
+}
+
+function refreshNavPlanLabel() {
+  const navBtn = document.getElementById('nav-plans');
+  if (!navBtn) return;
+  const onPlans = document.getElementById('view-plans')?.classList.contains('active');
+  if (!onPlans || !state.selectedPlanId) { navBtn.textContent = 'Plans'; return; }
+  const p = state.plans.find(x => x.id === state.selectedPlanId);
+  navBtn.textContent = p ? `Plan: ${p.name || 'Untitled'}` : 'Plans';
 }
 
 function applyTheme(theme) {
@@ -1014,6 +1110,8 @@ function importJSON(text) {
     state.groups = data.groups || [];
     state.tags = data.tags || [];
     state.plans = data.plans || [];
+    state.plans.forEach(p => p.steps?.forEach(normalizeStep));
+    state.calibration = mergeCalibration(data.calibration);
     saveState();
     initFilters();
     renderRoster();
@@ -1028,6 +1126,514 @@ function downloadFile(name, mime, content) {
   a.href = url; a.download = name;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+// === TRAINING PLANS ===
+// Per-tribesman ordered list of training-ground sessions. See
+// docs/training_plans.md for the full design.
+
+function findPlan(id) { return state.plans.find(p => p.id === id); }
+function findStep(plan, stepId) { return plan?.steps.find(s => s.id === stepId); }
+function findTribesman(id) { return state.roster.find(t => t.id === id); }
+function talentMeta(name) { return state.talents.find(x => x.name === name); }
+
+// --- Time estimation -------------------------------------------------------
+
+function stepBaseKey(step) {
+  if (step.type === 'cap-raise') return 'cap-raise';
+  if (step.type === 'learn') return 'learn';
+  // upgrade: which level transition?
+  const target = step.targetLevel || 2;
+  return target <= 2 ? 'upgrade-1-2' : 'upgrade-2-3';
+}
+
+function estimateStepMin(step) {
+  if (!step) return 0;
+  const base = state.calibration.baseTimes[stepBaseKey(step)];
+  const mult = state.calibration.tierMultipliers[step.material] ?? 1;
+  if (base == null) return 0;
+  return Math.round(base * mult);
+}
+
+function estimatePlanMin(plan) {
+  if (!plan) return 0;
+  return plan.steps.reduce((sum, s) => sum + estimateStepMin(s), 0);
+}
+
+function fmtMinutes(min) {
+  if (!min || min < 1) return '—';
+  const h = Math.floor(min / 60), m = min % 60;
+  if (!h) return `${m}m`;
+  if (!m) return `${h}h`;
+  return `${h}h ${m}m`;
+}
+
+// --- Plan CRUD -------------------------------------------------------------
+
+function createPlan(traineeId, name) {
+  const trainee = findTribesman(traineeId);
+  const plan = {
+    id: newPlanId(),
+    name: name || `${trainee?.name || 'Unnamed'} — new plan`,
+    traineeId,
+    status: 'draft',
+    createdAt: new Date().toISOString(),
+    notes: '',
+    steps: [],
+  };
+  state.plans.push(plan);
+  saveState();
+  return plan;
+}
+
+function deletePlan(id) {
+  const idx = state.plans.findIndex(p => p.id === id);
+  if (idx < 0) return;
+  state.plans.splice(idx, 1);
+  if (state.selectedPlanId === id) state.selectedPlanId = null;
+  saveState();
+}
+
+function duplicatePlan(id) {
+  const src = findPlan(id);
+  if (!src) return null;
+  const copy = JSON.parse(JSON.stringify(src));
+  copy.id = newPlanId();
+  copy.name = `${src.name} (copy)`;
+  copy.status = 'draft';
+  copy.createdAt = new Date().toISOString();
+  copy.steps = copy.steps.map(s => ({ ...s, id: newStepId(), status: 'queued', startedAt: null, completedAt: null, actualDurationMin: null }));
+  state.plans.push(copy);
+  saveState();
+  return copy;
+}
+
+// --- Step CRUD -------------------------------------------------------------
+
+function newStep(type) {
+  return {
+    id: newStepId(),
+    type,
+    mentorId: null,
+    weapon: null,
+    talent: null,
+    targetCap: null,
+    targetLevel: null,
+    material: 3,         // gear material tier 1-5; Iron is mid-range default
+    status: 'queued',
+    startedAt: null,
+    completedAt: null,
+    actualDurationMin: null,
+    note: '',
+  };
+}
+
+// Forward-migrate legacy steps that used `gearTier` (1-6, with quality
+// conflated into the same axis). New code uses `material` (1-5).
+// Returns true if it changed anything, so the caller can re-save.
+function normalizeStep(s) {
+  if (s.material == null) {
+    const legacy = s.gearTier != null ? Number(s.gearTier) : 3;
+    s.material = Math.min(5, Math.max(1, legacy));
+    delete s.gearTier;
+    return true;
+  }
+  if ('gearTier' in s) { delete s.gearTier; return true; }
+  return false;
+}
+
+function addStep(planId, type) {
+  const plan = findPlan(planId);
+  if (!plan) return null;
+  const s = newStep(type);
+  plan.steps.push(s);
+  saveState();
+  return s;
+}
+
+function removeStep(planId, stepId) {
+  const plan = findPlan(planId);
+  if (!plan) return;
+  plan.steps = plan.steps.filter(s => s.id !== stepId);
+  saveState();
+}
+
+function moveStep(planId, stepId, dir) {
+  const plan = findPlan(planId);
+  if (!plan) return;
+  const i = plan.steps.findIndex(s => s.id === stepId);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= plan.steps.length) return;
+  [plan.steps[i], plan.steps[j]] = [plan.steps[j], plan.steps[i]];
+  saveState();
+}
+
+// --- Inline-edit handlers (exposed on window for inline onclick/oninput) ---
+
+window.planFieldUpd = function(id, field, value) {
+  const p = findPlan(id);
+  if (!p) return;
+  p[field] = value;
+  saveState();
+  refreshNavPlanLabel();
+};
+
+window.stepFieldUpd = function(planId, stepId, field, value) {
+  const plan = findPlan(planId);
+  const s = findStep(plan, stepId);
+  if (!s) return;
+  // Coerce numeric fields
+  if (field === 'material' || field === 'targetCap' || field === 'targetLevel') {
+    s[field] = value === '' ? null : Number(value);
+  } else if (field === 'mentorId' || field === 'weapon' || field === 'talent') {
+    s[field] = value || null;
+  } else {
+    s[field] = value;
+  }
+  saveState();
+  // Re-render the editor so derived fields (estimated time, dropdown defaults) update
+  if (state.selectedPlanId === planId) renderPlanEditor(planId);
+};
+
+window.onAddStep = function(planId, type) {
+  addStep(planId, type);
+  if (state.selectedPlanId === planId) renderPlanEditor(planId);
+};
+
+window.onRemoveStep = function(planId, stepId) {
+  if (!confirm('Remove this step?')) return;
+  removeStep(planId, stepId);
+  if (state.selectedPlanId === planId) renderPlanEditor(planId);
+};
+
+window.onMoveStep = function(planId, stepId, dir) {
+  moveStep(planId, stepId, dir);
+  if (state.selectedPlanId === planId) renderPlanEditor(planId);
+};
+
+window.onSetStepStatus = function(planId, stepId, status) {
+  const plan = findPlan(planId);
+  const s = findStep(plan, stepId);
+  if (!s) return;
+  s.status = status;
+  if (status === 'running' && !s.startedAt) s.startedAt = new Date().toISOString();
+  if (status === 'completed' && !s.completedAt) s.completedAt = new Date().toISOString();
+  saveState();
+  if (state.selectedPlanId === planId) renderPlanEditor(planId);
+};
+
+window.onSetPlanStatus = function(planId, status) {
+  const p = findPlan(planId);
+  if (!p) return;
+  p.status = status;
+  saveState();
+  if (state.selectedPlanId === planId) renderPlanEditor(planId);
+};
+
+window.onCreatePlan = function() {
+  if (!state.roster.length) { alert('Add a tribesman first.'); return; }
+  // Simple prompt-driven creation: pick trainee, then optional name.
+  const names = state.roster.map((t, i) => `${i + 1}. ${t.name}`).join('\n');
+  const idx = prompt(`Pick trainee by number:\n${names}`);
+  if (!idx) return;
+  const n = parseInt(idx, 10);
+  if (!Number.isFinite(n) || n < 1 || n > state.roster.length) { alert('Invalid pick.'); return; }
+  const trainee = state.roster[n - 1];
+  const name = prompt(`Plan name:`, `${trainee.name} — new plan`);
+  if (name === null) return;
+  const p = createPlan(trainee.id, name || `${trainee.name} — new plan`);
+  ui.showPlan(p.id);
+};
+
+window.onDeletePlan = function(id) {
+  const p = findPlan(id);
+  if (!p) return;
+  if (!confirm(`Delete plan "${p.name}"?`)) return;
+  deletePlan(id);
+  ui.showPlans();
+};
+
+window.onDuplicatePlan = function(id) {
+  const copy = duplicatePlan(id);
+  if (copy) ui.showPlan(copy.id);
+};
+
+window.onCalibrate = function(group, key, value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return;
+  state.calibration[group][key] = n;
+  saveState();
+  if (state.selectedPlanId) renderPlanEditor(state.selectedPlanId);
+  else renderPlansList();
+};
+
+window.onResetCalibration = function() {
+  if (!confirm('Reset calibration constants to defaults?')) return;
+  state.calibration = defaultCalibration();
+  saveState();
+  if (state.selectedPlanId) renderPlanEditor(state.selectedPlanId);
+  else renderPlansList();
+};
+
+// --- Renderers -------------------------------------------------------------
+
+function renderPlansList() {
+  const mount = document.getElementById('plans-content');
+  if (!mount) return;
+  const plans = state.plans;
+  let html = `<div class="plans-header">
+    <h2>Training Plans</h2>
+    <button class="primary" onclick="onCreatePlan()">+ New Plan</button>
+  </div>`;
+
+  if (!plans.length) {
+    html += `<p class="muted">No plans yet. Click <b>+ New Plan</b> to commit a multi-step training agenda for a tribesman.</p>`;
+  } else {
+    // Mentor-commitment count: tribesmen mentoring in active plans
+    const mentorActive = new Map();
+    for (const p of plans) {
+      if (p.status !== 'active' && p.status !== 'draft') continue;
+      for (const s of p.steps) {
+        if (!s.mentorId) continue;
+        if (s.status === 'completed' || s.status === 'abandoned') continue;
+        mentorActive.set(s.mentorId, (mentorActive.get(s.mentorId) || 0) + 1);
+      }
+    }
+
+    html += `<table class="plans-table"><thead><tr>
+      <th>Plan</th><th>Trainee</th><th>Mentors</th><th>Status</th><th>Steps</th><th>Est. time</th><th>Created</th><th></th>
+    </tr></thead><tbody>`;
+
+    for (const p of plans) {
+      const trainee = findTribesman(p.traineeId);
+      const mentorIds = [...new Set(p.steps.map(s => s.mentorId).filter(Boolean))];
+      const mentors = mentorIds
+        .map(id => findTribesman(id))
+        .filter(Boolean)
+        .map(m => escapeHtml(m.name))
+        .join(', ');
+      const completed = p.steps.filter(s => s.status === 'completed').length;
+      const created = p.createdAt?.slice(0, 10) || '—';
+      html += `<tr onclick="ui.showPlan('${p.id}')">
+        <td><b>${escapeHtml(p.name || 'Untitled')}</b></td>
+        <td>${trainee ? escapeHtml(trainee.name) : '<span class="muted">missing</span>'}</td>
+        <td>${mentors || '<span class="muted">—</span>'}</td>
+        <td><span class="plan-status plan-status-${p.status}">${p.status}</span></td>
+        <td>${completed}/${p.steps.length}</td>
+        <td>${fmtMinutes(estimatePlanMin(p))}</td>
+        <td>${created}</td>
+        <td><button onclick="event.stopPropagation();onDeletePlan('${p.id}')" class="danger small">Delete</button></td>
+      </tr>`;
+    }
+
+    html += `</tbody></table>`;
+
+    if (mentorActive.size) {
+      const items = [...mentorActive.entries()]
+        .filter(([,n]) => n > 1)
+        .sort((a,b) => b[1] - a[1])
+        .map(([id,n]) => {
+          const m = findTribesman(id);
+          return `<li><b>${escapeHtml(m?.name || 'unknown')}</b> is mentor in ${n} active step${n===1?'':'s'}</li>`;
+        });
+      if (items.length) {
+        html += `<div class="plans-warnings"><h3>Mentor commitments</h3>
+          <p class="muted">Training Ground only allows one session per mentor at a time.</p>
+          <ul>${items.join('')}</ul></div>`;
+      }
+    }
+  }
+
+  html += renderCalibrationPanel();
+  mount.innerHTML = html;
+}
+
+function renderPlanEditor(id) {
+  const mount = document.getElementById('plans-content');
+  if (!mount) return;
+  const p = findPlan(id);
+  if (!p) { renderPlansList(); return; }
+  const trainee = findTribesman(p.traineeId);
+  const completed = p.steps.filter(s => s.status === 'completed').length;
+  const total = estimatePlanMin(p);
+
+  let html = `<div class="plans-header">
+    <button class="linklike" onclick="ui.showPlans()">← All plans</button>
+  </div>`;
+
+  html += `<div class="card full-row plan-editor-head">
+    <div class="plan-name-row">
+      <input class="plan-name-input" value="${escapeHtml(p.name || '')}"
+        oninput="planFieldUpd('${p.id}','name',this.value)" placeholder="Plan name…">
+      <span class="plan-status plan-status-${p.status}">${p.status}</span>
+    </div>
+    <div class="plan-meta">
+      <span>Trainee: <b>${trainee ? escapeHtml(trainee.name) : '<span class="muted">missing</span>'}</b></span>
+      <span>Created: ${p.createdAt?.slice(0,10) || '—'}</span>
+      <span>Progress: <b>${completed}/${p.steps.length}</b></span>
+      <span>Estimated: <b>${fmtMinutes(total)}</b></span>
+    </div>
+    <div class="plan-actions">
+      <button onclick="onSetPlanStatus('${p.id}','active')">Mark Active</button>
+      <button onclick="onSetPlanStatus('${p.id}','done')">Mark Complete</button>
+      <button onclick="onSetPlanStatus('${p.id}','abandoned')">Abandon</button>
+      <button onclick="onDuplicatePlan('${p.id}')">Duplicate</button>
+      <button class="danger" onclick="onDeletePlan('${p.id}')">Delete</button>
+    </div>
+    <div class="field"><label>Notes</label>
+      <textarea oninput="planFieldUpd('${p.id}','notes',this.value)" placeholder="Long-form notes…">${escapeHtml(p.notes || '')}</textarea>
+    </div>
+  </div>`;
+
+  // Steps
+  html += `<div class="card full-row plan-steps">
+    <h3>Steps</h3>`;
+  if (!p.steps.length) {
+    html += `<p class="muted">No steps yet. Add one below.</p>`;
+  } else {
+    html += p.steps.map((s, i) => renderPlanStep(p, s, i)).join('');
+  }
+  html += `<div class="add-step-row">
+    <span class="muted">Add step:</span>
+    <button onclick="onAddStep('${p.id}','cap-raise')">+ Cap Raise</button>
+    <button onclick="onAddStep('${p.id}','learn')">+ Learn Talent</button>
+    <button onclick="onAddStep('${p.id}','upgrade')">+ Upgrade Talent</button>
+  </div>`;
+  html += `</div>`;
+
+  html += renderCalibrationPanel();
+  mount.innerHTML = html;
+}
+
+function renderPlanStep(plan, step, index) {
+  const trainee = findTribesman(plan.traineeId);
+  const isLast = index === plan.steps.length - 1;
+  const isFirst = index === 0;
+  const dur = fmtMinutes(estimateStepMin(step));
+  const label = PLAN_STEP_LABELS[step.type] || step.type;
+
+  // Build mentor candidates per step type
+  const mentors = state.roster.filter(m => m.id !== plan.traineeId);
+  let eligibleMentors = mentors;
+  if (step.type === 'cap-raise' && step.weapon && trainee) {
+    const traineeCap = trainee.weapons?.[step.weapon]?.cap ?? 0;
+    eligibleMentors = mentors.filter(m => (m.weapons?.[step.weapon]?.cap || 0) > traineeCap);
+  } else if (step.type === 'upgrade' && step.talent) {
+    eligibleMentors = mentors.filter(m =>
+      (m.talents || []).some(t => t.name === step.talent && t.level > (
+        (trainee?.talents || []).find(tt => tt.name === step.talent)?.level || 0
+      ))
+    );
+  } else if (step.type === 'learn' && trainee) {
+    const knownNames = new Set((trainee.talents || []).map(t => t.name));
+    eligibleMentors = mentors.filter(m =>
+      (m.talents || []).some(t => {
+        const meta = talentMeta(t.name);
+        return meta && meta.polarity === 'positive'
+          && !knownNames.has(t.name)
+          && isLearnableBy(t.name, trainee);
+      })
+    );
+  }
+
+  const mentorOpts = [`<option value="">— pick mentor —</option>`]
+    .concat(eligibleMentors.map(m => {
+      let detail = '';
+      if (step.type === 'cap-raise' && step.weapon) detail = ` (${step.weapon} ${m.weapons?.[step.weapon]?.cap || '—'})`;
+      else if (step.type === 'upgrade' && step.talent) {
+        const t = (m.talents||[]).find(tt => tt.name === step.talent);
+        detail = t ? ` (Lv ${t.level})` : '';
+      }
+      return `<option value="${m.id}" ${m.id === step.mentorId ? 'selected' : ''}>${escapeHtml(m.name)}${escapeHtml(detail)}</option>`;
+    })).join('');
+
+  // Type-specific subject pickers
+  let subject = '';
+  if (step.type === 'cap-raise') {
+    const ceiling = trainee && step.weapon ? weaponCeiling(trainee.profession, step.weapon) : null;
+    const traineeCap = trainee && step.weapon ? (trainee.weapons?.[step.weapon]?.cap ?? '—') : '—';
+    subject = `<label>Weapon</label>
+      <select onchange="stepFieldUpd('${plan.id}','${step.id}','weapon',this.value)">
+        <option value="">— pick weapon —</option>
+        ${WEAPONS.map(w => `<option value="${w}" ${w === step.weapon ? 'selected' : ''}>${w}</option>`).join('')}
+      </select>
+      <label>Target cap</label>
+      <input type="number" min="1" max="125" value="${step.targetCap ?? ''}"
+        placeholder="${ceiling ?? ''}"
+        oninput="stepFieldUpd('${plan.id}','${step.id}','targetCap',this.value)">
+      ${step.weapon ? `<span class="muted small">trainee ${traineeCap} → ceiling ${ceiling}</span>` : ''}`;
+  } else if (step.type === 'upgrade') {
+    const traineeTalents = (trainee?.talents || []).filter(t => (t.level || 0) < 3);
+    subject = `<label>Talent</label>
+      <select onchange="stepFieldUpd('${plan.id}','${step.id}','talent',this.value)">
+        <option value="">— pick talent —</option>
+        ${traineeTalents.map(t => `<option value="${escapeHtml(t.name)}" ${t.name === step.talent ? 'selected' : ''}>${escapeHtml(t.name)} (Lv ${t.level})</option>`).join('')}
+      </select>
+      <label>Target Lv</label>
+      <select onchange="stepFieldUpd('${plan.id}','${step.id}','targetLevel',this.value)">
+        ${[2,3].map(lv => `<option value="${lv}" ${lv === step.targetLevel ? 'selected' : ''}>Lv ${lv}</option>`).join('')}
+      </select>`;
+  } else if (step.type === 'learn') {
+    subject = `<span class="muted small">Random talent (Lv I) drawn from mentor's eligible positive talents.</span>`;
+  }
+
+  const statusBtns = STEP_STATUSES.map(st =>
+    `<button class="${step.status === st ? 'primary small' : 'small'}" onclick="onSetStepStatus('${plan.id}','${step.id}','${st}')">${st}</button>`
+  ).join('');
+
+  return `<div class="plan-step plan-step-${step.type} status-${step.status}">
+    <div class="plan-step-head">
+      <span class="step-num">#${index + 1}</span>
+      <span class="step-type">${label}</span>
+      <span class="step-dur">${dur}</span>
+      <span class="grow"></span>
+      <button class="small" onclick="onMoveStep('${plan.id}','${step.id}',-1)" ${isFirst ? 'disabled' : ''}>↑</button>
+      <button class="small" onclick="onMoveStep('${plan.id}','${step.id}',1)" ${isLast ? 'disabled' : ''}>↓</button>
+      <button class="small danger" onclick="onRemoveStep('${plan.id}','${step.id}')">×</button>
+    </div>
+    <div class="plan-step-body">
+      <div class="plan-step-fields">
+        <label>Mentor</label>
+        <select onchange="stepFieldUpd('${plan.id}','${step.id}','mentorId',this.value)">${mentorOpts}</select>
+        ${subject}
+        <label>Material</label>
+        <select onchange="stepFieldUpd('${plan.id}','${step.id}','material',this.value)">
+          ${MATERIAL_TIERS.map(t => `<option value="${t}" ${t === step.material ? 'selected' : ''}>${MATERIAL_NAMES[t]} (Tier ${ROMAN_TIERS[t]} ×${state.calibration.tierMultipliers[t]})</option>`).join('')}
+        </select>
+      </div>
+      <div class="plan-step-status">
+        <div class="status-pills">${statusBtns}</div>
+        <input type="text" placeholder="Step note…" value="${escapeHtml(step.note || '')}"
+          oninput="stepFieldUpd('${plan.id}','${step.id}','note',this.value)">
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderCalibrationPanel() {
+  const c = state.calibration;
+  const baseRows = Object.entries(c.baseTimes).map(([k, v]) =>
+    `<tr><td>${k}</td><td><input type="number" min="1" value="${v}" oninput="onCalibrate('baseTimes','${k}',this.value)"> min</td></tr>`
+  ).join('');
+  const tierRows = MATERIAL_TIERS.map(t =>
+    `<tr><td>${MATERIAL_NAMES[t]} <span class="muted small">(${ROMAN_TIERS[t]})</span></td>
+      <td><input type="number" min="0.1" step="0.05" value="${c.tierMultipliers[t] ?? 1}" oninput="onCalibrate('tierMultipliers','${t}',this.value)">×</td></tr>`
+  ).join('');
+  return `<details class="calibration-panel">
+    <summary>Calibration constants <span class="muted small">(edit if your timings differ)</span></summary>
+    <div class="calibration-grid">
+      <div>
+        <h4>Base times</h4>
+        <table><tbody>${baseRows}</tbody></table>
+      </div>
+      <div>
+        <h4>Material multiplier</h4>
+        <table><tbody>${tierRows}</tbody></table>
+      </div>
+    </div>
+    <p class="muted small">Material tier (Beast Hide → Endgame) affects training duration. Quality (the I-VI badges) and Mod do not — confirmed in-game. All values here are placeholders until measured. See <code>docs/training_plans.md</code>.</p>
+    <button class="small" onclick="onResetCalibration()">Reset to defaults</button>
+  </details>`;
 }
 
 // === ADD TRIBESMAN ===
@@ -1055,6 +1661,13 @@ function bindUI() {
   document.getElementById('nav-profile').addEventListener('click', () => {
     if (state.selectedId) ui.showProfile(state.selectedId);
     else if (state.roster.length) ui.showProfile(state.roster[0].id);
+  });
+  document.getElementById('nav-plans').addEventListener('click', () => {
+    if (state.selectedPlanId && state.plans.some(p => p.id === state.selectedPlanId)) {
+      ui.showPlan(state.selectedPlanId);
+    } else {
+      ui.showPlans();
+    }
   });
   document.getElementById('add-btn').addEventListener('click', addTribesman);
   for (const f of ['filter-name','filter-prof','filter-tribe','filter-group','filter-tag']) {

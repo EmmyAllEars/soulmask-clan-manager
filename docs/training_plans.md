@@ -35,9 +35,22 @@ Three step types, matching the three Training Ground tabs:
 
 | Step type | Trainee | Mentor | Configures | Outcome |
 |---|---|---|---|---|
-| **Cap Raise** | one weapon's cap | required, must have higher cap | weapon, target cap, gear tier | trainee's cap rises toward mentor's (clamped to 125 if class-weapon, else 100) |
-| **Learn Talent** | a talent slot | required, must have at least one positive talent the trainee lacks | gear tier, optional "preferred talent" wishlist | trainee gains one random talent (Lv I) from mentor's eligible pool |
-| **Upgrade Talent** | one existing talent | required, must have same talent at higher level | weapon (if talent requires one), gear tier | trainee's talent level rises by 1, sequentially |
+| **Cap Raise** | one weapon's cap | required, must have higher cap | weapon, target cap, gear material | trainee's cap rises toward mentor's (clamped to 125 if class-weapon, else 100) |
+| **Learn Talent** | a talent slot | required, must have at least one positive talent the trainee lacks | gear material, optional "preferred talent" wishlist | trainee gains one random talent (Lv I) from mentor's eligible pool |
+| **Upgrade Talent** | one existing talent | required, must have same talent at higher level | weapon (if talent requires one), gear material | trainee's talent level rises by 1, sequentially |
+
+Soulmask gear has three independent axes (visible in the Training Ground UI as
+"Specify Material, Quality, and Mod"):
+
+- **Material** — 1-5 progression: Beast Hide → Bronze → Iron → Steel → Endgame.
+  **Affects training duration** — modeled here.
+- **Quality** — the I-VI colored badges (gray → red). Cosmetic / stat upgrade,
+  but **does not** affect duration. Not modeled.
+- **Mod** — additional modifier slot. Also **does not** affect duration. Not
+  modeled.
+
+Talent levels are a separate concept (always 1-3) and live in the Upgrade
+Talent step's "target Lv" field.
 
 Step lifecycle: `draft → queued → running → completed | abandoned`.
 
@@ -64,8 +77,8 @@ TrainingStep = {
   weapon?: string,               // for cap-raise and weapon-gated talents
   talent?: string,               // for upgrade and (optional wishlist) learn
   targetCap?: number,            // cap-raise: stop value, defaults to mentor's cap
-  targetLevel?: number,          // upgrade: target Lv (1-3)
-  gearTier: 1|2|3|4|5|6,         // tier I-VI of the gear used
+  targetLevel?: number,          // upgrade: target Lv (2 or 3)
+  material: 1|2|3|4|5,           // gear material tier (Beast Hide..Endgame)
   status: "queued"|"running"|"completed"|"abandoned",
   startedAt?: ISO,
   completedAt?: ISO,
@@ -141,13 +154,14 @@ Two-step wizard:
   have); optional checklist of mentor's available talents marked as
   "preferred" — used only for documentation / odds display, since Learn is
   random in-game.
-- Always: gear tier dropdown (I-VI), notes.
+- Always: gear material dropdown (1-5: Beast Hide → Endgame), notes.
 - Estimated duration shown live as inputs change.
 
 ## Time estimation
 
 Bake the observed timings from the knowledge file as a constants table.
-**Both gear tier and step type matter; gear quality (mods) does not.**
+**Both gear material and step type matter; gear quality and mod do not**
+(confirmed in-game).
 
 ```js
 const BASE_TIMES_MIN = {
@@ -156,21 +170,21 @@ const BASE_TIMES_MIN = {
   'upgrade-2-3': 168,  // ~2h 48m
   'cap-raise':   180,  // PLACEHOLDER — needs first-hand measurement
 };
-// Higher gear tier reduces duration; quality (mod) does NOT (confirmed in-game).
-const GEAR_TIER_MULTIPLIER = {
-  1: 1.40, // Tier I gray  — slow
-  2: 1.20,
-  3: 1.05,
-  4: 0.95,
-  5: 0.85,
-  6: 0.70, // Tier VI red  — fast
+// Higher gear material reduces duration. Quality (I-VI badges) and Mod
+// do NOT (confirmed in-game).
+const MATERIAL_MULTIPLIER = {
+  1: 1.40, // Beast Hide — slow
+  2: 1.15, // Bronze
+  3: 1.00, // Iron       — neutral
+  4: 0.85, // Steel
+  5: 0.70, // Endgame    — fast
 };
-// All multiplier values are placeholders until measured. They should
-// be exposed in a small "Calibration" panel so Emmy can adjust them
+// All multiplier values are placeholders until measured. They are
+// exposed in a small "Calibration" panel so Emmy can adjust them
 // based on her own training logs.
 ```
 
-Total plan time = sum of step `base * tier_mult`.
+Total plan time = sum of step `base * material_mult`.
 
 When a step completes and the user fills in `actualDurationMin`, the app can
 suggest recalibrating the multipliers. v1 ships with the placeholder
@@ -213,10 +227,11 @@ Useful but not necessary for v1. Mention in the v2 tracker.
 1. **Cap-raise timing.** No measurement yet. The first cap-raise run (Bertha
    → Andaria Gauntlets) will give the base value. Worth logging the duration
    in the step's `actualDurationMin` to seed the constants.
-2. **Tier-multiplier curve.** Gear tier confirmed to matter, magnitude unknown.
-   Suggest Emmy run two identical talent upgrades back-to-back with different
-   tiers to measure (e.g. Lv 2→3 with Tier III then Tier V on a different
-   talent). Even one comparison gives an order-of-magnitude.
+2. **Material-multiplier curve.** Gear material confirmed to matter,
+   magnitude unknown. Suggest Emmy run two identical talent upgrades
+   back-to-back with different materials to measure (e.g. Lv 2→3 with
+   Bronze then Steel on a different talent). Even one comparison gives
+   an order-of-magnitude.
 3. **Medicine slot.** Three potion icons in the Training Ground UI; effect
    not yet pinned down. Probably another duration multiplier or a success-
    rate boost on Learn. v1 stores it as a free-text field; v2 can quantify.
@@ -234,11 +249,11 @@ Useful but not necessary for v1. Mention in the v2 tracker.
 
 To ship a useful v1 fast:
 
-- **In:** Plan CRUD; Cap Raise + Learn + Upgrade step types; manual gear tier
-  picker; static placeholder time constants (with editable Calibration panel);
-  Plans view + Plan editor + Profile Plans card; `+ Add to plan` from
-  suggestions; localStorage persistence with v1→v2 migration; CSV/JSON export
-  including plans.
+- **In:** Plan CRUD; Cap Raise + Learn + Upgrade step types; manual gear
+  material picker (1-5); static placeholder time constants (with editable
+  Calibration panel); Plans view + Plan editor + Profile Plans card; `+ Add
+  to plan` from suggestions; localStorage persistence with v1→v2 migration;
+  CSV/JSON export including plans.
 - **Out (defer):** Auto-generated plans, calibration auto-fit, mentor
   conflict resolution, gantt-style timeline, mid-plan mentor swap.
 
@@ -262,7 +277,7 @@ ahead, executable).
 
 - [ ] Can create a plan, add 3 steps of mixed types, save, reload, all
       preserved.
-- [ ] Total estimated time updates as gear tier changes per step.
+- [ ] Total estimated time updates as gear material changes per step.
 - [ ] Profile shows the plan; the Plans view shows it; suggestions on the
       profile have a working `+ Add to plan` button.
 - [ ] Marking a step complete bumps the plan's progress count.
@@ -273,8 +288,8 @@ ahead, executable).
 
 ## What I want feedback on
 
-- Is "trainee + mentor + step type + gear tier + target" enough metadata per
-  step, or am I missing a knob you'd want?
+- Is "trainee + mentor + step type + gear material + target" enough metadata
+  per step, or am I missing a knob you'd want?
 - Should I treat the in-game Training Ground's "Auto-create Upgrade Talent
   task after learning" as a single combined step in the planner, or two
   steps? (Currently modeled as two — feels cleaner.)
