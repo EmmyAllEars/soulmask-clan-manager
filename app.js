@@ -527,6 +527,7 @@ function renderProfile() {
     <h2>${escapeHtml(t.name)}</h2>
     <span class="meta">LV ${t.level ?? '—'} · ${escapeHtml(t.title || '')} ${escapeHtml(t.profession || '')} · ${escapeHtml(t.tribe || '')} ${t.trait ? '· '+escapeHtml(t.trait) : ''}</span>
     <span class="grow" style="flex:1"></span>
+    <button onclick="onDuplicateTribesman('${t.id}')" title="Create an editable copy with a new id">Duplicate</button>
     <button onclick="onDeleteTribesman('${t.id}')" class="btn-danger-strong">Delete tribesman</button>
   </div>`;
   html += '<div class="profile">';
@@ -1890,6 +1891,30 @@ function addTribesman() {
   renderRoster();
   ui.showProfile(t.id);
 }
+
+// Deep-clone a tribesman with a fresh id. Resets is_body (the body flag is
+// tied to the original character corpse in-game) but keeps talents, skills,
+// weapons, attrs, groups, tags, and notes — that's the whole point of
+// duplication: planning "what if I built another one like this".
+function duplicateTribesman(id) {
+  const src = state.roster.find(t => t.id === id);
+  if (!src) return null;
+  const copy = JSON.parse(JSON.stringify(src));
+  copy.id = newId();
+  copy.name = `${src.name} (copy)`;
+  copy.is_body = false;
+  state.roster.push(copy);
+  saveState();
+  initFilters();
+  return copy;
+}
+
+window.onDuplicateTribesman = function(id) {
+  const copy = duplicateTribesman(id);
+  if (!copy) return;
+  renderRoster();
+  ui.showProfile(copy.id);
+};
 
 // === BIND UI ===
 function bindUI() {
