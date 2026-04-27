@@ -127,7 +127,7 @@ async function boot() {
     state.talents = await r.json();
   } catch (e) {
     console.error('Failed to load talents:', e);
-    alert('Failed to load talents.json. Check console.');
+    showAlertModal({ title: 'Failed to load talents', message: 'Could not load talents.json — check the browser console for details.' });
     state.talents = [];
   }
 
@@ -733,13 +733,13 @@ function bindTalentAutocomplete(t) {
   });
 }
 
-function onConfirmAddTalent(id) {
+async function onConfirmAddTalent(id) {
   const t = state.roster.find(x => x.id === id);
   if (!t) return;
   const name = document.getElementById('talent-input').value.trim();
   if (!name) return;
   const meta = state.talents.find(x => x.name === name);
-  if (!meta) { alert(`Talent "${name}" not found in catalog.`); return; }
+  if (!meta) { showAlertModal({ title: 'Talent not found', message: `"${name}" isn't in the talent catalog. Pick from the autocomplete or check the spelling.` }); return; }
   const level = +document.getElementById('talent-level').value;
   // Enforce 6 positive talents max
   if (meta.polarity === 'positive') {
@@ -748,7 +748,12 @@ function onConfirmAddTalent(id) {
       return m && m.polarity === 'positive';
     }).length;
     if (posCount >= 6) {
-      if (!confirm(`${t.name} already has 6 positive talents (max). Add anyway?`)) return;
+      const ok = await showConfirmModal({
+        title: 'Talent slot limit',
+        message: `${t.name} already has 6 positive talents (the in-game max). Add anyway?`,
+        confirmLabel: 'Add anyway',
+      });
+      if (!ok) return;
     }
   }
   if (!t.talents) t.talents = [];
@@ -909,7 +914,7 @@ function rmFromList(id, listKey, val) {
 window.addToList = addToList;
 window.rmFromList = rmFromList;
 
-function onDeleteTribesman(id) {
+async function onDeleteTribesman(id) {
   const t = state.roster.find(x => x.id === id);
   if (!t) return;
 
@@ -922,13 +927,17 @@ function onDeleteTribesman(id) {
     .filter(p => p.traineeId !== id)
     .reduce((n, p) => n + p.steps.filter(s => s.mentorId === id).length, 0);
 
-  let warn = `Delete ${t.name}? This cannot be undone.`;
-  if (traineeOf.length || mentorStepCount) {
-    warn += '\n\n';
-    if (traineeOf.length) warn += `· ${traineeOf.length} plan${traineeOf.length === 1 ? '' : 's'} where ${t.name} is the trainee will also be deleted.\n`;
-    if (mentorStepCount) warn += `· ${mentorStepCount} step${mentorStepCount === 1 ? '' : 's'} in other plans use ${t.name} as mentor; those steps will be flagged "mentor missing" but kept.\n`;
-  }
-  if (!confirm(warn)) return;
+  const lines = ['This cannot be undone.'];
+  if (traineeOf.length) lines.push(`• ${traineeOf.length} plan${traineeOf.length === 1 ? '' : 's'} where ${t.name} is the trainee will also be deleted.`);
+  if (mentorStepCount) lines.push(`• ${mentorStepCount} step${mentorStepCount === 1 ? '' : 's'} in other plans use ${t.name} as mentor; those steps will be flagged "mentor missing" but kept.`);
+
+  const ok = await showConfirmModal({
+    title: `Delete ${t.name}?`,
+    message: lines.join('\n'),
+    confirmLabel: 'Delete tribesman',
+    danger: true,
+  });
+  if (!ok) return;
 
   state.roster = state.roster.filter(x => x.id !== id);
   if (traineeOf.length) {
@@ -1096,10 +1105,10 @@ function csvEscape(v) {
   }
   return s;
 }
-function importCSV(text) {
+async function importCSV(text) {
   // Simple CSV parser handling quoted fields
   const rows = parseCSV(text);
-  if (rows.length < 2) return alert('CSV is empty.');
+  if (rows.length < 2) { showAlertModal({ title: 'CSV is empty', message: 'No rows to import.' }); return; }
   const headers = rows[0];
   const newRoster = [];
   for (let i = 1; i < rows.length; i++) {
@@ -1139,7 +1148,13 @@ function importCSV(text) {
     }
     newRoster.push(t);
   }
-  if (!confirm(`Import ${newRoster.length} tribesmen? This will REPLACE the current roster.`)) return;
+  const ok = await showConfirmModal({
+    title: 'Replace current roster?',
+    message: `Import ${newRoster.length} tribesmen? Your current roster will be replaced.`,
+    confirmLabel: 'Replace roster',
+    danger: true,
+  });
+  if (!ok) return;
   state.roster = newRoster;
   saveState();
   initFilters();
@@ -1178,11 +1193,20 @@ function exportJSON() {
     exported: new Date().toISOString()
   }, null, 2));
 }
-function importJSON(text) {
+async function importJSON(text) {
   try {
     const data = migrateState(JSON.parse(text));
-    if (!data.roster) return alert('Invalid backup file: no roster.');
-    if (!confirm(`Restore ${data.roster.length} tribesmen? This will REPLACE the current state.`)) return;
+    if (!data.roster) {
+      await showConfirmModal({ title: 'Invalid backup file', message: 'The selected file has no roster array.', confirmLabel: 'OK', cancelLabel: '' });
+      return;
+    }
+    const ok = await showConfirmModal({
+      title: 'Replace current state?',
+      message: `Restore ${data.roster.length} tribesmen from this backup? Your current roster, plans, and calibration will be replaced.`,
+      confirmLabel: 'Restore backup',
+      danger: true,
+    });
+    if (!ok) return;
     state.roster = data.roster;
     state.groups = data.groups || [];
     state.tags = data.tags || [];
@@ -1193,7 +1217,7 @@ function importJSON(text) {
     initFilters();
     renderRoster();
     ui.showRoster();
-  } catch (e) { alert('Failed to parse JSON: ' + e.message); }
+  } catch (e) { showAlertModal({ title: 'Failed to parse JSON', message: e.message }); }
 }
 
 function downloadFile(name, mime, content) {
@@ -1377,8 +1401,13 @@ window.onAddStep = function(planId, type) {
   if (state.selectedPlanId === planId) renderPlanEditor(planId);
 };
 
-window.onRemoveStep = function(planId, stepId) {
-  if (!confirm('Remove this step?')) return;
+window.onRemoveStep = async function(planId, stepId) {
+  const ok = await showConfirmModal({
+    title: 'Remove this step?',
+    confirmLabel: 'Remove',
+    danger: true,
+  });
+  if (!ok) return;
   removeStep(planId, stepId);
   if (state.selectedPlanId === planId) renderPlanEditor(planId);
 };
@@ -1407,25 +1436,42 @@ window.onSetPlanStatus = function(planId, status) {
   if (state.selectedPlanId === planId) renderPlanEditor(planId);
 };
 
-window.onCreatePlan = function() {
-  if (!state.roster.length) { alert('Add a tribesman first.'); return; }
-  // Simple prompt-driven creation: pick trainee, then optional name.
-  const names = state.roster.map((t, i) => `${i + 1}. ${t.name}`).join('\n');
-  const idx = prompt(`Pick trainee by number:\n${names}`);
-  if (!idx) return;
-  const n = parseInt(idx, 10);
-  if (!Number.isFinite(n) || n < 1 || n > state.roster.length) { alert('Invalid pick.'); return; }
-  const trainee = state.roster[n - 1];
-  const name = prompt(`Plan name:`, `${trainee.name} — new plan`);
+window.onCreatePlan = async function() {
+  if (!state.roster.length) {
+    await showConfirmModal({ title: 'No tribesmen yet', message: 'Add a tribesman first via "+ Add Tribesman" in the topbar.', confirmLabel: 'OK', cancelLabel: '' });
+    return;
+  }
+  // Roster picker, alphabetical: each tribesman is a clickable card.
+  const sorted = [...state.roster].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  const trainee = await showPickerModal({
+    title: 'New plan — pick trainee',
+    options: sorted.map(t => ({
+      value: t,
+      label: t.name,
+      sublabel: [t.title, t.profession, t.tribe].filter(Boolean).join(' · '),
+    })),
+  });
+  if (!trainee) return;
+  const name = await showInputModal({
+    title: 'Plan name',
+    defaultValue: `${trainee.name} — new plan`,
+    confirmLabel: 'Create plan',
+  });
   if (name === null) return;
   const p = createPlan(trainee.id, name || `${trainee.name} — new plan`);
   ui.showPlan(p.id);
 };
 
-window.onDeletePlan = function(id) {
+window.onDeletePlan = async function(id) {
   const p = findPlan(id);
   if (!p) return;
-  if (!confirm(`Delete plan "${p.name}"?`)) return;
+  const ok = await showConfirmModal({
+    title: 'Delete plan?',
+    message: `"${p.name}" will be deleted. This cannot be undone.`,
+    confirmLabel: 'Delete',
+    danger: true,
+  });
+  if (!ok) return;
   deletePlan(id);
   ui.showPlans();
 };
@@ -1444,8 +1490,13 @@ window.onCalibrate = function(group, key, value) {
   else renderPlansList();
 };
 
-window.onResetCalibration = function() {
-  if (!confirm('Reset calibration constants to defaults?')) return;
+window.onResetCalibration = async function() {
+  const ok = await showConfirmModal({
+    title: 'Reset calibration?',
+    message: 'All base times and material multipliers will return to placeholder defaults. Any custom values you tuned will be lost.',
+    confirmLabel: 'Reset to defaults',
+  });
+  if (!ok) return;
   state.calibration = defaultCalibration();
   saveState();
   if (state.selectedPlanId) renderPlanEditor(state.selectedPlanId);
@@ -1505,7 +1556,10 @@ window.onSuggestPlan = function(traineeId) {
   if (!trainee) return;
   const suggestions = getTrainingSuggestions(trainee);
   if (!suggestions.length) {
-    alert(`No training opportunities found for ${trainee.name} in the current roster.`);
+    showAlertModal({
+      title: 'No training opportunities',
+      message: `${trainee.name} has nothing trainable from the current roster — caps maxed and talents already learned.`,
+    });
     return;
   }
   const plan = suggestPlanFor(traineeId);
@@ -1514,70 +1568,56 @@ window.onSuggestPlan = function(traineeId) {
 
 // Picker dialog: "add to existing plan" or "start a new plan". Renders into
 // the existing modal scaffolding (#modal-bg / #modal). Plain DOM, no framework.
-window.onAddSuggestionToPlan = function(traineeId, suggestionIndex) {
+window.onAddSuggestionToPlan = async function(traineeId, suggestionIndex) {
   const trainee = findTribesman(traineeId);
   if (!trainee) return;
-  const suggestions = getTrainingSuggestions(trainee);
-  const s = suggestions[suggestionIndex];
-  if (!s) return;
+  const suggestion = getTrainingSuggestions(trainee)[suggestionIndex];
+  if (!suggestion) return;
 
   const existing = state.plans.filter(p =>
     p.traineeId === traineeId && (p.status === 'draft' || p.status === 'active')
   );
 
-  const planOptions = existing.map(p =>
-    `<option value="${p.id}">${escapeHtml(p.name || 'Untitled')} (${p.steps.length} steps · ${p.status})</option>`
-  ).join('');
+  // Build a picker: each existing plan is a card; "Start a new plan" is its own
+  // card at the bottom. Single click → resolves immediately, no radios + tiny
+  // dropdown to wrestle with.
+  const NEW_PLAN_SENTINEL = '__new__';
+  const options = [
+    ...existing.map(p => ({
+      value: p.id,
+      label: `Add to: ${p.name || 'Untitled'}`,
+      sublabel: `${p.steps.length} step${p.steps.length === 1 ? '' : 's'} · ${p.status}`,
+    })),
+    {
+      value: NEW_PLAN_SENTINEL,
+      label: 'Start a new plan',
+      sublabel: existing.length ? 'Create a separate plan for this step' : '',
+    },
+  ];
 
-  const modal = document.getElementById('modal');
-  const bg = document.getElementById('modal-bg');
-  modal.innerHTML = `<h3>Add to plan</h3>
-    <p class="muted small">${s.head}</p>
-    ${existing.length ? `
-      <div class="field">
-        <label><input type="radio" name="add-plan-mode" value="existing" checked> Add to existing plan</label>
-        <select id="add-plan-existing">${planOptions}</select>
-      </div>
-    ` : ''}
-    <div class="field">
-      <label><input type="radio" name="add-plan-mode" value="new" ${existing.length ? '' : 'checked'}> Start a new plan</label>
-      <input id="add-plan-new-name" type="text" placeholder="Plan name…" value="${escapeHtml(trainee.name)} — ${PLAN_STEP_LABELS[s.type]}">
-    </div>
-    <div class="actions">
-      <button onclick="closeAddSuggestionModal()">Cancel</button>
-      <button class="primary" onclick="confirmAddSuggestionToPlan('${traineeId}', ${suggestionIndex})">Add step</button>
-    </div>`;
-  bg.classList.add('active');
-};
+  const choice = await showPickerModal({
+    title: 'Add to plan',
+    message: suggestion.head,
+    options,
+  });
+  if (!choice) return;
 
-window.closeAddSuggestionModal = function() {
-  document.getElementById('modal-bg').classList.remove('active');
-  document.getElementById('modal').innerHTML = '';
-};
-
-window.confirmAddSuggestionToPlan = function(traineeId, suggestionIndex) {
-  const trainee = findTribesman(traineeId);
-  if (!trainee) return closeAddSuggestionModal();
-  const suggestion = getTrainingSuggestions(trainee)[suggestionIndex];
-  if (!suggestion) return closeAddSuggestionModal();
-
-  const mode = document.querySelector('input[name="add-plan-mode"]:checked')?.value || 'new';
   let plan;
-  if (mode === 'existing') {
-    const planId = document.getElementById('add-plan-existing')?.value;
-    plan = findPlan(planId);
-  }
-  if (!plan) {
-    const name = document.getElementById('add-plan-new-name')?.value?.trim()
-      || `${trainee.name} — new plan`;
-    plan = createPlan(traineeId, name);
+  if (choice === NEW_PLAN_SENTINEL) {
+    const name = await showInputModal({
+      title: 'New plan name',
+      defaultValue: `${trainee.name} — ${PLAN_STEP_LABELS[suggestion.type]}`,
+      confirmLabel: 'Create plan',
+    });
+    if (name === null) return; // user cancelled the second step; abort cleanly
+    plan = createPlan(traineeId, name || `${trainee.name} — new plan`);
+  } else {
+    plan = findPlan(choice);
+    if (!plan) return;
   }
 
-  const step = suggestionToStep(suggestion);
-  plan.steps.push(step);
-  if (plan.status === 'draft') plan.status = 'draft'; // unchanged
+  plan.steps.push(suggestionToStep(suggestion));
   saveState();
-  closeAddSuggestionModal();
   ui.showPlan(plan.id);
 };
 
@@ -1922,10 +1962,15 @@ function renderProfilePlanRow(plan, role, tribesmanId) {
   </li>`;
 }
 
-window.onCreatePlanForTribesman = function(traineeId) {
+window.onCreatePlanForTribesman = async function(traineeId) {
   const trainee = findTribesman(traineeId);
   if (!trainee) return;
-  const name = prompt('Plan name:', `${trainee.name} — new plan`);
+  const name = await showInputModal({
+    title: 'New plan',
+    message: `For ${trainee.name}.`,
+    defaultValue: `${trainee.name} — new plan`,
+    confirmLabel: 'Create plan',
+  });
   if (name === null) return;
   const p = createPlan(traineeId, name || `${trainee.name} — new plan`);
   ui.showPlan(p.id);
@@ -1958,8 +2003,12 @@ function renderCalibrationPanel() {
 }
 
 // === ADD TRIBESMAN ===
-function addTribesman() {
-  const name = prompt('New tribesman name:');
+async function addTribesman() {
+  const name = await showInputModal({
+    title: 'New tribesman',
+    placeholder: 'Tribesman name…',
+    confirmLabel: 'Add',
+  });
   if (!name) return;
   const t = {
     id: newId(), name, level: null, title: '', profession: '', tribe: '',
@@ -2022,7 +2071,13 @@ function bindUI() {
   document.getElementById('export-csv').addEventListener('click', exportCSV);
   document.getElementById('export-json').addEventListener('click', exportJSON);
   document.getElementById('reset-defaults').addEventListener('click', async () => {
-    if (!confirm('Reset to default roster? This will overwrite all current data (your localStorage will be reset).')) return;
+    const ok = await showConfirmModal({
+      title: 'Reset to default roster?',
+      message: 'Your current roster, plans, calibration, and any other local data will be wiped and replaced with the bootstrap roster. This cannot be undone — back up first if you want to keep anything.',
+      confirmLabel: 'Wipe and reset',
+      danger: true,
+    });
+    if (!ok) return;
     localStorage.removeItem(STORAGE_KEY);
     await loadDefaults();
     initFilters();
@@ -2055,6 +2110,101 @@ function bindUI() {
 function escapeHtml(s) {
   if (s == null) return '';
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// === MODAL HELPERS ===
+// Promise-based wrappers around the existing #modal-bg / #modal scaffolding,
+// so we don't need to use the browser's native prompt/confirm/alert. Each
+// helper returns a Promise that resolves with the user's choice (or null on
+// cancel) — let `await` handle the flow at the call site.
+
+let __modalResolve = null;
+
+function _openModal(html, opts = {}) {
+  return new Promise(resolve => {
+    __modalResolve = (val) => {
+      __modalResolve = null;
+      resolve(val);
+      document.getElementById('modal-bg').classList.remove('active');
+      document.getElementById('modal').innerHTML = '';
+      document.removeEventListener('keydown', _modalKeydown);
+    };
+    document.getElementById('modal').innerHTML = html;
+    document.getElementById('modal-bg').classList.add('active');
+    document.addEventListener('keydown', _modalKeydown);
+    if (typeof opts.afterOpen === 'function') opts.afterOpen();
+  });
+}
+window.__resolveModal = (val) => { if (__modalResolve) __modalResolve(val); };
+
+function _modalKeydown(ev) {
+  if (ev.key === 'Escape') { ev.preventDefault(); window.__resolveModal(null); }
+  if (ev.key === 'Enter') {
+    const submit = document.querySelector('#modal .modal-submit');
+    const target = ev.target;
+    // Don't intercept Enter inside textareas or buttons (button has its own handler).
+    if (target?.tagName === 'TEXTAREA' || target?.tagName === 'BUTTON') return;
+    if (submit) { ev.preventDefault(); submit.click(); }
+  }
+}
+
+function showInputModal({title, message = '', defaultValue = '', placeholder = '', confirmLabel = 'OK', cancelLabel = 'Cancel'}) {
+  const html = `
+    <h3>${escapeHtml(title)}</h3>
+    ${message ? `<p class="muted">${escapeHtml(message)}</p>` : ''}
+    <div class="field">
+      <input id="modal-input" type="text" value="${escapeHtml(defaultValue)}" placeholder="${escapeHtml(placeholder)}">
+    </div>
+    <div class="actions">
+      <button onclick="__resolveModal(null)">${escapeHtml(cancelLabel)}</button>
+      <button class="primary modal-submit" onclick="__resolveModal(document.getElementById('modal-input').value)">${escapeHtml(confirmLabel)}</button>
+    </div>`;
+  return _openModal(html, {
+    afterOpen: () => {
+      const input = document.getElementById('modal-input');
+      input?.focus();
+      input?.select();
+    },
+  });
+}
+
+// Renders a vertical list of clickable item-buttons. Each option:
+//   { value, label, sublabel?, danger? }
+// Clicking an item resolves the promise immediately with the value.
+function showPickerModal({title, message = '', options, cancelLabel = 'Cancel'}) {
+  // Stash by index so we don't have to JSON-serialize values into onclick attributes.
+  window.__modalPickerOptions = options;
+  const itemsHtml = options.map((o, i) => `
+    <button class="modal-picker-item${o.danger ? ' danger' : ''}" onclick="__resolveModal(window.__modalPickerOptions[${i}].value)">
+      <span class="modal-picker-label">${escapeHtml(o.label)}</span>
+      ${o.sublabel ? `<span class="modal-picker-sub muted small">${escapeHtml(o.sublabel)}</span>` : ''}
+    </button>`).join('');
+  const html = `
+    <h3>${escapeHtml(title)}</h3>
+    ${message ? `<p class="muted">${escapeHtml(message)}</p>` : ''}
+    <div class="modal-picker-list">${itemsHtml}</div>
+    <div class="actions">
+      <button onclick="__resolveModal(null)">${escapeHtml(cancelLabel)}</button>
+    </div>`;
+  return _openModal(html);
+}
+
+function showConfirmModal({title, message = '', confirmLabel = 'Confirm', cancelLabel = 'Cancel', danger = false}) {
+  const msgHtml = message ? `<div class="modal-confirm-msg">${escapeHtml(message).replace(/\n/g, '<br>')}</div>` : '';
+  const cancelBtn = cancelLabel ? `<button onclick="__resolveModal(false)">${escapeHtml(cancelLabel)}</button>` : '';
+  const html = `
+    <h3>${escapeHtml(title)}</h3>
+    ${msgHtml}
+    <div class="actions">
+      ${cancelBtn}
+      <button class="${danger ? 'danger' : 'primary'} modal-submit" onclick="__resolveModal(true)">${escapeHtml(confirmLabel)}</button>
+    </div>`;
+  return _openModal(html);
+}
+
+// Single-button informational modal — replacement for alert().
+function showAlertModal({title, message = '', confirmLabel = 'OK'}) {
+  return showConfirmModal({ title, message, confirmLabel, cancelLabel: '' });
 }
 
 // Boot the app
