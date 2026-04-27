@@ -1713,10 +1713,13 @@ function renderPlanStep(plan, step, index) {
     })).join('');
 
   // Type-specific subject pickers
+  const mentor = step.mentorId ? findTribesman(step.mentorId) : null;
+
   let subject = '';
   if (step.type === 'cap-raise') {
     const ceiling = trainee && step.weapon ? weaponCeiling(trainee.profession, step.weapon) : null;
     const traineeCap = trainee && step.weapon ? (trainee.weapons?.[step.weapon]?.cap ?? '—') : '—';
+    const mentorCap = mentor && step.weapon ? (mentor.weapons?.[step.weapon]?.cap ?? null) : null;
     subject = `<label>Weapon</label>
       <select onchange="stepFieldUpd('${plan.id}','${step.id}','weapon',this.value)">
         <option value="">— pick weapon —</option>
@@ -1726,9 +1729,24 @@ function renderPlanStep(plan, step, index) {
       <input type="number" min="1" max="125" value="${step.targetCap ?? ''}"
         placeholder="${ceiling ?? ''}"
         oninput="stepFieldUpd('${plan.id}','${step.id}','targetCap',this.value)">
-      ${step.weapon ? `<span class="muted small">trainee ${traineeCap} → ceiling ${ceiling}</span>` : ''}`;
+      ${step.weapon ? `<span class="muted small">trainee ${traineeCap} → ceiling ${ceiling}${mentorCap ? ` · mentor ${mentorCap}` : ''}</span>` : ''}`;
   } else if (step.type === 'upgrade') {
     const traineeTalents = (trainee?.talents || []).filter(t => (t.level || 0) < 3);
+    // Show the picked talent's icon + tooltip (with the mentor's level for context)
+    let upgradePreview = '';
+    if (step.talent) {
+      const traineeT = (trainee?.talents || []).find(t => t.name === step.talent);
+      const mentorT = (mentor?.talents || []).find(t => t.name === step.talent);
+      if (traineeT) {
+        const meta = talentMeta(step.talent);
+        const previewTalent = { ...traineeT, icon: traineeT.icon || meta?.icon };
+        const mentorLvl = mentorT ? `mentor Lv ${mentorT.level}` : (mentor ? 'mentor doesn\'t have this talent' : '');
+        upgradePreview = `<div class="plan-step-talent-preview">
+          ${renderTalentIconRow([previewTalent])}
+          <span class="muted small">trainee Lv ${traineeT.level}${mentorLvl ? ' · ' + mentorLvl : ''}</span>
+        </div>`;
+      }
+    }
     subject = `<label>Talent</label>
       <select onchange="stepFieldUpd('${plan.id}','${step.id}','talent',this.value)">
         <option value="">— pick talent —</option>
@@ -1737,9 +1755,33 @@ function renderPlanStep(plan, step, index) {
       <label>Target Lv</label>
       <select onchange="stepFieldUpd('${plan.id}','${step.id}','targetLevel',this.value)">
         ${[2,3].map(lv => `<option value="${lv}" ${lv === step.targetLevel ? 'selected' : ''}>Lv ${lv}</option>`).join('')}
-      </select>`;
+      </select>
+      ${upgradePreview}`;
   } else if (step.type === 'learn') {
-    subject = `<span class="muted small">Random talent (Lv I) drawn from mentor's eligible positive talents.</span>`;
+    // List the actual learnable talents the mentor brings to the table, not
+    // just the static "random talent" placeholder. Without a mentor, fall
+    // back to the placeholder copy.
+    let learnPreview = `<span class="muted small">Random talent (Lv I) drawn from mentor's eligible positive talents.</span>`;
+    if (mentor && trainee) {
+      const knownNames = new Set((trainee.talents || []).map(t => t.name));
+      const eligible = (mentor.talents || []).filter(t => {
+        const meta = talentMeta(t.name);
+        return meta && meta.polarity === 'positive'
+          && !knownNames.has(t.name)
+          && isLearnableBy(t.name, trainee);
+      });
+      if (eligible.length) {
+        // Display level shows the mentor's level (for tooltip context), even
+        // though Learn always lands at Lv I in-game.
+        learnPreview = `<div class="plan-step-talent-preview">
+          ${renderTalentIconRow(eligible)}
+          <span class="muted small">${eligible.length} possible outcome${eligible.length === 1 ? '' : 's'} · all land at Lv I</span>
+        </div>`;
+      } else {
+        learnPreview = `<span class="muted small">${escapeHtml(mentor.name)} has no learnable talents for this trainee.</span>`;
+      }
+    }
+    subject = learnPreview;
   }
 
   const statusBtns = STEP_STATUSES.map(st =>
