@@ -248,6 +248,13 @@ table.roster.editable input.cell-input.num-tiny {
   font-variant-numeric: tabular-nums;
   color: inherit;
 }
+table.roster.editable input.cell-input.list-input {
+  min-width: 120px;
+  color: var(--accent);
+}
+table.roster.editable input.cell-input.list-input::placeholder {
+  color: var(--text-dim); opacity: 0.6;
+}
 /* MozAppearance / WebkitAppearance: hide spinners to save horizontal space */
 table.roster.editable input.cell-input.num-tiny::-webkit-outer-spin-button,
 table.roster.editable input.cell-input.num-tiny::-webkit-inner-spin-button {

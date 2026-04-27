@@ -519,15 +519,17 @@ function renderRoster() {
     }
     const classW = PROF_CLASS_WEAPONS[t.profession] || [];
     for (const w of WEAPONS) {
-      const v = (t.weapons?.[w]) || {cap:null};
+      const v = (t.weapons?.[w]) || {current:null, cap:null};
       const cls = tierClass(v.cap);
       const al = classW.includes(w) ? ' aligned-skill' : '';
-      html += `<td class="weapon-cell ${cls}${al}">
-        <input class="cell-input num-tiny" type="number" value="${v.cap ?? ''}" oninput="updWeaponFromRoster('${id}','${w}',this)">
-      </td>`;
+      html += `<td class="weapon-cell ${cls}${al}"><div class="cur-cap">
+        <input class="cell-input num-tiny" type="number" value="${v.current ?? ''}" oninput="updWeaponFromRoster('${id}','${w}','current',this)">
+        <span class="sep">/</span>
+        <input class="cell-input num-tiny" type="number" value="${v.cap ?? ''}" oninput="updWeaponFromRoster('${id}','${w}','cap',this)">
+      </div></td>`;
     }
-    html += `<td>${(t.groups || []).map(g => `<span class="chip group">${escapeHtml(g)}</span>`).join('')}</td>`;
-    html += `<td>${(t.tags || []).map(g => `<span class="chip tag">${escapeHtml(g)}</span>`).join('')}</td>`;
+    html += `<td><input class="cell-input list-input" value="${escapeHtml((t.groups || []).join(', '))}" placeholder="comma-separated" oninput="updListFromRoster('${id}','groups',this.value)" title="Comma-separated. Edit here, or use the profile for chip-style management."></td>`;
+    html += `<td><input class="cell-input list-input" value="${escapeHtml((t.tags || []).join(', '))}" placeholder="comma-separated" oninput="updListFromRoster('${id}','tags',this.value)" title="Comma-separated. Edit here, or use the profile for chip-style management."></td>`;
     html += `<td>${renderTalentIconRow(t.talents)}</td>`;
     html += '</tr>';
   }
@@ -905,22 +907,48 @@ function updSkillFromRoster(id, skill, field, inputEl) {
   }
 }
 
-function updWeaponFromRoster(id, weapon, inputEl) {
+function updWeaponFromRoster(id, weapon, field, inputEl) {
   const t = state.roster.find(x => x.id === id);
   if (!t) return;
   t.weapons = t.weapons || {};
   t.weapons[weapon] = t.weapons[weapon] || {current:null, cap:null};
   const val = inputEl.value === '' ? null : +inputEl.value;
-  t.weapons[weapon].cap = val;
+  t.weapons[weapon][field] = val;
   saveState();
-  const td = inputEl.closest('td');
-  if (td) {
-    const aligned = (PROF_CLASS_WEAPONS[t.profession] || []).includes(weapon);
-    td.className = `weapon-cell ${tierClass(val)}${aligned ? ' aligned-skill' : ''}`;
+  if (field === 'cap') {
+    const td = inputEl.closest('td');
+    if (td) {
+      const aligned = (PROF_CLASS_WEAPONS[t.profession] || []).includes(weapon);
+      td.className = `weapon-cell ${tierClass(val)}${aligned ? ' aligned-skill' : ''}`;
+    }
   }
 }
+
+// Comma-separated inline editor for groups/tags. The profile keeps its
+// chip+button rich UI; this is the dense-grid alternative.
+function updListFromRoster(id, listKey, csv) {
+  const t = state.roster.find(x => x.id === id);
+  if (!t) return;
+  // Parse: split on commas, trim, drop empties, dedupe (case-insensitive).
+  const seen = new Set();
+  const items = csv.split(',').map(s => s.trim()).filter(s => {
+    if (!s) return false;
+    const k = s.toLowerCase();
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  t[listKey] = items;
+  saveState();
+  // Refresh the relevant filter dropdown so newly-typed groups/tags appear in
+  // the toolbar without a full re-render of the table (which would steal focus
+  // from the input the user is still editing).
+  initFilters();
+}
+
 window.updSkillFromRoster = updSkillFromRoster;
 window.updWeaponFromRoster = updWeaponFromRoster;
+window.updListFromRoster = updListFromRoster;
 
 function addToList(id, listKey) {
   const t = state.roster.find(x => x.id === id);
