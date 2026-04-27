@@ -850,6 +850,11 @@ a.suggestion-in-plan:hover { filter: brightness(1.15); text-decoration: underlin
   color: var(--red); font-size: 11px; text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+.plan-step .step-applied {
+  color: var(--tier-iron); font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.plan-step.applied { border-left-color: var(--tier-iron); }
 
 /* Modal field layout */
 .modal .field { margin: 10px 0; }
