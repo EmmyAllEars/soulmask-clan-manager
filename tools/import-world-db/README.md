@@ -178,11 +178,25 @@ two screenshots per tribesman: their **Character → Ability** tab and
 Workflow:
 
 1. In-game, tab through your tribesmen. For each, capture both tabs.
-2. Open a fresh Claude session, paste the contents of
-   [`EXTRACT_PROMPT.md`](EXTRACT_PROMPT.md), and attach the screenshots.
-3. Claude returns a single `clan-screenshot-patch-v1` JSON document. Save it
+2. **Preprocess.** Crop out the character model and the right-side detail
+   rail so the small `current/cap` numbers survive the vision-model
+   downsample (without this, 1/7, 3/8, 5/6 confusions are routine on the
+   proficiency tab):
+
+   ```sh
+   node preprocess-screenshots.js \
+     --in  /path/to/raw/screenshots \
+     --out /path/to/cropped
+   ```
+
+   Defaults are tuned for 3456×2234 retina screenshots; pass `--abil-crop`
+   / `--prof-crop` (`W:H:X:Y`) for other resolutions. See `--help`.
+3. Open a fresh Claude session, paste the contents of
+   [`EXTRACT_PROMPT.md`](EXTRACT_PROMPT.md), and attach the **cropped**
+   screenshots.
+4. Claude returns a single `clan-screenshot-patch-v1` JSON document. Save it
    to e.g. `/tmp/patch.json`.
-4. Apply it:
+5. Apply it:
 
    ```sh
    node apply-patch.js \
@@ -191,7 +205,7 @@ Workflow:
      --out /path/to/clan_backup_patched.json
    ```
 
-5. Load the patched JSON via **Restore JSON** in ClanManager.
+6. Load the patched JSON via **Restore JSON** in ClanManager.
 
 The patch tool only touches fields the patch contains. Talents, notes,
 groups, tags, location, `is_body` — anything user-curated — is preserved.
@@ -199,6 +213,13 @@ groups, tags, location, `is_body` — anything user-curated — is preserved.
 > **Validated end-to-end on Andaria.** A single patch produced 28 changes:
 > 22 previously-blank skill / weapon `current` values populated, 4 cap
 > corrections (the manual entries had drifted), and 2 attribute corrections.
+>
+> **Why preprocessing matters** (2026-04-28 clan refresh): A single
+> Atalanta proficiency crop surfaced 8 misreads from the previous
+> full-image pass — Dual-blade 10→61, Great Sword 33→21, Cooking 118→114,
+> Armor Crafting 101→108, plus Shield/Spiked Whip values that were
+> previously omitted entirely. Skip preprocessing only if you enjoy
+> playing detective with your roster.
 
 ## Files
 
@@ -210,6 +231,7 @@ tools/import-world-db/
   parse-training-log.js  - regex parser for in-game Training ground log events
   apply-training.js      - apply parsed training deltas to a roster
   apply-patch.js         - apply a screenshot-extracted patch to a roster
+  preprocess-screenshots.js - crop screenshots to the data-bearing region (ffmpeg)
   EXTRACT_PROMPT.md      - vision prompt to paste into a Claude session for screenshot extraction
   schema.md              - what we learned about world.db, Soulmask BLOBs, and RCON
   README.md              - this file
