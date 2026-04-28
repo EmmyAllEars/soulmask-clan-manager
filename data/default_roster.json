@@ -113,7 +113,6 @@
         "End": 16,
         "Str": 17
       },
-      "recognition": "",
       "talents": [
         {
           "name": "Light Footsteps",
@@ -255,7 +254,6 @@
         "End": 14,
         "Str": 13
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Go for the Jugular",
@@ -385,7 +383,6 @@
         "End": null,
         "Str": null
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Body-Resilience Conversion",
@@ -524,7 +521,6 @@
         "End": null,
         "Str": null
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Last Light Counter",
@@ -673,7 +669,6 @@
         "End": null,
         "Str": null
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Last Radiance",
@@ -805,7 +800,6 @@
         "End": 21,
         "Str": 21
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Accelerate Cooking — [Craftsman Exclusive]",
@@ -952,7 +946,6 @@
         "End": null,
         "Str": null
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Extraordinary Talent",
@@ -1084,7 +1077,6 @@
         "End": null,
         "Str": null
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Accelerate Leatherworking — [Porter Exclusive]",
@@ -1226,7 +1218,6 @@
         "End": null,
         "Str": null
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Acceleration at Stress",
@@ -1373,7 +1364,6 @@
         "End": null,
         "Str": null
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Unnoticeable",
@@ -1530,7 +1520,6 @@
         "End": null,
         "Str": null
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Superarmor Break",
@@ -1672,7 +1661,6 @@
         "End": 25,
         "Str": 23
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Swift Pace",
@@ -1809,7 +1797,6 @@
         "End": null,
         "Str": null
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Wild Nature Awakened",
@@ -1956,7 +1943,6 @@
         "End": 13,
         "Str": 16
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Full Stamina",
@@ -2088,7 +2074,6 @@
         "End": 26,
         "Str": 23
       },
-      "recognition": "535 / 1000",
       "talents": [
         {
           "name": "Dual-blade DMG Increase",
@@ -2239,7 +2224,6 @@
         "End": 7,
         "Str": 14
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Grapple-Throw",
@@ -2368,7 +2352,6 @@
         "End": 22,
         "Str": 24
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Crave for Blood",
@@ -2515,7 +2498,6 @@
         "End": 18,
         "Str": 18
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Fire Deterrence",
@@ -2647,7 +2629,6 @@
         "End": 18,
         "Str": 26
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Blood Activating",
@@ -2789,7 +2770,6 @@
         "End": 21,
         "Str": 11
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Rampage",
@@ -2938,7 +2918,6 @@
         "End": 23,
         "Str": 21
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Baffle Reflect",
@@ -3085,7 +3064,6 @@
         "End": 29,
         "Str": 22
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Resourceful",
@@ -3232,7 +3210,6 @@
         "End": 15,
         "Str": 35
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Remote Strike",
@@ -3379,7 +3356,6 @@
         "End": 26,
         "Str": 28
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Trick Force",
@@ -3526,7 +3502,6 @@
         "End": 19,
         "Str": 20
       },
-      "recognition": null,
       "talents": [
         {
           "name": "Fierce Attack",

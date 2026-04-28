@@ -55,7 +55,6 @@
  * @property {string[]} groups
  * @property {string[]} tags
  * @property {string} notes
- * @property {Object} [recognition]
  */
 
 /** @typedef {"draft"|"active"|"done"|"abandoned"} PlanStatus */

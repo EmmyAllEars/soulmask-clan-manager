@@ -13,7 +13,7 @@ runs anywhere — locally, on GitHub Pages, or any static host.
 ## Features
 
 - **Roster view** — full table of every tribesman with all 14 work skills + 9 weapon caps
-  + 5 attributes + Recognition. Profession-aligned skills bolded with a star. Cap-tier
+  + 5 attributes. Profession-aligned skills bolded with a star. Cap-tier
   color coded: orange (mastery 120+) → yellow (specialist 100+) → green (Iron 90+) →
   grey (sub-Iron).
 - **Profile view** — full editor for one tribesman: identity, attributes, every skill
@@ -95,7 +95,7 @@ In a tribesman's profile, the "Training Suggestions" card automatically lists:
 When you Export CSV, the columns are:
 
 ```
-id, name, level, title, profession, tribe, trait, location, is_body, recognition, notes,
+id, name, level, title, profession, tribe, trait, location, is_body, notes,
 skill_<Skill>_cur, skill_<Skill>_cap (×14),
 weapon_<Weapon>_cur, weapon_<Weapon>_cap (×9),
 attr_Per, attr_Agi, attr_Phy, attr_End, attr_Str,
