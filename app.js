@@ -9,7 +9,7 @@
  */
 
 // === CONSTANTS ===
-const APP_VERSION = '0.5.0';
+const APP_VERSION = '1.0.0';
 const REPO_URL = 'https://github.com/EmmyAllEars/soulmask-clan-manager';
 const STORAGE_KEY = 'soulmaskClan_v1';
 const THEME_KEY = 'soulmaskClan_theme';
@@ -58,7 +58,7 @@ const PROF_CLASS_WEAPONS = {
 };
 
 // === STATE ===
-const STORAGE_VERSION = 2;
+const STORAGE_VERSION = 3;
 
 // Training Plan time-estimation constants (see docs/training_plans.md).
 // Both base times and material multipliers are placeholders until measured;
@@ -143,6 +143,14 @@ function migrateState(data) {
     data.plans = data.plans || [];
     data.version = 2;
   }
+  if (v < 3) {
+    // v3: talent catalog expanded from 253 → 551 entries (issue #46), with
+    // some combined records ("Limb / Torso / Head / Tail Destruction") split
+    // into per-part records. Pruning of now-orphaned tribesman talents
+    // happens in boot() once the catalog is loaded — this stub just bumps
+    // the version field.
+    data.version = 3;
+  }
   return data;
 }
 
@@ -172,7 +180,66 @@ async function boot() {
     const savedTiers = Object.keys(saved.calibration?.tierMultipliers || {});
     const droppedStaleTiers = savedTiers.some(k => !MATERIAL_TIERS.includes(Number(k)));
     state.calibration = mergeCalibration(saved.calibration);
-    if (wasOlder || normalized || droppedStaleTiers) saveState();
+    // v2→v3 catalog migration: reconcile tribesman talent names against the
+    // expanded catalog. Two kinds of mismatch are common:
+    //   1. Old curated names had a " — [Class Exclusive]" suffix that the
+    //      new scrape doesn't. Strip the suffix and retry.
+    //   2. Some upstream entries are lowercased ("Accelerate leatherworking").
+    //      Fall back to case-insensitive match.
+    // If a rename is found, rewrite the talent name in place. Otherwise it's
+    // a true orphan (e.g. the combined Destruction entry whose split
+    // replacements live under different names) — drop it and log it for the
+    // alert. `wasOlder` is captured pre-migrateState so it correctly
+    // reflects the on-disk version.
+    const dropped = [];
+    const renamed = [];
+    if (wasOlder && state.talents.length) {
+      const knownByName = new Map(state.talents.map(c => [c.name, c]));
+      // Index by a normalized key that strips the "— [Class Exclusive]"
+      // suffix and unifies em-dash ↔ hyphen-minus so old curated names
+      // ("Attack-Defense Resonance — Attack") map to the new catalog
+      // ("Attack-Defense Resonance - Attack").
+      const normKey = s => s.toLowerCase().replace(/\s+—\s+\[.*$/, '').replace(/—/g, '-').replace(/\s+/g, ' ').trim();
+      const knownByNorm = new Map(state.talents.map(c => [normKey(c.name), c]));
+      const reconcile = (name) => {
+        if (knownByName.has(name)) return name;
+        const hit = knownByNorm.get(normKey(name));
+        return hit ? hit.name : null;
+      };
+      for (const t of state.roster) {
+        if (!t.talents) continue;
+        const kept = [];
+        for (const tt of t.talents) {
+          const target = reconcile(tt.name);
+          if (target === null) {
+            dropped.push({ tribesman: t.name, talent: tt.name });
+          } else {
+            if (target !== tt.name) renamed.push({ tribesman: t.name, from: tt.name, to: target });
+            kept.push({ ...tt, name: target });
+          }
+        }
+        t.talents = kept;
+      }
+    }
+    const migrated = dropped.length || renamed.length;
+    if (wasOlder || normalized || droppedStaleTiers || migrated) saveState();
+    if (migrated) {
+      // showAlertModal escapes HTML and only translates \n → <br>, so build
+      // the message with plain newlines rather than markup.
+      const parts = [];
+      if (renamed.length) {
+        parts.push(`${renamed.length} renamed (catalog now matches the in-game name without the "— [Class Exclusive]" suffix):\n` +
+          renamed.map(r => `• ${r.tribesman}: "${r.from}" → "${r.to}"`).join('\n'));
+      }
+      if (dropped.length) {
+        parts.push(`${dropped.length} dropped — combined entries split into per-part talents (e.g. "Limb / Torso / Head / Tail Destruction" → four separate Destruction talents). Re-add the specific variants from the dropdown:\n` +
+          dropped.map(d => `• ${d.tribesman}: "${d.talent}"`).join('\n'));
+      }
+      showAlertModal({
+        title: `Talent catalog updated (253 → 551 entries)`,
+        message: parts.join('\n\n'),
+      });
+    }
   } else {
     await loadDefaults();
   }
@@ -712,6 +779,20 @@ function renderProfile() {
   bindTalentAutocomplete(t);
 }
 
+// Map a talent's polarity to a CSS modifier class. Five buckets:
+// positive (default, no class), negative (red), preference (purple/pink),
+// origin (amber), title (blue/grey). See style.css for the borders.
+function polarityClass(meta) {
+  if (!meta) return '';
+  switch (meta.polarity) {
+    case 'negative':   return 'negative';
+    case 'preference': return 'preference';
+    case 'origin':     return 'origin';
+    case 'title':      return 'title';
+    default:           return '';
+  }
+}
+
 // Compact icon row for the roster's "Talents" column. Each icon hovers to
 // reveal the same name/effect tooltip the profile pills use.
 function renderTalentIconRow(talents) {
@@ -720,9 +801,9 @@ function renderTalentIconRow(talents) {
   return `<div class="talent-icon-row">${tals.map(tal => {
     const meta = state.talents.find(x => x.name === tal.name);
     const effect = (meta && meta.effect) ? meta.effect : '';
-    const isNeg = meta && meta.polarity === 'negative';
+    const cls = polarityClass(meta);
     const lv = tal.level ? ` · Lv ${tal.level}` : '';
-    return `<span class="talent-icon-mini ${isNeg?'negative':''}" tabindex="0">
+    return `<span class="talent-icon-mini ${cls}" tabindex="0">
       <img src="${ICON_DIR}${tal.icon}" alt="${escapeHtml(tal.name)}" onerror="this.style.opacity=0.2">
       <div class="talent-tip" role="tooltip">
         <div class="tip-name">${escapeHtml(tal.name)}${escapeHtml(lv)}</div>
@@ -738,9 +819,9 @@ function renderTalentList(t) {
   if (!tals.length) { grid.innerHTML = '<span class="muted">No talents recorded yet.</span>'; return; }
   grid.innerHTML = tals.map((tal,i) => {
     const meta = state.talents.find(x => x.name === tal.name);
-    const isNeg = meta && meta.polarity === 'negative';
+    const cls = polarityClass(meta);
     const effect = (meta && meta.effect) ? meta.effect : '';
-    return `<div class="talent-pill ${isNeg?'negative':''}">
+    return `<div class="talent-pill ${cls}">
       <img src="${ICON_DIR}${tal.icon}" alt="${escapeHtml(tal.name)}" onerror="this.style.opacity=0.2">
       <div class="info">
         <div class="name">${escapeHtml(tal.name)}</div>

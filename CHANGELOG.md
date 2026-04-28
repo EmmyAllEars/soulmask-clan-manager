@@ -13,6 +13,48 @@ The live app is at <https://emmyallears.github.io/soulmask-clan-manager/>.
 
 ---
 
+## v1.0.0 — Full talent catalog ([#46][])
+
+The talent catalog grew from 253 to **551 entries**, covering every Preference,
+Origin, Title, Personality, and Tribe Exclusive talent the in-game scrape
+exposes.
+
+### Added
+
+- **Five polarity buckets** instead of two. Each gets its own border colour:
+  - `positive` — default, no border tint, counts toward the 6-talent cap
+  - `negative` — red, defects (e.g. Slow Pace, Weak Attack)
+  - `preference` — purple/pink, Preferences and Personalities (e.g. Likes
+    camel, Personality: Cautious)
+  - `origin` — amber, fixed-at-birth Origin talents (e.g. Origin - Hunting)
+  - `title` — blue/grey, earned Titles (e.g. Archery Master)
+- **`tools/generate-talents/`** — committed Node generator that rebuilds
+  `data/talents.json` from a frozen upstream scrape, plus an icon fetcher
+  that downloads any missing icons (`brew install webp` required).
+
+### Changed
+
+- The 6-positive-talent cap now correctly excludes preferences, origins, and
+  titles (none of which are chosen by the player, so they shouldn't eat
+  trait slots).
+- Mentor-eligibility filtering already excluded the new buckets via the
+  existing `polarity === 'positive'` predicate — no change needed.
+- The combined "Limb / Torso / Head / Tail Destruction" entry is split into
+  four per-part records, matching the in-game data. Same for "Head / Arm /
+  Torso / Thigh Stress Response" → four separate stress-response talents.
+
+### Migration
+
+- `STORAGE_VERSION` 2 → 3. On first load after the update, any tribesman
+  talent whose name no longer exists in the new catalog (e.g. the combined
+  Destruction entry) is removed from the roster, and a one-time alert
+  surfaces what was pruned. The user can re-add the specific variants from
+  the now-richer dropdown.
+
+[#46]: https://github.com/EmmyAllEars/soulmask-clan-manager/issues/46
+
+---
+
 ## v0.5.0 — Training Plans
 
 The diagnostic-only Training Suggestions card now has a commitment counterpart:

@@ -31,6 +31,11 @@
   --chip-group-fg:   #e8eef3;
   --chip-tag-bg:     #3d2f33;
   --chip-tag-fg:     #d4a583;
+
+  /* Talent polarity borders (preference, origin, title) */
+  --talent-preference: #c47fbb;   /* purple/pink */
+  --talent-origin:     #d4a04a;   /* amber */
+  --talent-title:      #8a99af;   /* blue/grey */
 }
 
 :root[data-theme="light"] {
@@ -61,6 +66,11 @@
   --chip-group-fg:   #2f4858;
   --chip-tag-bg:     #efddc8;
   --chip-tag-fg:     #8a5224;
+
+  /* Talent polarity borders (preference, origin, title) */
+  --talent-preference: #a8519a;
+  --talent-origin:     #b8842c;
+  --talent-title:      #5d6f8a;
 }
 
 /* Default: dark, until JS sets the attribute. Avoids flash of unstyled. */
@@ -77,6 +87,7 @@
   --tier-on: #1c1f24;
   --chip-group-bg: #324452; --chip-group-fg: #e8eef3;
   --chip-tag-bg: #3d2f33; --chip-tag-fg: #d4a583;
+  --talent-preference: #c47fbb; --talent-origin: #d4a04a; --talent-title: #8a99af;
 }
 
 * { box-sizing: border-box; }
@@ -428,6 +439,12 @@ table.roster.editable .row-go:hover {
 }
 .talent-pill.negative { border-color: var(--red); }
 .talent-pill.negative .lvl { background: var(--red); color: var(--accent-on); }
+.talent-pill.preference { border-color: var(--talent-preference); }
+.talent-pill.preference .lvl { background: var(--talent-preference); color: var(--accent-on); }
+.talent-pill.origin { border-color: var(--talent-origin); }
+.talent-pill.origin .lvl { background: var(--talent-origin); color: var(--accent-on); }
+.talent-pill.title { border-color: var(--talent-title); }
+.talent-pill.title .lvl { background: var(--talent-title); color: var(--accent-on); }
 .talent-pill .remove {
   background: transparent; border: none; color: var(--text-dim); cursor: pointer;
   padding: 2px 6px; font-size: 16px; line-height: 1;
@@ -471,6 +488,9 @@ table.roster.editable .row-go:hover {
 }
 .talent-icon-mini img { width: 100%; height: 100%; object-fit: cover; border-radius: 2px; display: block; }
 .talent-icon-mini.negative { border-color: var(--red); }
+.talent-icon-mini.preference { border-color: var(--talent-preference); }
+.talent-icon-mini.origin { border-color: var(--talent-origin); }
+.talent-icon-mini.title { border-color: var(--talent-title); }
 
 /* Talent preview inside a plan step (Learn / Upgrade subject area) */
 .plan-step-talent-preview {
