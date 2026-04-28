@@ -127,7 +127,7 @@ header.topbar button.primary:hover { background: var(--accent-hover); border-col
 header.topbar button.danger { color: var(--red); }
 
 /* ============== LAYOUT ============== */
-main { padding: 20px; max-width: 100%; overflow-x: auto; }
+main { padding: 20px; max-width: 100%; }
 .view { display: none; }
 .view.active { display: block; }
 
@@ -158,6 +158,14 @@ main { padding: 20px; max-width: 100%; overflow-x: auto; }
 .swatch.t-sub        { background: var(--tier-sub); color: var(--tier-sub-text); }
 
 /* ============== ROSTER TABLE ============== */
+/* The roster table scrolls inside its own wrapper, on both axes, so its
+   sticky header + sticky name column have a real container to stick to.
+   max-height leaves room for topbar (~50) + toolbar (~50) + main padding
+   (40) + small buffer. */
+#roster-table-wrap {
+  overflow: auto;
+  max-height: calc(100vh - 180px);
+}
 table.roster {
   border-collapse: collapse;
   width: max-content;
@@ -177,6 +185,12 @@ table.roster th {
   z-index: 5;
   font-weight: 600;
 }
+/* Top-left corner: stick both axes, above other sticky headers and the
+   sticky name column so it owns the corner during two-axis scroll. */
+table.roster thead th:first-child {
+  left: 0;
+  z-index: 7;
+}
 table.roster th.weapon-col { background: var(--table-head-weapon); }
 table.roster th.sortable { cursor: pointer; user-select: none; }
 table.roster th.sortable:hover { filter: brightness(1.12); }
@@ -193,7 +207,7 @@ table.roster th .sort-ind {
    3. Drop a 3px accent bar on the leading cell (Name) as the left-edge
       anchor — visible across the whole row even when middle cells are
       tier-saturated. */
-table.roster tr:hover td:not(.tier-mastery):not(.tier-specialist):not(.tier-iron):not(.tier-sub) {
+table.roster tr:hover td:not(.tier-mastery):not(.tier-specialist):not(.tier-iron):not(.tier-sub):not(.name-cell) {
   background: var(--row-hover);
 }
 table.roster tr:hover td.tier-mastery,
@@ -296,6 +310,10 @@ table.roster.editable td.name-cell {
   align-items: center;
   gap: 4px;
   min-width: 160px;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background-color: var(--bg);
 }
 table.roster.editable td.name-cell input.name-input {
   font-weight: 600;
@@ -609,7 +627,12 @@ table.roster.editable .row-go:hover {
   cursor: help;
 }
 .legend-hint:hover { border-color: var(--accent); color: var(--accent); }
-.legend-hint .help-tip { left: auto; right: 0; max-width: 320px; }
+/* Open the tooltip *downward* (top: 100%) into the page area. The default
+   .help-tip anchors above its parent, but this chip sits in the toolbar
+   immediately under the sticky topbar — opening upward put the tip behind
+   the topbar (z:100 > tip z:50). Right-anchored so it doesn't run off
+   the right edge of the viewport. */
+.legend-hint .help-tip { top: 100%; bottom: auto; left: auto; right: 0; max-width: 320px; }
 
 /* Roster column header tip — anchor to the right of long-text columns
    so it doesn't fall off the left edge for early columns */
