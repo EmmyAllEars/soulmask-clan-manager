@@ -89,6 +89,17 @@ The Combat Skills tab names already match ClanManager exactly. Use them as-is:
 `Spear`, `Shield`, `Dual-blade`, `Great Sword`, `Spiked Whip`, `Blade`,
 `Bow`, `Gauntlets`, `Hammer`.
 
+### Priority of fields — read this before the rules
+
+Skill `current`, weapon `current`, and the five attributes
+(Per/Agi/Phy/End/Str) are the **primary reason this workflow exists**. They
+live only in the in-game UI — the lgo and training-log import paths can't
+capture them. If a screenshot patch comes back without these populated, the
+workflow has failed, even if the diff *looks* reasonable.
+
+Caps, level, title, tribe, and profession are useful additions but
+secondary; those can also be updated via lgo or manually in the UI.
+
 ### Rules
 
 1. **Strip owner-suffix tags** (`<E>`, `<Q>`, etc.) from the name before
@@ -98,9 +109,24 @@ The Combat Skills tab names already match ClanManager exactly. Use them as-is:
    Validate the second word is one of the six professions; if not, leave
    `profession` empty and put the whole string in `title`.
 3. **Tribe**: from `<Wildwolf Tribe>`, emit just `"Wildwolf"`.
-4. **If a screenshot is unreadable** for a particular field, omit that field
-   from the patch. Don't guess. The `apply-patch.js` tool preserves existing
-   values for any field absent from the patch.
+4. **Confidence vs. completeness — emit your best read, but bias by what's
+   already in the roster.** Two cases:
+
+   - **Cell is null/empty in the existing JSON** (most skill `current` and
+     weapon `current` values, attrs on blank skeletons): emit even at
+     marginal confidence. The user has no other source for these — a
+     correctable misread beats a permanent null. Always populate every
+     visible primary-priority cell (see above) per tribesman.
+   - **Cell has an existing value you can't confirm changed**: omit. The
+     existing value is preserved; overwriting good data with a misread is
+     the real hazard.
+
+   The user runs `--dry-run` before committing to spot-check any unexpected
+   change — that's the safety net for misreads on the first case. Don't use
+   "I might be wrong" as a reason to skip a primary-priority cell when the
+   existing value is null. A patch that "looks" successful (lots of attr
+   diffs, all reads conservative) but leaves skill/weapon currents
+   permanently blank has *failed*.
 5. **Body N / "Body Two" / etc.**: ignore — that's an in-game body-slot
    indicator, not stored in ClanManager.
 6. **Multiple tribesmen**: append additional entries to the `tribesmen`
