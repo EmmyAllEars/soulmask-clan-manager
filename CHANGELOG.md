@@ -17,7 +17,8 @@ The live app is at <https://emmyallears.github.io/soulmask-clan-manager/>.
 
 The talent catalog grew from 253 to **551 entries**, covering every Preference,
 Origin, Title, Personality, and Tribe Exclusive talent the in-game scrape
-exposes.
+exposes. With the catalog now considered complete, the running version moves
+out of the 0.x range to **1.0**.
 
 ### Added
 
@@ -28,9 +29,17 @@ exposes.
     camel, Personality: Cautious)
   - `origin` — amber, fixed-at-birth Origin talents (e.g. Origin - Hunting)
   - `title` — blue/grey, earned Titles (e.g. Archery Master)
+- **~110 new talent icons** fetched + converted from the upstream scrape —
+  every entry in the new catalog has a working icon at lowercase `.webp`
+  (so GitHub Pages' case-sensitive serving works the same as the local
+  case-insensitive disk).
 - **`tools/generate-talents/`** — committed Node generator that rebuilds
-  `data/talents.json` from a frozen upstream scrape, plus an icon fetcher
-  that downloads any missing icons (`brew install webp` required).
+  `data/talents.json` from a frozen upstream scrape (`source/soulmask_talents_551.json`)
+  plus a curated-overrides snapshot (`source/curated_overrides.json`,
+  preserving hand-tagged polarity for the original 253 entries). Companion
+  `fetch-icons.mjs` downloads + converts any missing icons via `cwebp`
+  (`brew install webp`). Both scripts are idempotent so future scrape
+  refreshes just need a re-run.
 
 ### Changed
 
@@ -45,11 +54,18 @@ exposes.
 
 ### Migration
 
-- `STORAGE_VERSION` 2 → 3. On first load after the update, any tribesman
-  talent whose name no longer exists in the new catalog (e.g. the combined
-  Destruction entry) is removed from the roster, and a one-time alert
-  surfaces what was pruned. The user can re-add the specific variants from
-  the now-richer dropdown.
+- `STORAGE_VERSION` 2 → 3. On first load after the update, a boot-time
+  reconciler walks every tribesman's talents and:
+  1. **Renames** old curated names whose only difference from the new
+     catalog is the trailing `— [Class Exclusive]` suffix (e.g. `"Accelerate
+     Alchemy — [Craftsman Exclusive]"` → `"Accelerate Alchemy"`). Em-dash
+     ↔ hyphen-minus is also normalized so `"Attack-Defense Resonance —
+     Attack"` finds `"Attack-Defense Resonance - Attack"`.
+  2. **Drops** any name that still doesn't resolve — typically the
+     combined records that got split (e.g. `"Limb / Torso / Head / Tail
+     Destruction"` → re-add the specific per-part variant).
+  A single alert surfaces both lists on first load. The bundled default
+  roster gets ~17 renames + 3 drops, all reported.
 
 [#46]: https://github.com/EmmyAllEars/soulmask-clan-manager/issues/46
 
