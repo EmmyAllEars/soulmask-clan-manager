@@ -1528,10 +1528,257 @@ window.stepFieldUpd = function(planId, stepId, field, value) {
   if (state.selectedPlanId === planId) renderPlanEditor(planId);
 };
 
-window.onAddStep = function(planId, type) {
-  addStep(planId, type);
+// --- Goal-first step pickers ----------------------------------------------
+// Each step type has a pool helper (what goals are available?) and a picker
+// (two-step modal flow: pick goal, then pick mentor when there are multiple
+// candidates). All three pickers share the same shape — see openLearnTalentPicker
+// as the reference implementation.
+
+/**
+ * @param {Tribesman} trainee
+ * @returns {Array<{weapon: string, currentCap: number, ceiling: number, achievableCap: number, mentors: Array<{id: string, name: string, cap: number}>}>}
+ */
+function getCapRaisePool(trainee) {
+  if (!trainee) return [];
+  const classW = PROF_CLASS_WEAPONS[trainee.profession] || [];
+  const out = [];
+  for (const w of WEAPONS) {
+    const cur = trainee.weapons?.[w]?.cap;
+    if (cur == null) continue;
+    const ceiling = classW.includes(w) ? 125 : 100;
+    if (cur >= ceiling) continue;
+    const mentors = state.roster
+      .filter(m => m.id !== trainee.id)
+      .map(m => ({ id: m.id, name: m.name, cap: m.weapons?.[w]?.cap }))
+      .filter(x => x.cap && x.cap > cur)
+      .sort((a, b) => b.cap - a.cap || a.name.localeCompare(b.name));
+    if (!mentors.length) continue;
+    out.push({ weapon: w, currentCap: cur, ceiling, achievableCap: Math.min(mentors[0].cap, ceiling), mentors });
+  }
+  // Order by gap (biggest improvement first) so the most impactful goals are at the top.
+  return out.sort((a, b) => (b.achievableCap - b.currentCap) - (a.achievableCap - a.currentCap));
+}
+
+/**
+ * @param {Tribesman} trainee
+ * @returns {Array<{talent: string, currentLevel: number, achievableLevel: number, mentors: Array<{id: string, name: string, level: number}>}>}
+ */
+function getUpgradePool(trainee) {
+  if (!trainee) return [];
+  const out = [];
+  for (const tal of (trainee.talents || [])) {
+    if ((tal.level || 0) >= 3) continue;
+    const mentors = state.roster
+      .filter(m => m.id !== trainee.id)
+      .map(m => {
+        const mt = (m.talents || []).find(x => x.name === tal.name);
+        return mt ? { id: m.id, name: m.name, level: mt.level } : null;
+      })
+      .filter(x => x && x.level > tal.level)
+      .sort((a, b) => b.level - a.level || a.name.localeCompare(b.name));
+    if (!mentors.length) continue;
+    out.push({ talent: tal.name, currentLevel: tal.level, achievableLevel: Math.min(mentors[0].level, 3), mentors });
+  }
+  return out.sort((a, b) => a.talent.localeCompare(b.talent));
+}
+
+/**
+ * @param {TrainingPlan} plan
+ * @param {TrainingStep} [existingStep]
+ * @returns {Promise<TrainingStep|null>}
+ */
+async function openCapRaisePicker(plan, existingStep) {
+  const trainee = findTribesman(plan.traineeId);
+  if (!trainee) return null;
+  const pool = getCapRaisePool(trainee);
+  if (!pool.length) {
+    await showAlertModal({
+      title: 'No cap-raise opportunities',
+      message: `${trainee.name}'s weapon caps are at ceiling, or no mentor in the roster has a higher cap on a weapon they could train.`,
+    });
+    return null;
+  }
+
+  const weaponChoice = await showPickerModal({
+    title: 'Pick a weapon to raise',
+    message: `For ${trainee.name}. Sorted by improvement potential.`,
+    options: pool.map(p => ({
+      value: p.weapon,
+      label: p.weapon,
+      sublabel: `${p.currentCap} → up to ${p.achievableCap} (ceiling ${p.ceiling}) · ${p.mentors.length} mentor${p.mentors.length === 1 ? '' : 's'}`,
+    })),
+  });
+  if (!weaponChoice) return null;
+  const entry = pool.find(p => p.weapon === weaponChoice);
+  if (!entry) return null;
+
+  let mentorId;
+  if (entry.mentors.length === 1) {
+    mentorId = entry.mentors[0].id;
+  } else {
+    const choice = await showPickerModal({
+      title: `Pick a mentor for ${entry.weapon}`,
+      options: entry.mentors.map(m => ({
+        value: m.id,
+        label: m.name,
+        sublabel: `${entry.weapon} cap ${m.cap}`,
+      })),
+    });
+    if (!choice) return null;
+    mentorId = choice;
+  }
+
+  const mentorCap = state.roster.find(t => t.id === mentorId)?.weapons?.[entry.weapon]?.cap || entry.achievableCap;
+  const step = existingStep || newStep('cap-raise');
+  step.weapon = entry.weapon;
+  step.mentorId = mentorId;
+  step.targetCap = Math.min(mentorCap, entry.ceiling);
+  if (!existingStep) plan.steps.push(step);
+  saveState();
+  return step;
+}
+
+/**
+ * @param {TrainingPlan} plan
+ * @param {TrainingStep} [existingStep]
+ * @returns {Promise<TrainingStep|null>}
+ */
+async function openUpgradePicker(plan, existingStep) {
+  const trainee = findTribesman(plan.traineeId);
+  if (!trainee) return null;
+  const pool = getUpgradePool(trainee);
+  if (!pool.length) {
+    await showAlertModal({
+      title: 'Nothing to upgrade',
+      message: `${trainee.name} has no talents below Lv 3 with a higher-level mentor in the roster.`,
+    });
+    return null;
+  }
+
+  const talentChoice = await showPickerModal({
+    title: 'Pick a talent to upgrade',
+    message: `For ${trainee.name}. One step = one level (sequential).`,
+    options: pool.map(p => ({
+      value: p.talent,
+      label: p.talent,
+      sublabel: `Current Lv ${p.currentLevel} → next Lv ${p.currentLevel + 1} · ${p.mentors.length} mentor${p.mentors.length === 1 ? '' : 's'} (best Lv ${p.achievableLevel})`,
+    })),
+  });
+  if (!talentChoice) return null;
+  const entry = pool.find(p => p.talent === talentChoice);
+  if (!entry) return null;
+
+  let mentorId;
+  if (entry.mentors.length === 1) {
+    mentorId = entry.mentors[0].id;
+  } else {
+    const choice = await showPickerModal({
+      title: `Pick a mentor for ${entry.talent}`,
+      options: entry.mentors.map(m => ({
+        value: m.id,
+        label: m.name,
+        sublabel: `Has talent at Lv ${m.level}`,
+      })),
+    });
+    if (!choice) return null;
+    mentorId = choice;
+  }
+
+  const step = existingStep || newStep('upgrade');
+  step.talent = entry.talent;
+  step.mentorId = mentorId;
+  step.targetLevel = entry.currentLevel + 1;
+  if (!existingStep) plan.steps.push(step);
+  saveState();
+  return step;
+}
+
+/**
+ * Two-step picker for Learn steps: pick a talent first (every learnable
+ * talent in the trainee's mentor pool, deduped), then pick the mentor
+ * (auto-skipped if exactly one mentor offers the talent). Used both when
+ * adding a fresh Learn step and when changing the target on an existing one.
+ *
+ * @param {TrainingPlan} plan
+ * @param {TrainingStep} [existingStep] update in place if provided
+ * @returns {Promise<TrainingStep|null>} the created/updated step, or null on cancel
+ */
+async function openLearnTalentPicker(plan, existingStep) {
+  const trainee = findTribesman(plan.traineeId);
+  if (!trainee) return null;
+  const pool = getLearnTalentPool(trainee);
+  if (!pool.length) {
+    await showAlertModal({
+      title: 'No learnable talents',
+      message: `No mentors in the current roster have a positive talent ${trainee.name} could learn.`,
+    });
+    return null;
+  }
+
+  const talentChoice = await showPickerModal({
+    title: 'Pick a talent to learn',
+    message: `For ${trainee.name}. Each option lists how many mentors can teach it.`,
+    options: pool.map(t => ({
+      value: t.name,
+      label: t.name,
+      sublabel: `${t.mentors.length} mentor${t.mentors.length === 1 ? '' : 's'} · ${t.effect || 'no effect data'}`,
+    })),
+  });
+  if (!talentChoice) return null;
+
+  const entry = pool.find(t => t.name === talentChoice);
+  if (!entry) return null;
+
+  let mentorId;
+  if (entry.mentors.length === 1) {
+    mentorId = entry.mentors[0].id;
+  } else {
+    const choice = await showPickerModal({
+      title: `Pick a mentor for ${entry.name}`,
+      message: `${entry.mentors.length} mentors can teach this talent. The mentor's own level is shown — Learn lands at Lv I regardless.`,
+      options: entry.mentors.map(m => ({
+        value: m.id,
+        label: m.name,
+        sublabel: `Has talent at Lv ${m.level}`,
+      })),
+    });
+    if (!choice) return null;
+    mentorId = choice;
+  }
+
+  const step = existingStep || newStep('learn');
+  step.talent = entry.name;
+  step.mentorId = mentorId;
+  if (!existingStep) plan.steps.push(step);
+  saveState();
+  return step;
+}
+
+window.onAddStep = async function(planId, type) {
+  const plan = findPlan(planId);
+  if (!plan) return;
+  let step = null;
+  if (type === 'cap-raise')   step = await openCapRaisePicker(plan);
+  else if (type === 'upgrade') step = await openUpgradePicker(plan);
+  else if (type === 'learn')   step = await openLearnTalentPicker(plan);
+  else                          step = addStep(planId, type);
+  if (!step) return;
   if (state.selectedPlanId === planId) renderPlanEditor(planId);
 };
+
+// "Change target" handlers re-open the same picker for an existing step so
+// the user can swap the goal without nuking and re-adding.
+async function changeStepTarget(planId, stepId) {
+  const plan = findPlan(planId);
+  const step = findStep(plan, stepId);
+  if (!plan || !step) return;
+  if (step.type === 'cap-raise')   await openCapRaisePicker(plan, step);
+  else if (step.type === 'upgrade') await openUpgradePicker(plan, step);
+  else if (step.type === 'learn')   await openLearnTalentPicker(plan, step);
+  if (state.selectedPlanId === planId) renderPlanEditor(planId);
+}
+window.onChangeStepTarget = changeStepTarget;
+window.onChangeLearnTarget = changeStepTarget; // legacy alias
 
 window.onRemoveStep = async function(planId, stepId) {
   const ok = await showConfirmModal({
@@ -1633,15 +1880,26 @@ async function applyStepOutcomeToTrainee(plan, step) {
       return;
     }
 
+    // Promote the targeted talent to the top so the most likely outcome is the
+    // first option — the user often just clicks it.
+    const ordered = candidates.slice().sort((a, b) => {
+      if (a.name === step.talent) return -1;
+      if (b.name === step.talent) return 1;
+      return 0;
+    });
+
     const pick = await showPickerModal({
       title: `Which talent did ${trainee.name} learn?`,
-      message: 'Learn produces a random talent in-game; pick the one that actually landed.',
-      options: candidates.map(t => {
+      message: step.talent
+        ? `You targeted "${step.talent}". Confirm if it landed, or pick the actual roll.`
+        : 'Learn produces a random talent in-game; pick the one that actually landed.',
+      options: ordered.map(t => {
         const meta = talentMeta(t.name);
+        const isTarget = t.name === step.talent;
         return {
           value: t.name,
-          label: t.name,
-          sublabel: meta?.effect || '',
+          label: isTarget ? `${t.name}  ★` : t.name,
+          sublabel: (isTarget ? '(targeted) · ' : '') + (meta?.effect || ''),
         };
       }),
     });
@@ -1743,7 +2001,46 @@ window.onResetCalibration = async function() {
 // many fields pre-filled as the suggestion lets us. Mentor defaults to the
 // top candidate; user can swap it in the plan editor.
 /** @param {TrainingSuggestion} suggestion @returns {TrainingStep} */
-function suggestionToStep(suggestion) {
+/**
+ * For a trainee, returns the deduped pool of positive talents the trainee
+ * doesn't have and can legally learn, with every mentor that offers each one.
+ * Mentors per-talent are sorted highest-mentor-level first as a mastery signal
+ * (Learn always lands at Lv 1 in-game regardless of mentor level).
+ * @param {Tribesman} trainee
+ * @returns {Array<{name: string, effect: string, icon: string, mentors: Array<{id: string, name: string, level: number}>}>}
+ */
+function getLearnTalentPool(trainee) {
+  if (!trainee) return [];
+  const knownNames = new Set((trainee.talents || []).map(t => t.name));
+  /** @type {Map<string, {name: string, effect: string, icon: string, mentors: Array<{id: string, name: string, level: number}>}>} */
+  const acc = new Map();
+  for (const m of state.roster) {
+    if (m.id === trainee.id) continue;
+    for (const t of (m.talents || [])) {
+      const meta = talentMeta(t.name);
+      if (!meta || meta.polarity !== 'positive') continue;
+      if (knownNames.has(t.name)) continue;
+      if (!isLearnableBy(t.name, trainee)) continue;
+      let entry = acc.get(t.name);
+      if (!entry) {
+        entry = { name: t.name, effect: meta.effect || '', icon: meta.icon || t.icon || '', mentors: [] };
+        acc.set(t.name, entry);
+      }
+      entry.mentors.push({ id: m.id, name: m.name, level: t.level });
+    }
+  }
+  const out = [...acc.values()];
+  for (const e of out) e.mentors.sort((a, b) => b.level - a.level || a.name.localeCompare(b.name));
+  out.sort((a, b) => a.name.localeCompare(b.name));
+  return out;
+}
+
+/**
+ * @param {TrainingSuggestion} suggestion
+ * @param {Tribesman} [trainee] - required to seed Learn target talent
+ * @returns {TrainingStep}
+ */
+function suggestionToStep(suggestion, trainee) {
   const step = newStep(suggestion.type);
   step.mentorId = suggestion.mentorIds?.[0] || null;
   if (suggestion.type === 'cap-raise') {
@@ -1752,8 +2049,19 @@ function suggestionToStep(suggestion) {
   } else if (suggestion.type === 'upgrade') {
     step.talent = suggestion.talent;
     step.targetLevel = suggestion.targetLevel;
+  } else if (suggestion.type === 'learn' && trainee) {
+    // Pick a default target from the pool: highest top-mentor level, then
+    // alphabetical. User can swap via "Change target" in the editor.
+    const pool = getLearnTalentPool(trainee);
+    if (pool.length) {
+      const top = pool.slice().sort((a, b) =>
+        (b.mentors[0]?.level || 0) - (a.mentors[0]?.level || 0)
+        || a.name.localeCompare(b.name)
+      )[0];
+      step.talent = top.name;
+      step.mentorId = top.mentors[0].id;
+    }
   }
-  // 'learn' has no extra fields beyond mentor (random outcome in-game)
   return step;
 }
 
@@ -1782,7 +2090,7 @@ function suggestPlanFor(traineeId) {
   const ordered = [...capRaises, ...learns, ...upgrades].slice(0, SUGGEST_PLAN_STEP_BUDGET);
 
   const plan = createPlan(traineeId, `${trainee.name} — suggested plan`);
-  for (const s of ordered) plan.steps.push(suggestionToStep(s));
+  for (const s of ordered) plan.steps.push(suggestionToStep(s, trainee));
   saveState();
   return plan;
 }
@@ -1852,8 +2160,16 @@ window.onAddSuggestionToPlan = async function(traineeId, suggestionIndex) {
     if (!plan) return;
   }
 
-  plan.steps.push(suggestionToStep(suggestion));
-  saveState();
+  // Learn suggestion is the lumped "you could learn N more talents" entry —
+  // route it through the talent-first picker so the user picks a specific
+  // target rather than getting an empty Learn step.
+  if (suggestion.type === 'learn') {
+    const step = await openLearnTalentPicker(plan);
+    if (!step) return;
+  } else {
+    plan.steps.push(suggestionToStep(suggestion, trainee));
+    saveState();
+  }
   ui.showPlan(plan.id);
 };
 
@@ -2008,15 +2324,26 @@ function renderPlanStep(plan, step, index) {
       ))
     );
   } else if (step.type === 'learn' && trainee) {
-    const knownNames = new Set((trainee.talents || []).map(t => t.name));
-    eligibleMentors = mentors.filter(m =>
-      (m.talents || []).some(t => {
-        const meta = talentMeta(t.name);
-        return meta && meta.polarity === 'positive'
-          && !knownNames.has(t.name)
-          && isLearnableBy(t.name, trainee);
-      })
-    );
+    if (step.talent) {
+      // Once a target is set, only mentors who actually have that talent are
+      // valid for this step. Lets the user swap mentor without abandoning the
+      // target.
+      eligibleMentors = mentors.filter(m =>
+        (m.talents || []).some(t => t.name === step.talent)
+      );
+    } else {
+      // No target picked yet — fall back to "any mentor who could teach
+      // anything". Rare since the picker is now the entry point for Learn.
+      const knownNames = new Set((trainee.talents || []).map(t => t.name));
+      eligibleMentors = mentors.filter(m =>
+        (m.talents || []).some(t => {
+          const meta = talentMeta(t.name);
+          return meta && meta.polarity === 'positive'
+            && !knownNames.has(t.name)
+            && isLearnableBy(t.name, trainee);
+        })
+      );
+    }
   }
 
   const mentorOpts = [`<option value="">— pick mentor —</option>`]
@@ -2076,30 +2403,39 @@ function renderPlanStep(plan, step, index) {
       </select>
       ${upgradePreview}`;
   } else if (step.type === 'learn') {
-    // List the actual learnable talents the mentor brings to the table, not
-    // just the static "random talent" placeholder. Without a mentor, fall
-    // back to the placeholder copy.
-    let learnPreview = `<span class="muted small">Random talent (Lv I) drawn from mentor's eligible positive talents.</span>`;
-    if (mentor && trainee) {
-      const knownNames = new Set((trainee.talents || []).map(t => t.name));
-      const eligible = (mentor.talents || []).filter(t => {
-        const meta = talentMeta(t.name);
-        return meta && meta.polarity === 'positive'
-          && !knownNames.has(t.name)
-          && isLearnableBy(t.name, trainee);
-      });
-      if (eligible.length) {
-        // Display level shows the mentor's level (for tooltip context), even
-        // though Learn always lands at Lv I in-game.
-        learnPreview = `<div class="plan-step-talent-preview">
-          ${renderTalentIconRow(eligible)}
-          <span class="muted small">${eligible.length} possible outcome${eligible.length === 1 ? '' : 's'} · all land at Lv I</span>
-        </div>`;
-      } else {
-        learnPreview = `<span class="muted small">${escapeHtml(mentor.name)} has no learnable talents for this trainee.</span>`;
+    // Targeted Learn: show the goal talent prominently, plus the other
+    // talents the mentor's pool might roll instead (Learn is random in-game).
+    if (!step.talent) {
+      // Legacy / unset — let user open the picker.
+      subject = `<span class="muted small">No target talent picked yet.</span>
+        <button class="small" onclick="onChangeStepTarget('${plan.id}','${step.id}')">Pick a target</button>`;
+    } else {
+      const targetMeta = talentMeta(step.talent);
+      const targetIcon = renderTalentIconRow([{ name: step.talent, level: 1, icon: targetMeta?.icon }]);
+      let othersHtml = '';
+      if (mentor && trainee) {
+        const knownNames = new Set((trainee.talents || []).map(t => t.name));
+        const others = (mentor.talents || []).filter(t => {
+          if (t.name === step.talent) return false;
+          const tm = talentMeta(t.name);
+          return tm && tm.polarity === 'positive'
+            && !knownNames.has(t.name)
+            && isLearnableBy(t.name, trainee);
+        });
+        if (others.length) {
+          othersHtml = `<div class="learn-other-outcomes">
+            <span class="muted small">Other possible rolls (${others.length}) from this mentor:</span>
+            ${renderTalentIconRow(others)}
+          </div>`;
+        }
       }
+      subject = `<div class="plan-step-talent-preview">
+          ${targetIcon}
+          <span class="muted small"><b>Target:</b> ${escapeHtml(step.talent)} · all rolls land at Lv I</span>
+          <button class="small" onclick="onChangeStepTarget('${plan.id}','${step.id}')">Change target</button>
+        </div>
+        ${othersHtml}`;
     }
-    subject = learnPreview;
   }
 
   const statusBtns = STEP_STATUSES.map(st =>
