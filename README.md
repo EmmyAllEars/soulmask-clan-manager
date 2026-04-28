@@ -5,8 +5,10 @@ runs anywhere — locally, on GitHub Pages, or any static host.
 
 **Live site:** <https://emmyallears.github.io/soulmask-clan-manager/>
 
-> v0.0.1 — first cut, generated with Claude Cowork. Expect rough edges; please open
-> issues at <https://github.com/EmmyAllEars/soulmask-clan-manager/issues>.
+> See [CHANGELOG.md](./CHANGELOG.md) for release notes. The app is iterated
+> via individual PRs against `main`; there's no tag/release ceremony — the
+> footer's version label is the running number.
+> Issues: <https://github.com/EmmyAllEars/soulmask-clan-manager/issues>.
 
 ## Features
 

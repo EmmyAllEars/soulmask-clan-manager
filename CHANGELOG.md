@@ -4,6 +4,11 @@ All notable changes to **Soulmask Clan Manager** are listed here. Versions
 follow loose semver: a major feature ships as a minor bump (`0.5.0`), small
 fixes/polish stack as patch bumps (`0.5.1`).
 
+There are no git tags or GitHub Releases — the app iterates via PRs against
+`main` and deploys straight from `main` via GitHub Pages. \`APP_VERSION\` in
+`app.js` is the running number (visible in the footer, used as the cache-bust
+query string for the script/style refs, and auto-filled in bug reports).
+
 The live app is at <https://emmyallears.github.io/soulmask-clan-manager/>.
 
 ---
