@@ -13,6 +13,64 @@ The live app is at <https://emmyallears.github.io/soulmask-clan-manager/>.
 
 ---
 
+## v1.0.0 — Full talent catalog ([#46][])
+
+The talent catalog grew from 253 to **551 entries**, covering every Preference,
+Origin, Title, Personality, and Tribe Exclusive talent the in-game scrape
+exposes. With the catalog now considered complete, the running version moves
+out of the 0.x range to **1.0**.
+
+### Added
+
+- **Five polarity buckets** instead of two. Each gets its own border colour:
+  - `positive` — default, no border tint, counts toward the 6-talent cap
+  - `negative` — red, defects (e.g. Slow Pace, Weak Attack)
+  - `preference` — purple/pink, Preferences and Personalities (e.g. Likes
+    camel, Personality: Cautious)
+  - `origin` — amber, fixed-at-birth Origin talents (e.g. Origin - Hunting)
+  - `title` — blue/grey, earned Titles (e.g. Archery Master)
+- **~110 new talent icons** fetched + converted from the upstream scrape —
+  every entry in the new catalog has a working icon at lowercase `.webp`
+  (so GitHub Pages' case-sensitive serving works the same as the local
+  case-insensitive disk).
+- **`tools/generate-talents/`** — committed Node generator that rebuilds
+  `data/talents.json` from a frozen upstream scrape (`source/soulmask_talents_551.json`)
+  plus a curated-overrides snapshot (`source/curated_overrides.json`,
+  preserving hand-tagged polarity for the original 253 entries). Companion
+  `fetch-icons.mjs` downloads + converts any missing icons via `cwebp`
+  (`brew install webp`). Both scripts are idempotent so future scrape
+  refreshes just need a re-run.
+
+### Changed
+
+- The 6-positive-talent cap now correctly excludes preferences, origins, and
+  titles (none of which are chosen by the player, so they shouldn't eat
+  trait slots).
+- Mentor-eligibility filtering already excluded the new buckets via the
+  existing `polarity === 'positive'` predicate — no change needed.
+- The combined "Limb / Torso / Head / Tail Destruction" entry is split into
+  four per-part records, matching the in-game data. Same for "Head / Arm /
+  Torso / Thigh Stress Response" → four separate stress-response talents.
+
+### Migration
+
+- `STORAGE_VERSION` 2 → 3. On first load after the update, a boot-time
+  reconciler walks every tribesman's talents and:
+  1. **Renames** old curated names whose only difference from the new
+     catalog is the trailing `— [Class Exclusive]` suffix (e.g. `"Accelerate
+     Alchemy — [Craftsman Exclusive]"` → `"Accelerate Alchemy"`). Em-dash
+     ↔ hyphen-minus is also normalized so `"Attack-Defense Resonance —
+     Attack"` finds `"Attack-Defense Resonance - Attack"`.
+  2. **Drops** any name that still doesn't resolve — typically the
+     combined records that got split (e.g. `"Limb / Torso / Head / Tail
+     Destruction"` → re-add the specific per-part variant).
+  A single alert surfaces both lists on first load. The bundled default
+  roster gets ~17 renames + 3 drops, all reported.
+
+[#46]: https://github.com/EmmyAllEars/soulmask-clan-manager/issues/46
+
+---
+
 ## v0.5.0 — Training Plans
 
 The diagnostic-only Training Suggestions card now has a commitment counterpart:
