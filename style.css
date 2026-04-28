@@ -846,9 +846,13 @@ a.suggestion-in-plan:hover { filter: brightness(1.15); text-decoration: underlin
 
 /* Step with a missing mentor (cascade-delete leftover) */
 .plan-step.mentor-missing { border-left-color: var(--red); }
+.plan-step.mentor-too-low { border-left-color: var(--tier-specialist); }
 .plan-step .step-warn {
   color: var(--red); font-size: 11px; text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+.plan-step.mentor-too-low .step-warn {
+  color: var(--tier-specialist); /* yellow — softer than mentor-missing red */
 }
 .plan-step .step-applied {
   color: var(--tier-iron); font-size: 11px; text-transform: uppercase;

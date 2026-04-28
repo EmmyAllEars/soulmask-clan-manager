@@ -45,6 +45,11 @@ const PROF_BEST_SKILLS = {
   Craftsman: ['Craftsman','Alchemist','Cook','Blacksmith','Armorer'],
   Warrior: [], Hunter: [], Guard: [],
 };
+// In-game restriction: only level-50 tribesmen can be assigned as mentors in
+// the Training Ground. Used by the picker pools, suggestion logic, and the
+// step renderer's eligible-mentor filter.
+const MENTOR_MIN_LEVEL = 50;
+
 // Profession class weapons (cap can train up to 125 in Training Ground)
 const PROF_CLASS_WEAPONS = {
   Warrior: ['Dual-blade','Hammer','Blade','Great Sword','Gauntlets'],
@@ -243,6 +248,16 @@ const MATERIAL_NAMES = { 1:'Beast Hide', 2:'Bronze', 3:'Iron', 4:'Steel', 5:'End
  * @param {string} weapon
  * @returns {number} 125 if class weapon, else 100
  */
+/**
+ * Whether a tribesman is high-enough level to be assigned as a mentor in the
+ * Training Ground (in-game requirement: Lv 50).
+ * @param {Tribesman|null|undefined} m
+ * @returns {boolean}
+ */
+function isMentorEligible(m) {
+  return !!m && (m.level || 0) >= MENTOR_MIN_LEVEL;
+}
+
 function weaponCeiling(profession, weapon) {
   const cls = PROF_CLASS_WEAPONS[profession] || [];
   return cls.includes(weapon) ? 125 : 100;
@@ -1511,6 +1526,12 @@ window.planFieldUpd = function(id, field, value) {
   refreshNavPlanLabel();
 };
 
+// Fields that don't affect any derived display — saving them mustn't trigger
+// a re-render (which would kill text-input focus mid-typing). Other fields
+// (mentor, weapon, target, material) DO need re-render to refresh durations
+// and filtered dropdowns.
+const STEP_FIELDS_NO_RERENDER = new Set(['note']);
+
 window.stepFieldUpd = function(planId, stepId, field, value) {
   const plan = findPlan(planId);
   const s = findStep(plan, stepId);
@@ -1524,7 +1545,9 @@ window.stepFieldUpd = function(planId, stepId, field, value) {
     s[field] = value;
   }
   saveState();
-  // Re-render the editor so derived fields (estimated time, dropdown defaults) update
+  // Re-render the editor so derived fields (estimated time, dropdown defaults)
+  // update — except for fields where the user is mid-typing (note).
+  if (STEP_FIELDS_NO_RERENDER.has(field)) return;
   if (state.selectedPlanId === planId) renderPlanEditor(planId);
 };
 
@@ -1533,6 +1556,48 @@ window.stepFieldUpd = function(planId, stepId, field, value) {
 // (two-step modal flow: pick goal, then pick mentor when there are multiple
 // candidates). All three pickers share the same shape — see openLearnTalentPicker
 // as the reference implementation.
+//
+// "Projected state" lets a picker reflect the trainee's expected state at the
+// point in the plan where this step would land — so a user can queue an
+// Upgrade for a talent that an earlier Learn step in the same plan will
+// produce, before they've actually learned it. Only forward-looking steps
+// (queued/running, no appliedAt) are projected; completed-and-applied steps
+// are already in trainee.* and don't need re-projection; abandoned steps are
+// skipped.
+
+/**
+ * @param {TrainingPlan} plan
+ * @param {TrainingStep} [beforeStep] - if set, project up to but not including this step's index
+ * @returns {Tribesman|null} a deep clone of the trainee with the plan's prior steps applied
+ */
+function projectTraineeState(plan, beforeStep) {
+  const real = findTribesman(plan.traineeId);
+  if (!real) return null;
+  /** @type {Tribesman} */
+  const projected = JSON.parse(JSON.stringify(real));
+  const stopAt = beforeStep ? plan.steps.indexOf(beforeStep) : plan.steps.length;
+  for (let i = 0; i < (stopAt < 0 ? plan.steps.length : stopAt); i++) {
+    const s = plan.steps[i];
+    if (s.status === 'abandoned' || s.appliedAt) continue;
+    if (s.type === 'cap-raise' && s.weapon && s.targetCap != null) {
+      projected.weapons = projected.weapons || {};
+      projected.weapons[s.weapon] = projected.weapons[s.weapon] || { current: null, cap: null };
+      const cur = projected.weapons[s.weapon].cap ?? 0;
+      if (s.targetCap > cur) projected.weapons[s.weapon].cap = s.targetCap;
+    } else if (s.type === 'upgrade' && s.talent && s.targetLevel != null) {
+      projected.talents = projected.talents || [];
+      const tal = projected.talents.find(t => t.name === s.talent);
+      if (tal && s.targetLevel > (tal.level || 0)) tal.level = s.targetLevel;
+    } else if (s.type === 'learn' && s.talent) {
+      projected.talents = projected.talents || [];
+      if (!projected.talents.some(t => t.name === s.talent)) {
+        const meta = talentMeta(s.talent);
+        projected.talents.push({ name: s.talent, level: 1, icon: meta?.icon || '' });
+      }
+    }
+  }
+  return projected;
+}
 
 /**
  * @param {Tribesman} trainee
@@ -1549,11 +1614,16 @@ function getCapRaisePool(trainee) {
     if (cur >= ceiling) continue;
     const mentors = state.roster
       .filter(m => m.id !== trainee.id)
-      .map(m => ({ id: m.id, name: m.name, cap: m.weapons?.[w]?.cap }))
+      .map(m => ({ id: m.id, name: m.name, level: m.level || 0, cap: m.weapons?.[w]?.cap, eligible: isMentorEligible(m) }))
       .filter(x => x.cap && x.cap > cur)
-      .sort((a, b) => b.cap - a.cap || a.name.localeCompare(b.name));
+      // Eligible (level-50) mentors first; within each group, highest cap first.
+      .sort((a, b) => Number(b.eligible) - Number(a.eligible) || b.cap - a.cap || a.name.localeCompare(b.name));
     if (!mentors.length) continue;
-    out.push({ weapon: w, currentCap: cur, ceiling, achievableCap: Math.min(mentors[0].cap, ceiling), mentors });
+    // achievableCap reflects what the BEST eligible mentor can train up to —
+    // if no mentor is currently eligible, fall back to the top sub-50 mentor's
+    // cap (as an "after you level them" preview).
+    const topEligible = mentors.find(m => m.eligible) || mentors[0];
+    out.push({ weapon: w, currentCap: cur, ceiling, achievableCap: Math.min(topEligible.cap, ceiling), mentors });
   }
   // Order by gap (biggest improvement first) so the most impactful goals are at the top.
   return out.sort((a, b) => (b.achievableCap - b.currentCap) - (a.achievableCap - a.currentCap));
@@ -1572,12 +1642,13 @@ function getUpgradePool(trainee) {
       .filter(m => m.id !== trainee.id)
       .map(m => {
         const mt = (m.talents || []).find(x => x.name === tal.name);
-        return mt ? { id: m.id, name: m.name, level: mt.level } : null;
+        return mt ? { id: m.id, name: m.name, mentorLevel: m.level || 0, level: mt.level, eligible: isMentorEligible(m) } : null;
       })
       .filter(x => x && x.level > tal.level)
-      .sort((a, b) => b.level - a.level || a.name.localeCompare(b.name));
+      .sort((a, b) => Number(b.eligible) - Number(a.eligible) || b.level - a.level || a.name.localeCompare(b.name));
     if (!mentors.length) continue;
-    out.push({ talent: tal.name, currentLevel: tal.level, achievableLevel: Math.min(mentors[0].level, 3), mentors });
+    const topEligible = mentors.find(m => m.eligible) || mentors[0];
+    out.push({ talent: tal.name, currentLevel: tal.level, achievableLevel: Math.min(topEligible.level, 3), mentors });
   }
   return out.sort((a, b) => a.talent.localeCompare(b.talent));
 }
@@ -1590,7 +1661,10 @@ function getUpgradePool(trainee) {
 async function openCapRaisePicker(plan, existingStep) {
   const trainee = findTribesman(plan.traineeId);
   if (!trainee) return null;
-  const pool = getCapRaisePool(trainee);
+  // Project the trainee through any prior steps in the plan so cap raises
+  // already queued earlier in the plan don't reappear here.
+  const projected = projectTraineeState(plan, existingStep) || trainee;
+  const pool = getCapRaisePool(projected);
   if (!pool.length) {
     await showAlertModal({
       title: 'No cap-raise opportunities',
@@ -1602,11 +1676,16 @@ async function openCapRaisePicker(plan, existingStep) {
   const weaponChoice = await showPickerModal({
     title: 'Pick a weapon to raise',
     message: `For ${trainee.name}. Sorted by improvement potential.`,
-    options: pool.map(p => ({
-      value: p.weapon,
-      label: p.weapon,
-      sublabel: `${p.currentCap} → up to ${p.achievableCap} (ceiling ${p.ceiling}) · ${p.mentors.length} mentor${p.mentors.length === 1 ? '' : 's'}`,
-    })),
+    options: pool.map(p => {
+      const ready = p.mentors.filter(m => m.eligible).length;
+      const total = p.mentors.length;
+      const mentorTxt = ready === total ? `${total} mentor${total === 1 ? '' : 's'}` : `${ready}/${total} mentor${total === 1 ? '' : 's'} ready (others need Lv ${MENTOR_MIN_LEVEL})`;
+      return {
+        value: p.weapon,
+        label: p.weapon,
+        sublabel: `${p.currentCap} → up to ${p.achievableCap} (ceiling ${p.ceiling}) · ${mentorTxt}`,
+      };
+    }),
   });
   if (!weaponChoice) return null;
   const entry = pool.find(p => p.weapon === weaponChoice);
@@ -1620,8 +1699,8 @@ async function openCapRaisePicker(plan, existingStep) {
       title: `Pick a mentor for ${entry.weapon}`,
       options: entry.mentors.map(m => ({
         value: m.id,
-        label: m.name,
-        sublabel: `${entry.weapon} cap ${m.cap}`,
+        label: m.eligible ? m.name : `${m.name}  (Lv ${m.level} — ⚠ needs Lv ${MENTOR_MIN_LEVEL})`,
+        sublabel: `${entry.weapon} cap ${m.cap}` + (m.eligible ? '' : ` · level them up first`),
       })),
     });
     if (!choice) return null;
@@ -1646,7 +1725,12 @@ async function openCapRaisePicker(plan, existingStep) {
 async function openUpgradePicker(plan, existingStep) {
   const trainee = findTribesman(plan.traineeId);
   if (!trainee) return null;
-  const pool = getUpgradePool(trainee);
+  // Project the trainee through any prior steps so a Learn step earlier in
+  // the plan can produce a talent that this Upgrade then bumps. Lets the
+  // user queue "Learn X then Upgrade X to Lv 2 to Lv 3" without first
+  // actually learning X.
+  const projected = projectTraineeState(plan, existingStep) || trainee;
+  const pool = getUpgradePool(projected);
   if (!pool.length) {
     await showAlertModal({
       title: 'Nothing to upgrade',
@@ -1658,11 +1742,16 @@ async function openUpgradePicker(plan, existingStep) {
   const talentChoice = await showPickerModal({
     title: 'Pick a talent to upgrade',
     message: `For ${trainee.name}. One step = one level (sequential).`,
-    options: pool.map(p => ({
-      value: p.talent,
-      label: p.talent,
-      sublabel: `Current Lv ${p.currentLevel} → next Lv ${p.currentLevel + 1} · ${p.mentors.length} mentor${p.mentors.length === 1 ? '' : 's'} (best Lv ${p.achievableLevel})`,
-    })),
+    options: pool.map(p => {
+      const ready = p.mentors.filter(m => m.eligible).length;
+      const total = p.mentors.length;
+      const mentorTxt = ready === total ? `${total} mentor${total === 1 ? '' : 's'}` : `${ready}/${total} mentor${total === 1 ? '' : 's'} ready (others need Lv ${MENTOR_MIN_LEVEL})`;
+      return {
+        value: p.talent,
+        label: p.talent,
+        sublabel: `Current Lv ${p.currentLevel} → next Lv ${p.currentLevel + 1} · ${mentorTxt} (best Lv ${p.achievableLevel})`,
+      };
+    }),
   });
   if (!talentChoice) return null;
   const entry = pool.find(p => p.talent === talentChoice);
@@ -1676,8 +1765,8 @@ async function openUpgradePicker(plan, existingStep) {
       title: `Pick a mentor for ${entry.talent}`,
       options: entry.mentors.map(m => ({
         value: m.id,
-        label: m.name,
-        sublabel: `Has talent at Lv ${m.level}`,
+        label: m.eligible ? m.name : `${m.name}  (Lv ${m.mentorLevel} — ⚠ needs Lv ${MENTOR_MIN_LEVEL})`,
+        sublabel: `Has talent at Lv ${m.level}` + (m.eligible ? '' : ` · level them up first`),
       })),
     });
     if (!choice) return null;
@@ -1706,7 +1795,10 @@ async function openUpgradePicker(plan, existingStep) {
 async function openLearnTalentPicker(plan, existingStep) {
   const trainee = findTribesman(plan.traineeId);
   if (!trainee) return null;
-  const pool = getLearnTalentPool(trainee);
+  // Project so previously-queued Learn steps drop their target talents from
+  // the pool — no point offering to learn the same thing twice.
+  const projected = projectTraineeState(plan, existingStep) || trainee;
+  const pool = getLearnTalentPool(projected);
   if (!pool.length) {
     await showAlertModal({
       title: 'No learnable talents',
@@ -1717,12 +1809,17 @@ async function openLearnTalentPicker(plan, existingStep) {
 
   const talentChoice = await showPickerModal({
     title: 'Pick a talent to learn',
-    message: `For ${trainee.name}. Each option lists how many mentors can teach it.`,
-    options: pool.map(t => ({
-      value: t.name,
-      label: t.name,
-      sublabel: `${t.mentors.length} mentor${t.mentors.length === 1 ? '' : 's'} · ${t.effect || 'no effect data'}`,
-    })),
+    message: `For ${trainee.name}. Each option shows mentor readiness — entries with all mentors below Lv ${MENTOR_MIN_LEVEL} need levelling first.`,
+    options: pool.map(t => {
+      const ready = t.mentors.filter(m => m.eligible).length;
+      const total = t.mentors.length;
+      const mentorTxt = ready === total ? `${total} mentor${total === 1 ? '' : 's'}` : `${ready}/${total} mentor${total === 1 ? '' : 's'} ready`;
+      return {
+        value: t.name,
+        label: t.name,
+        sublabel: `${mentorTxt} · ${t.effect || 'no effect data'}`,
+      };
+    }),
   });
   if (!talentChoice) return null;
 
@@ -1735,11 +1832,11 @@ async function openLearnTalentPicker(plan, existingStep) {
   } else {
     const choice = await showPickerModal({
       title: `Pick a mentor for ${entry.name}`,
-      message: `${entry.mentors.length} mentors can teach this talent. The mentor's own level is shown — Learn lands at Lv I regardless.`,
+      message: `${entry.mentors.length} mentors can teach this talent. Mentors flagged ⚠ are below Lv ${MENTOR_MIN_LEVEL} and need to be levelled before they can train anyone.`,
       options: entry.mentors.map(m => ({
         value: m.id,
-        label: m.name,
-        sublabel: `Has talent at Lv ${m.level}`,
+        label: m.eligible ? m.name : `${m.name}  (Lv ${m.mentorLevel} — ⚠ needs Lv ${MENTOR_MIN_LEVEL})`,
+        sublabel: `Has talent at Lv ${m.level}` + (m.eligible ? '' : ` · level them up first`),
       })),
     });
     if (!choice) return null;
@@ -2012,7 +2109,7 @@ window.onResetCalibration = async function() {
 function getLearnTalentPool(trainee) {
   if (!trainee) return [];
   const knownNames = new Set((trainee.talents || []).map(t => t.name));
-  /** @type {Map<string, {name: string, effect: string, icon: string, mentors: Array<{id: string, name: string, level: number}>}>} */
+  /** @type {Map<string, {name: string, effect: string, icon: string, mentors: Array<{id: string, name: string, mentorLevel: number, level: number, eligible: boolean}>}>} */
   const acc = new Map();
   for (const m of state.roster) {
     if (m.id === trainee.id) continue;
@@ -2026,11 +2123,11 @@ function getLearnTalentPool(trainee) {
         entry = { name: t.name, effect: meta.effect || '', icon: meta.icon || t.icon || '', mentors: [] };
         acc.set(t.name, entry);
       }
-      entry.mentors.push({ id: m.id, name: m.name, level: t.level });
+      entry.mentors.push({ id: m.id, name: m.name, mentorLevel: m.level || 0, level: t.level, eligible: isMentorEligible(m) });
     }
   }
   const out = [...acc.values()];
-  for (const e of out) e.mentors.sort((a, b) => b.level - a.level || a.name.localeCompare(b.name));
+  for (const e of out) e.mentors.sort((a, b) => Number(b.eligible) - Number(a.eligible) || b.level - a.level || a.name.localeCompare(b.name));
   out.sort((a, b) => a.name.localeCompare(b.name));
   return out;
 }
@@ -2310,6 +2407,8 @@ function renderPlanStep(plan, step, index) {
   const dur = fmtMinutes(estimateStepMin(step));
   const label = PLAN_STEP_LABELS[step.type] || step.type;
   const mentorMissing = step.mentorId && !findTribesman(step.mentorId);
+  const assignedMentor = step.mentorId ? findTribesman(step.mentorId) : null;
+  const mentorTooLow = !!assignedMentor && !isMentorEligible(assignedMentor);
 
   // Build mentor candidates per step type
   const mentors = state.roster.filter(m => m.id !== plan.traineeId);
@@ -2346,15 +2445,23 @@ function renderPlanStep(plan, step, index) {
     }
   }
 
+  // Sort eligible (Lv MENTOR_MIN_LEVEL+) candidates first; sub-level mentors
+  // stay in the list with a "(Lv X — needs Lv 50)" suffix so they can still be
+  // picked but the constraint is visible at a glance.
+  const sortedMentors = eligibleMentors.slice().sort((a, b) =>
+    Number(isMentorEligible(b)) - Number(isMentorEligible(a))
+    || (a.name || '').localeCompare(b.name || '')
+  );
   const mentorOpts = [`<option value="">— pick mentor —</option>`]
-    .concat(eligibleMentors.map(m => {
+    .concat(sortedMentors.map(m => {
       let detail = '';
       if (step.type === 'cap-raise' && step.weapon) detail = ` (${step.weapon} ${m.weapons?.[step.weapon]?.cap || '—'})`;
       else if (step.type === 'upgrade' && step.talent) {
         const t = (m.talents||[]).find(tt => tt.name === step.talent);
         detail = t ? ` (Lv ${t.level})` : '';
       }
-      return `<option value="${m.id}" ${m.id === step.mentorId ? 'selected' : ''}>${escapeHtml(m.name)}${escapeHtml(detail)}</option>`;
+      const levelSuffix = isMentorEligible(m) ? '' : ` — Lv ${m.level || 0} ⚠ needs Lv ${MENTOR_MIN_LEVEL}`;
+      return `<option value="${m.id}" ${m.id === step.mentorId ? 'selected' : ''}>${escapeHtml(m.name)}${escapeHtml(detail)}${escapeHtml(levelSuffix)}</option>`;
     })).join('');
 
   // Type-specific subject pickers
@@ -2450,12 +2557,13 @@ function renderPlanStep(plan, step, index) {
     ? `<button class="small" onclick="onApplyStepOutcome('${plan.id}','${step.id}')" title="Re-prompt for the talent that was learned">Apply outcome</button>`
     : '';
 
-  return `<div class="plan-step plan-step-${step.type} status-${step.status}${mentorMissing ? ' mentor-missing' : ''}${applied ? ' applied' : ''}">
+  return `<div class="plan-step plan-step-${step.type} status-${step.status}${mentorMissing ? ' mentor-missing' : ''}${mentorTooLow ? ' mentor-too-low' : ''}${applied ? ' applied' : ''}">
     <div class="plan-step-head">
       <span class="step-num">#${index + 1}</span>
       <span class="step-type">${label}</span>
       <span class="step-dur">${dur}</span>
       ${mentorMissing ? '<span class="step-warn">⚠ mentor missing</span>' : ''}
+      ${mentorTooLow ? `<span class="step-warn" title="${escapeHtml(assignedMentor.name)} is Lv ${assignedMentor.level || 0}; mentors must be Lv ${MENTOR_MIN_LEVEL} to train.">⚠ mentor needs Lv ${MENTOR_MIN_LEVEL}</span>` : ''}
       ${applied ? '<span class="step-applied" title="Outcome pushed to trainee">✓ applied</span>' : ''}
       ${applyBtn}
       <span class="grow"></span>
