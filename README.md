@@ -61,6 +61,8 @@ ClanManager/
 │   ├── talents.json        # 252 talents catalog (parsed from TALENTS_REFERENCE.md)
 │   └── default_roster.json # 25-tribesman starter roster
 ├── icons/                  # 251 talent icon WebP files
+├── tools/
+│   └── import-world-db/    # Node CLI: refresh roster from a live Soulmask server (RCON)
 └── README.md               # this file
 ```
 
@@ -108,6 +110,24 @@ groups, tags, talents
 When you Import CSV, the same format is expected. Rows missing fields use defaults.
 **Import REPLACES the entire roster.** Use JSON Backup before importing if you want
 to be safe.
+
+### Importing from a live Soulmask server
+
+If your server is hosted on BisectHosting (or any Pterodactyl-style panel with
+the [Bisect Starbase MCP](https://github.com/EmmyAllEars/BisectHosting-Starbase-MCP)
+configured), there is a Node CLI under [`tools/import-world-db/`](tools/import-world-db/)
+that:
+
+- pulls the current clan roster from the game's RCON (`lgo <guild_uid>`),
+- merges it with your existing `clan_backup.json` — preserving every curated
+  field on tribesmen you've already keyed in,
+- adds blank skeletons for new captures,
+- optionally bumps weapon caps and talent levels using a copy-paste of the
+  in-game **Training ground** log,
+- writes a new `clan_backup.json` you load via the **Restore JSON** button.
+
+See [`tools/import-world-db/README.md`](tools/import-world-db/README.md) for
+the full workflow. No `npm install` — plain Node 18+.
 
 ## Mechanics references baked into the app
 
