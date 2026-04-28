@@ -6,6 +6,15 @@ attach screenshots of one or more tribesmen's **Character → Ability** and
 `clan-screenshot-patch-v1` JSON document you save to a file and feed to
 `apply-patch.js`.
 
+> **Preprocess your screenshots first.** Run
+> `tools/import-world-db/preprocess-screenshots.js` against your raw
+> screenshot folder and attach the cropped output to the Claude session.
+> Without cropping, the small `current/cap` numbers in the Proficiency tab
+> get downsampled into ambiguous blobs and misread rates spike (1/7, 3/8,
+> 5/6 confusions on the order of one per tribesman). The README's
+> "Refreshing skills, weapons, and stats from screenshots" section
+> documents the full workflow.
+
 > **Why a separate prompt instead of embedding it in the CLI:** vision is
 > Claude's job, not Node's. Keeping the extraction in a Claude session means
 > it works in any environment with Claude available, doesn't require an API
