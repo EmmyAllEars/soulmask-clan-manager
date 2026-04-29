@@ -90,6 +90,10 @@ function inferPolarity({ scrapeCategory, name, curatedPolarity }) {
   if (scrapeCategory === 'Origin') return 'origin';
   if (scrapeCategory === 'Title') return 'title';
   if (scrapeCategory === 'Preference' || scrapeCategory === 'Personality') return 'preference';
+  // Tribe-locked and Experience entries are born-with traits — treated as
+  // origin for polarity purposes (not counted toward the 6-positive cap and
+  // not learnable from a mentor). Only green-icon positives are teachable.
+  if (scrapeCategory === 'Tribe Exclusive' || scrapeCategory === 'Experience') return 'origin';
   // 2. Curated override (preserves the 31 hand-tagged negatives).
   if (curatedPolarity) return curatedPolarity;
   // 3. Body-defect keyword leaders.

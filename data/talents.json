@@ -4476,7 +4476,7 @@
     "prereq": null,
     "icon": "icon_ng_jingli_nengzhengshanzhan.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_JingLi_nengzhengshanzhan.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-700011",
     "tiers": {
       "★": {
@@ -8814,7 +8814,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_liufangzhe.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_liufangzhe.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "outcast-cold-resist-1star-420401",
     "tiers": {
       "★": {
@@ -8841,7 +8841,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_liufangzhe.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_liufangzhe.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "outcast-radiation-resist-1star-420711",
     "tiers": {
       "★": {
@@ -8868,7 +8868,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_liufangzhe.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_liufangzhe.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "outcast-scorching-heat-resist-1star-420701",
     "tiers": {
       "★": {
@@ -11904,7 +11904,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_manjiao.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_ManJiao.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-420601",
     "tiers": {
       "★": {
@@ -11931,7 +11931,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huanglang.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuangLang.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-420501",
     "tiers": {
       "★": {
@@ -11958,7 +11958,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_lizhua.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_LiZhua.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-crit-cold-resist-1star-420041",
     "tiers": {
       "★": {
@@ -11985,7 +11985,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_lizhua.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_LiZhua.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-crit-radiation-resist-1star-420101",
     "tiers": {
       "★": {
@@ -12012,7 +12012,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_lizhua.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_LiZhua.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-crit-dmg-cold-resist-1star-420031",
     "tiers": {
       "★": {
@@ -12039,7 +12039,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_lizhua.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_LiZhua.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-420151",
     "tiers": {
       "★": {
@@ -12066,7 +12066,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_lizhua.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_LiZhua.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-crit-dmg-radiation-resist-1star-420091",
     "tiers": {
       "★": {
@@ -12093,7 +12093,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_lizhua.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_LiZhua.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-420161",
     "tiers": {
       "★": {
@@ -12120,7 +12120,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huoshi.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuoShi.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-def-cold-resist-1star-420061",
     "tiers": {
       "★": {
@@ -12147,7 +12147,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huoshi.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuoShi.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-def-radiation-resist-1star-420121",
     "tiers": {
       "★": {
@@ -12174,7 +12174,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huoshi.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuoShi.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-def-scorching-heat-resist-1star-420181",
     "tiers": {
       "★": {
@@ -12201,7 +12201,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_manjiao.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_ManJiao.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-420631",
     "tiers": {
       "★": {
@@ -12228,7 +12228,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_manjiao.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_ManJiao.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-420651",
     "tiers": {
       "★": {
@@ -12255,7 +12255,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huanglang.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuangLang.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-endurance-heat-resist-1star-420521",
     "tiers": {
       "★": {
@@ -12282,7 +12282,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huanglang.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuangLang.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-endurance-radiation-resist-1star-420541",
     "tiers": {
       "★": {
@@ -12309,7 +12309,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huanglang.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuangLang.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-increased-damage-heat-resist-1star-420531",
     "tiers": {
       "★": {
@@ -12336,7 +12336,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huanglang.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuangLang.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-increased-damage-radiation-resist-1star-420551",
     "tiers": {
       "★": {
@@ -12363,7 +12363,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_manjiao.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_ManJiao.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-420611",
     "tiers": {
       "★": {
@@ -12390,7 +12390,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huanglang.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuangLang.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-420511",
     "tiers": {
       "★": {
@@ -12417,7 +12417,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_duya.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_DuYa.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-poison-cold-resist-1star-420071",
     "tiers": {
       "★": {
@@ -12444,7 +12444,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_duya.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_DuYa.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-poison-radiation-resist-1star-420141",
     "tiers": {
       "★": {
@@ -12471,7 +12471,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_duya.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_DuYa.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-poison-scorching-heat-resist-1star-420191",
     "tiers": {
       "★": {
@@ -12498,7 +12498,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_duya.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_DuYa.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-poison-dmg-immunity-cold-resist-1star-420081",
     "tiers": {
       "★": {
@@ -12525,7 +12525,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_duya.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_DuYa.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-poison-dmg-immunity-scorching-heat-resist-1star-420201",
     "tiers": {
       "★": {
@@ -12552,7 +12552,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_duya.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_DuYa.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-420021",
     "tiers": {
       "★": {
@@ -12579,7 +12579,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_duya.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_DuYa.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-420011",
     "tiers": {
       "★": {
@@ -12606,7 +12606,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_lizhua.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_LiZhua.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-400031",
     "tiers": {
       "★": {
@@ -12633,7 +12633,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huoshi.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuoShi.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-410031",
     "tiers": {
       "★": {
@@ -12660,7 +12660,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huoshi.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuoShi.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-410011",
     "tiers": {
       "★": {
@@ -12687,7 +12687,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_lizhua.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_LiZhua.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-400011",
     "tiers": {
       "★": {
@@ -12714,7 +12714,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huoshi.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuoShi.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-410021",
     "tiers": {
       "★": {
@@ -12741,7 +12741,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huoshi.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuoShi.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-resilience-cold-resist-1star-420051",
     "tiers": {
       "★": {
@@ -12768,7 +12768,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huoshi.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuoShi.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-resilience-radiation-resist-1star-420111",
     "tiers": {
       "★": {
@@ -12795,7 +12795,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_huoshi.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_HuoShi.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-resilience-scorching-heat-resist-1star-420171",
     "tiers": {
       "★": {
@@ -12822,7 +12822,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_manjiao.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_ManJiao.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-420621",
     "tiers": {
       "★": {
@@ -12849,7 +12849,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_manjiao.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_ManJiao.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "tribe-stamina-radiation-resist-1star-420641",
     "tiers": {
       "★": {
@@ -12876,7 +12876,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_xingcunzhe.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_xingcunzhe.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-100113",
     "tiers": {
       "★★": {
@@ -12895,7 +12895,7 @@
     "prereq": null,
     "icon": "icon_ng_buluo_lizhua.webp",
     "icon_url": "https://www.soulmaskdatabase.com/images/Icon_NG_BuLuo_LiZhua.png",
-    "polarity": "positive",
+    "polarity": "origin",
     "primarySlug": "talent-400021",
     "tiers": {
       "★": {

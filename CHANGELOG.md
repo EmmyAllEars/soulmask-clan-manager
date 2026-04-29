@@ -13,6 +13,31 @@ The live app is at <https://emmyallears.github.io/soulmask-clan-manager/>.
 
 ---
 
+## v1.0.1 — Origin talent fixes ([#53][], [#54][])
+
+### Fixed
+
+- **Origin talents can stack at multiple levels.** Adding e.g. *Origin - Fighting*
+  at Lv II and Lv III used to silently overwrite the first instance. The Add
+  flow now dedupes by `(name, level)` for Origin talents (matching the in-game
+  model where the same Origin can coexist at different ranks) and by `name`
+  alone for everything else, so upgrading a green-icon positive from Lv II →
+  Lv III still overwrites. ([#53][])
+- **Tribe-locked and Experience talents are now classified as Origin.** All 41
+  *Tribe -* / *Outcast -* prefixed talents and *Experience - Battle-tested*
+  used to be tagged `polarity: 'positive'`, which meant they ate slots in the
+  6-positive cap and showed up as learnable from mentors. They're born-with
+  traits — only green-icon positives are teachable. Catalog distribution shifts
+  `positive` 274 → 232 and `origin` 12 → 54 on regen. ([#54][])
+- The *Talents (N/6 positive max)* header was counting all talents instead of
+  just positives, so N would have been visibly wrong after the polarity flip.
+  Now filters by polarity to match the cap-enforcement logic.
+
+[#53]: https://github.com/EmmyAllEars/soulmask-clan-manager/issues/53
+[#54]: https://github.com/EmmyAllEars/soulmask-clan-manager/issues/54
+
+---
+
 ## v1.0.0 — Full talent catalog ([#46][])
 
 The talent catalog grew from 253 to **551 entries**, covering every Preference,

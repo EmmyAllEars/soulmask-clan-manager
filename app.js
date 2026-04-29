@@ -9,7 +9,7 @@
  */
 
 // === CONSTANTS ===
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.0.1';
 const REPO_URL = 'https://github.com/EmmyAllEars/soulmask-clan-manager';
 const STORAGE_KEY = 'soulmaskClan_v1';
 const THEME_KEY = 'soulmaskClan_theme';
@@ -724,7 +724,7 @@ function renderProfile() {
 
   // Talents
   html += `<div class="card full-row">
-    <h3>Talents (${(t.talents||[]).length}/6 positive max)</h3>
+    <h3>Talents (${(t.talents||[]).filter(tt => state.talents.find(x => x.name === tt.name)?.polarity === 'positive').length}/6 positive max)</h3>
     <div class="talents-grid" id="talents-grid"></div>
     <div class="add-talent-row">
       <input id="talent-input" type="text" placeholder="Search talent name…" autocomplete="off">
@@ -889,8 +889,13 @@ async function onConfirmAddTalent(id) {
     }
   }
   if (!t.talents) t.talents = [];
-  // Replace existing if same name
-  const existing = t.talents.findIndex(tt => tt.name === name);
+  // Replace existing if same name. Origin talents can coexist at multiple
+  // levels (the in-game model allows this), so for those we dedupe by
+  // (name, level) instead of by name alone.
+  const isOrigin = meta.polarity === 'origin';
+  const existing = t.talents.findIndex(tt =>
+    tt.name === name && (!isOrigin || tt.level === level)
+  );
   const entry = { name, level, icon: meta.icon };
   if (existing >= 0) t.talents[existing] = entry;
   else t.talents.push(entry);
