@@ -9,7 +9,7 @@
  */
 
 // === CONSTANTS ===
-const APP_VERSION = '1.0.1';
+const APP_VERSION = '1.0.2';
 const REPO_URL = 'https://github.com/EmmyAllEars/soulmask-clan-manager';
 const STORAGE_KEY = 'soulmaskClan_v1';
 const THEME_KEY = 'soulmaskClan_theme';

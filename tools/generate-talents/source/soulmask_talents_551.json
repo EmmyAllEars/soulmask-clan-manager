@@ -399,15 +399,15 @@
     "tiers": {
       "★": {
         "slug": "talent-170231",
-        "description": "[Warrior Exclusive] Hitting an enemy has a 5% chance to steal 10% of their Attack (up to 30 points), lasting 12 seconds, with a maximum of 5 stacks."
+        "description": "[Warrior Exclusive] Hitting an enemy has a 5% chance to steal 10% of their Attack (up to 20 points), lasting 12 seconds, with a maximum of 5 stacks."
       },
       "★★": {
         "slug": "talent-170232",
-        "description": "[Warrior Exclusive] Hitting an enemy has a 10% chance to steal 10% of their Attack (up to 30 points), lasting 12 seconds, with a maximum of 5 stacks."
+        "description": "[Warrior Exclusive] Hitting an enemy has a 10% chance to steal 10% of their Attack (up to 20 points), lasting 12 seconds, with a maximum of 5 stacks."
       },
       "★★★": {
         "slug": "talent-170233",
-        "description": "[Warrior Exclusive] Hitting an enemy has a 15% chance to steal 10% of their Attack (up to 30 points), lasting 12 seconds, with a maximum of 5 stacks."
+        "description": "[Warrior Exclusive] Hitting an enemy has a 15% chance to steal 10% of their Attack (up to 20 points), lasting 12 seconds, with a maximum of 5 stacks."
       }
     }
   },
@@ -441,15 +441,15 @@
     "tiers": {
       "★": {
         "slug": "talent-170321",
-        "description": "Hitting an enemy has a 5% chance to convert 50% of the character&#x27;s total Defense into Attack for 12 seconds.(Cooldown: 60 seconds)"
+        "description": "Hitting an enemy has a 5% chance to convert half of the character&#x27;s current Defense into Attack at a 50% rate (capped at 150 points) for 12 seconds. (Cooldown: 60 seconds)"
       },
       "★★": {
         "slug": "talent-170322",
-        "description": "Hitting an enemy has a 10% chance to convert 50% of the character&#x27;s total Defense into Attack for 12 seconds.(Cooldown: 45 seconds)"
+        "description": "Hitting an enemy has a 10% chance to convert half of the character&#x27;s current Defense into Attack at a 50% rate (capped at 150 points) for 12 seconds. (Cooldown: 45 seconds)"
       },
       "★★★": {
         "slug": "talent-170323",
-        "description": "Hitting an enemy has a 15% chance to convert 50% of the character&#x27;s total Defense into Attack for 12 seconds.(Cooldown: 30 seconds)"
+        "description": "Hitting an enemy has a 15% chance to convert half of the character&#x27;s current Defense into Attack at a 50% rate (capped at 150 points) for 12 seconds. (Cooldown: 30 seconds)"
       }
     }
   },
@@ -462,15 +462,15 @@
     "tiers": {
       "★": {
         "slug": "talent-170431",
-        "description": "When defending against enemy attacks, a 10% chance to convert half of the user&#x27;s Attack into Defense at 200% conversation rate for 12 seconds.(Cooldown: 60 seconds)"
+        "description": "When defending against enemy attacks, a 10% chance to convert half of the user&#x27;s current Attack into Defense at a 200% conversion rate (capped at 300 points) for 12 seconds. (Cooldown: 60 seconds)"
       },
       "★★": {
         "slug": "talent-170432",
-        "description": "When defending against enemy attacks, a 15% chance to convert half of the user&#x27;s Attack into Defense at 200% conversation rate for 12 seconds.(Cooldown: 45 seconds)"
+        "description": "When defending against enemy attacks, a 15% chance to convert half of the user&#x27;s current Attack into Defense at a 200% conversion rate (capped at 300 points) for 12 seconds. (Cooldown: 45 seconds)"
       },
       "★★★": {
         "slug": "talent-170433",
-        "description": "When defending against enemy attacks, a 20% chance to convert half of the user&#x27;s Attack into Defense at 200% conversation rate for 12 seconds.(Cooldown: 30 seconds)"
+        "description": "When defending against enemy attacks, a 20% chance to convert half of the user&#x27;s current Attack into Defense at a 200% conversion rate (capped at 300 points) for 12 seconds. (Cooldown: 30 seconds)"
       }
     }
   },
@@ -483,15 +483,15 @@
     "tiers": {
       "★": {
         "slug": "talent-170291",
-        "description": "Hitting the target has a 10% chance to boost the user&#x27;s lower stat between Attack and Defense, up to a maximum of 20% boost, lasting 12 seconds. (Cooldown: 60 seconds)"
+        "description": "Hitting the target has a 10% chance to increase the lower of the user&#x27;s Attack or Defense (capped at 100 points), lasting 12 seconds. (Cooldown: 60 seconds)"
       },
       "★★": {
         "slug": "talent-170292",
-        "description": "Hitting the target has a 15% chance to boost the user&#x27;s lower stat between Attack and Defense, up to a maximum of 20% boost, lasting 12 seconds. (Cooldown: 45 seconds)"
+        "description": "Hitting the target has a 15% chance to increase the lower of the user&#x27;s Attack or Defense (capped at 100 points), lasting 12 seconds. (Cooldown: 45 seconds)"
       },
       "★★★": {
         "slug": "talent-170293",
-        "description": "Hitting the target has a 20% chance to boost the user&#x27;s lower stat between Attack and Defense, up to a maximum of 20% boost, lasting 12 seconds. (Cooldown: 30 seconds)"
+        "description": "Hitting the target has a 20% chance to increase the lower of the user&#x27;s Attack or Defense (capped at 100 points), lasting 12 seconds. (Cooldown: 30 seconds)"
       }
     }
   },
@@ -504,15 +504,15 @@
     "tiers": {
       "★": {
         "slug": "talent-170401",
-        "description": "When defending against enemy attacks, a 15% chance to boost the user&#x27;s lower stat between Attack and Defense by 20% of the higher stat&#x27;s value, lasting 12 seconds. (Cooldown: 60 seconds)"
+        "description": "When defending against enemy attacks, a 15% chance to increase the lower of the user&#x27;s Attack or Defense (capped at 100 points), lasting 12 seconds. (Cooldown: 60 seconds)"
       },
       "★★": {
         "slug": "talent-170402",
-        "description": "When defending against enemy attacks, a 20% chance to boost the user&#x27;s lower stat between Attack and Defense by 20% of the higher stat&#x27;s value, lasting 12 seconds. (Cooldown: 45 seconds)"
+        "description": "When defending against enemy attacks, a 20% chance to increase the lower of the user&#x27;s Attack or Defense (capped at 100 points), lasting 12 seconds. (Cooldown: 45 seconds)"
       },
       "★★★": {
         "slug": "talent-170403",
-        "description": "When defending against enemy attacks, a 25% chance to boost the user&#x27;s lower stat between Attack and Defense by 20% of the higher stat&#x27;s value, lasting 12 seconds. (Cooldown: 30 seconds)"
+        "description": "When defending against enemy attacks, a 25% chance to increase the lower of the user&#x27;s Attack or Defense (capped at 100 points), lasting 12 seconds. (Cooldown: 30 seconds)"
       }
     }
   },
@@ -1505,15 +1505,15 @@
     "tiers": {
       "★": {
         "slug": "talent-170101",
-        "description": "When attacked, a 15% chance to sacrifice 10% of Max HP to gain a 10% Attack Power boost for 12 seconds. (CD: 30 seconds)"
+        "description": "When attacking, a 15% chance to sacrifice 10% of Max HP to gain a 10% Attack Power boost (capped at 50 points) for 12 seconds. (CD: 30 seconds)"
       },
       "★★": {
         "slug": "talent-170102",
-        "description": "When attacked, a 20% chance to sacrifice 30% of Max HP to gain a 30% Attack Power boost for 12 seconds. (CD: 30 seconds)"
+        "description": "When attacking, a 20% chance to sacrifice 30% of Max HP to gain a 30% Attack Power boost (capped at 100 points) for 12 seconds. (CD: 30 seconds)"
       },
       "★★★": {
         "slug": "talent-170103",
-        "description": "When attacked, a 25% chance to sacrifice 50% of Max HP to gain a 50% Attack Power boost for 12 seconds. (CD: 30 seconds)"
+        "description": "When attacking, a 25% chance to sacrifice 50% of Max HP to gain a 50% Attack Power boost (capped at 150 points) for 12 seconds. (CD: 30 seconds)"
       }
     }
   },
@@ -7203,15 +7203,15 @@
     "tiers": {
       "★": {
         "slug": "talent-170171",
-        "description": "Enters a 5-second Rampage state when Ignited, Poisoned, or Bleeding: +20% Attack Speed and Movement SPD, 20% of DMG dealt is converted to HP Recovery, and becomes immune to most Slow effects. (CD: 60 seconds)"
+        "description": "Enters a 5-second Rampage state when Ignited, Poisoned, or Bleeding: +20% Attack Speed and Movement SPD, 20% chance to convert 25% of DMG dealt into HP Recovery, and becomes immune to most Slow effects. (CD: 60 seconds)"
       },
       "★★": {
         "slug": "talent-170172",
-        "description": "Enters a 10-second Rampage state when Ignited, Poisoned, or Bleeding: +20% Attack Speed and Movement SPD, 20% of DMG dealt is converted to HP Recovery, and becomes immune to most Slow effects. (CD: 45 seconds)"
+        "description": "Enters a 10-second Rampage state when Ignited, Poisoned, or Bleeding: +20% Attack Speed and Movement SPD, 20% chance to convert 25% of DMG dealt into HP Recovery, and becomes immune to most Slow effects. (CD: 45 seconds)"
       },
       "★★★": {
         "slug": "talent-170173",
-        "description": "Enters a 15-second Rampage state when Ignited, Poisoned, or Bleeding: +20% Attack Speed and Movement SPD, 20% of DMG dealt is converted to HP Recovery, and becomes immune to most Slow effects. (CD: 30 seconds)"
+        "description": "Enters a 15-second Rampage state when Ignited, Poisoned, or Bleeding: +20% Attack Speed and Movement SPD, 20% chance to convert 25% of DMG dealt into HP Recovery, and becomes immune to most Slow effects. (CD: 30 seconds)"
       }
     }
   },
@@ -7476,15 +7476,15 @@
     "tiers": {
       "★": {
         "slug": "talent-170641",
-        "description": "Enters a 10-second Rampage state upon reaching full HP or recovering from Near-Death, increasing Attack Speed and Movement Speed by 20%, converting 20% of damage dealt to the target into HP recovery, and gaining immunity to most Slow effects. (Cooldown: 60 seconds)"
+        "description": "Enters a 10-second Rampage state upon reaching full HP or recovering from Near-Death, increasing Attack Speed and Movement Speed by 20%, with a 20% chance to convert 25% of damage dealt to the target into HP recovery, and gaining immunity to most Slow effects. (Cooldown: 60 seconds)"
       },
       "★★": {
         "slug": "talent-170642",
-        "description": "Enters a 10-second Rampage state upon reaching full HP or recovering from Near-Death, increasing Attack Speed and Movement Speed by 20%, converting 20% of damage dealt to the target into HP recovery, and gaining immunity to most Slow effects. (Cooldown: 45 seconds)"
+        "description": "Enters a 10-second Rampage state upon reaching full HP or recovering from Near-Death, increasing Attack Speed and Movement Speed by 20%, with a 20% chance to convert 25% of damage dealt to the target into HP recovery, and gaining immunity to most Slow effects. (Cooldown: 45 seconds)"
       },
       "★★★": {
         "slug": "talent-170643",
-        "description": "Enters a 10-second Rampage state upon reaching full HP or recovering from Near-Death, increasing Attack Speed and Movement Speed by 20%, converting 20% of damage dealt to the target into HP recovery, and gaining immunity to most Slow effects. (Cooldown: 30 seconds)"
+        "description": "Enters a 10-second Rampage state upon reaching full HP or recovering from Near-Death, increasing Attack Speed and Movement Speed by 20%, with a 20% chance to convert 25% of damage dealt to the target into HP recovery, and gaining immunity to most Slow effects. (Cooldown: 30 seconds)"
       }
     }
   },

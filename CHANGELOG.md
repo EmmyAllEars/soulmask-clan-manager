@@ -13,6 +13,37 @@ The live app is at <https://emmyallears.github.io/soulmask-clan-manager/>.
 
 ---
 
+## v1.0.2 — Patch-note talent updates ([#57][])
+
+### Changed
+
+- **Bloodfury Pursuit** now triggers on dealing damage instead of taking damage,
+  and the +Attack Power gain is capped at 50/100/150 points per tier. (Was: any
+  Attack Power gain, with no cap.)
+- **Rampage** lifesteal flips from a flat *20% of damage dealt → HP* to a
+  *20% chance to convert 25% of damage dealt → HP*. Same change applied to
+  **Resurgence**.
+- **Attack Steal** per-stack Attack cap reduced from 30 points to 20 points.
+- **Attack-Defense Resonance — Attack** and **— Defense** rephrased: each now
+  *increases the lower of the user's Attack or Defense, capped at 100 points*
+  (replacing the old "20% of higher stat" / "max 20% boost" wording).
+- **Attack-Defense Alteration — Attack** now converts *half of current Defense*
+  into Attack at a 50% rate, capped at 150 points (was: 50% of total Defense,
+  no cap).
+- **Attack-Defense Alteration — Defense** picks up a 300-point cap on the
+  Attack→Defense conversion. (Behaviour was already "half of current Attack at
+  200% rate"; only the cap is new.) Stale "conversation rate" → "conversion
+  rate" typo fixed at the same time.
+
+All eight entries flow from `tools/generate-talents/source/soulmask_talents_551.json`
+(per-tier descriptions) and `source/curated_overrides.json` (rolled-effect
+strings for Bloodfury / Rampage / Resurgence). Run
+`node tools/generate-talents/build.mjs` to regenerate `data/talents.json`.
+
+[#57]: https://github.com/EmmyAllEars/soulmask-clan-manager/issues/57
+
+---
+
 ## v1.0.1 — Origin talent fixes ([#53][], [#54][])
 
 ### Fixed
